@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import TagSystem from '../TagSystem'
 
@@ -176,15 +176,13 @@ describe('TagSystem', () => {
       expect(screen.getByText('react-native')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByText('react-native'))
+    const suggestion = screen.getByText('react-native')
+    await user.click(suggestion)
 
-    await waitFor(() => {
-      expect(mockOnTagsChange).toHaveBeenCalledWith(['react-native'])
-    })
+    expect(mockOnTagsChange).toHaveBeenCalledWith(['react-native'])
   })
 
-  it('limits maximum number of tags', async () => {
-    const user = userEvent.setup()
+  it('limits maximum number of tags', () => {
     const maxTags = 3
     
     render(
