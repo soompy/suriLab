@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import PostCard from './PostCard'
+import PostList from './PostList'
 import CategoryFilter from './CategoryFilter'
 import ProfileBox from './ProfileBox'
 import PopularPosts from './PopularPosts'
@@ -161,36 +161,14 @@ export default function BlogMainPage({ posts, onPostClick }: BlogMainPageProps) 
         />
       </div>
 
-      {/* Posts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPosts.length === 0 ? (
-          <div className="col-span-full text-center py-16">
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
-              No posts found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Try adjusting your search criteria.
-            </p>
-          </div>
-        ) : (
-          filteredPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onClick={() => onPostClick(post)}
-            />
-          ))
-        )}
-      </div>
-
-      {/* Load More */}
-      {filteredPosts.length > 0 && (
-        <div className="text-center mt-12">
-          <button className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-            Load more posts
-          </button>
-        </div>
-      )}
+      {/* Posts List with Pagination */}
+      <PostList
+        posts={filteredPosts}
+        onPostClick={onPostClick}
+        itemsPerPage={6}
+        showPagination={true}
+        layout="grid"
+      />
     </div>
   )
 }
