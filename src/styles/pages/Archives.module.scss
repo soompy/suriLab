@@ -1,0 +1,94 @@
+// Archives Page Styles
+.container {
+  @apply min-h-screen bg-white dark:bg-gray-950 transition-colors;
+}
+
+.main {
+  @apply max-w-[1400px] mx-auto px-4 md:px-6 py-12;
+}
+
+.content {
+  @apply max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-8;
+}
+
+.title {
+  @apply text-4xl font-bold text-gray-900 dark:text-white mb-8;
+}
+
+.archiveSection {
+  @apply space-y-8;
+  
+  .yearSection {
+    .yearTitle {
+      @apply text-2xl font-bold text-gray-900 dark:text-white mb-4;
+    }
+    
+    .postsList {
+      @apply space-y-4;
+      
+      .postItem {
+        @apply flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer;
+        
+        .date {
+          @apply text-sm text-gray-500 dark:text-gray-400 font-mono;
+        }
+        
+        .postInfo {
+          @apply flex-1;
+          
+          .postTitle {
+            @apply font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors;
+          }
+          
+          .tags {
+            @apply flex gap-2 mt-1;
+            
+            .tag {
+              @apply text-xs text-gray-500 dark:text-gray-400;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.statisticsSection {
+  @apply border-t border-gray-200 dark:border-gray-700 pt-8;
+  
+  .statsTitle {
+    @apply text-lg font-bold text-gray-900 dark:text-white mb-4;
+  }
+  
+  .statsGrid {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+    
+    .statItem {
+      @apply text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg;
+      
+      .value {
+        @apply text-2xl font-bold;
+        
+        &.blue {
+          @apply text-blue-600 dark:text-blue-400;
+        }
+        
+        &.green {
+          @apply text-green-600 dark:text-green-400;
+        }
+        
+        &.purple {
+          @apply text-purple-600 dark:text-purple-400;
+        }
+        
+        &.orange {
+          @apply text-orange-600 dark:text-orange-400;
+        }
+      }
+      
+      .label {
+        @apply text-sm text-gray-600 dark:text-gray-400;
+      }
+    }
+  }
+}

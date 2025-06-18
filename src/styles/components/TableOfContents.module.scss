@@ -1,0 +1,98 @@
+// TableOfContents Component Styles
+.container {
+  @apply sticky top-20;
+}
+
+.tocCard {
+  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm overflow-hidden;
+}
+
+.header {
+  @apply flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800;
+  
+  .title {
+    @apply font-semibold text-gray-900 dark:text-white text-sm;
+  }
+  
+  .toggleButton {
+    @apply text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors;
+    
+    svg {
+      @apply w-4 h-4 transition-transform;
+      
+      &.collapsed {
+        @apply rotate-180;
+      }
+    }
+  }
+}
+
+.navigation {
+  @apply p-4;
+  
+  .list {
+    @apply space-y-1;
+  }
+  
+  .listItem {
+    .button {
+      @apply w-full text-left transition-colors duration-200 rounded px-2 py-1.5 text-sm;
+      
+      &.active {
+        @apply text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 font-medium;
+      }
+      
+      &.inactive {
+        @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800;
+      }
+      
+      .content {
+        @apply flex items-start gap-2;
+        
+        .number {
+          @apply text-xs text-gray-400 dark:text-gray-500 mt-0.5 font-mono;
+        }
+        
+        .text {
+          @apply flex-1 leading-relaxed;
+        }
+      }
+    }
+  }
+}
+
+.progressBar {
+  @apply h-1 bg-gray-100 dark:bg-gray-800;
+  
+  .progress {
+    @apply h-full bg-blue-500 transition-all duration-300 ease-out;
+  }
+}
+
+.miniToc {
+  @apply lg:hidden mt-4;
+  
+  .miniContainer {
+    @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-3;
+    
+    .miniContent {
+      @apply flex items-center gap-2;
+      
+      .label {
+        @apply text-xs font-medium text-gray-500 dark:text-gray-400;
+      }
+      
+      .progressTrack {
+        @apply flex-1 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden;
+        
+        .progressFill {
+          @apply h-full bg-blue-500 transition-all duration-300;
+        }
+      }
+      
+      .counter {
+        @apply text-xs text-gray-500 dark:text-gray-400;
+      }
+    }
+  }
+}

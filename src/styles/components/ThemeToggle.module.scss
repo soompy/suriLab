@@ -1,0 +1,37 @@
+// ThemeToggle Component Styles
+.container {
+  @apply relative;
+}
+
+.button {
+  @apply p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800;
+  
+  &:focus {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+  }
+}
+
+.icon {
+  @apply w-5 h-5 text-gray-600 dark:text-gray-400 transition-colors;
+  
+  &.light {
+    @apply text-yellow-500;
+  }
+  
+  &.dark {
+    @apply text-gray-300;
+  }
+}
+
+.tooltip {
+  @apply absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs rounded whitespace-nowrap opacity-0 transition-opacity pointer-events-none;
+  
+  &.visible {
+    @apply opacity-100;
+  }
+  
+  &::after {
+    content: '';
+    @apply absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700;
+  }
+}

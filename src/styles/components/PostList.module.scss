@@ -1,0 +1,84 @@
+// PostList Component Styles
+.container {
+  @apply w-full;
+}
+
+.emptyState {
+  @apply text-center py-16;
+  
+  .emptyIcon {
+    @apply text-gray-400 dark:text-gray-600 text-6xl mb-4;
+  }
+  
+  .emptyTitle {
+    @apply text-xl font-medium text-gray-900 dark:text-white mb-2;
+  }
+  
+  .emptyDescription {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+}
+
+.grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.list {
+  @apply space-y-6;
+  
+  .listItem {
+    @apply max-w-4xl mx-auto;
+  }
+}
+
+.loadMoreSection {
+  @apply text-center mt-12;
+  
+  .loadMoreButton {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+  }
+}
+
+.pagination {
+  @apply flex items-center justify-center mt-12 space-x-2;
+  
+  .paginationButton {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+    
+    &.active {
+      @apply bg-blue-600 text-white;
+    }
+    
+    &.inactive {
+      @apply bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800;
+    }
+    
+    &.disabled {
+      @apply bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600;
+    }
+  }
+  
+  .pageNumbers {
+    @apply flex space-x-1;
+  }
+  
+  .pageNumber {
+    @apply w-10 h-10 rounded-lg font-medium transition-colors;
+    
+    &.current {
+      @apply bg-blue-600 text-white;
+    }
+    
+    &.ellipsis {
+      @apply text-gray-400 cursor-default dark:text-gray-600;
+    }
+    
+    &.normal {
+      @apply bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800;
+    }
+  }
+}
+
+.paginationInfo {
+  @apply text-center mt-6 text-sm text-gray-600 dark:text-gray-400;
+}

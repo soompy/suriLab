@@ -1,0 +1,48 @@
+// Projects Page Styles
+.container {
+  @apply min-h-screen bg-white dark:bg-gray-950 transition-colors;
+}
+
+.main {
+  @apply max-w-[1400px] mx-auto px-4 md:px-6 py-12;
+}
+
+.title {
+  @apply text-4xl font-bold text-gray-900 dark:text-white mb-8;
+}
+
+.grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.projectCard {
+  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow;
+  
+  .projectTitle {
+    @apply text-xl font-bold text-gray-900 dark:text-white mb-3;
+  }
+  
+  .projectDescription {
+    @apply text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed;
+  }
+  
+  .techStack {
+    @apply flex flex-wrap gap-2 mb-4;
+    
+    .techTag {
+      @apply px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full;
+    }
+  }
+  
+  .projectLinks {
+    @apply flex gap-3;
+    
+    .githubLink {
+      @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 text-sm;
+    }
+    
+    .demoLink {
+      @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm;
+    }
+  }
+}

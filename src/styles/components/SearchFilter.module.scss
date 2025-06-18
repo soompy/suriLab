@@ -1,0 +1,72 @@
+// SearchFilter Component Styles
+.container {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6;
+}
+
+.grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.searchInput {
+  @apply relative;
+  
+  .input {
+    @apply w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white;
+  }
+  
+  .searchIcon {
+    @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none;
+    
+    svg {
+      @apply h-5 w-5 text-gray-400;
+    }
+  }
+  
+  .clearButton {
+    @apply absolute inset-y-0 right-0 pr-3 flex items-center;
+    
+    svg {
+      @apply h-5 w-5 text-gray-400 hover:text-gray-600;
+    }
+  }
+}
+
+.select {
+  @apply w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white;
+}
+
+.resultsSummary {
+  @apply mt-4 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400;
+  
+  .clearFiltersButton {
+    @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium;
+  }
+}
+
+.activeFilters {
+  @apply mt-3 flex flex-wrap gap-2;
+  
+  .filterTag {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    
+    &.search {
+      @apply bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200;
+    }
+    
+    &.tag {
+      @apply bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200;
+    }
+    
+    .removeButton {
+      @apply ml-2;
+      
+      &.search {
+        @apply text-blue-600 dark:text-blue-400 hover:text-blue-800;
+      }
+      
+      &.tag {
+        @apply text-green-600 dark:text-green-400 hover:text-green-800;
+      }
+    }
+  }
+}

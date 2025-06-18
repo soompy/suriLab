@@ -1,0 +1,76 @@
+// Write Page Styles
+.container {
+  @apply min-h-screen bg-white dark:bg-gray-950 transition-colors;
+}
+
+.main {
+  @apply max-w-[1400px] mx-auto px-4 md:px-6 py-12;
+}
+
+.grid {
+  @apply grid grid-cols-1 lg:grid-cols-4 gap-8;
+}
+
+.editorSection {
+  @apply lg:col-span-3;
+  
+  .editorContainer {
+    @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm overflow-hidden;
+    
+    .editor {
+      @apply h-[600px];
+    }
+  }
+}
+
+.sidebar {
+  @apply space-y-6;
+  
+  .sidebarCard {
+    @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6;
+    
+    .cardTitle {
+      @apply text-sm font-semibold text-gray-900 dark:text-white mb-4;
+    }
+  }
+  
+  .publishCard {
+    .statusSection {
+      @apply space-y-4;
+      
+      .formGroup {
+        .label {
+          @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+        }
+        
+        .select {
+          @apply w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        }
+      }
+      
+      .publishButton {
+        @apply w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium;
+      }
+    }
+  }
+  
+  .statsCard {
+    @apply bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg p-6;
+    
+    .statsList {
+      @apply space-y-2 text-sm;
+      
+      .statItem {
+        @apply flex justify-between;
+        
+        .label {
+          @apply text-gray-600 dark:text-gray-400;
+        }
+        
+        .value {
+          @apply font-mono text-gray-900 dark:text-white;
+        }
+      }
+    }
+  }
+}

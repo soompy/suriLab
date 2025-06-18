@@ -1,0 +1,40 @@
+// TagSystem Component Styles
+.container {
+  @apply space-y-3;
+}
+
+.inputContainer {
+  @apply relative;
+  
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+}
+
+.tagsList {
+  @apply flex flex-wrap gap-2;
+  
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded-full font-medium;
+    
+    .removeButton {
+      @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer;
+    }
+  }
+}
+
+.suggestions {
+  @apply absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-40 overflow-y-auto;
+  
+  .suggestionItem {
+    @apply px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white;
+    
+    &.highlighted {
+      @apply bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200;
+    }
+  }
+}
+
+.maxTagsWarning {
+  @apply text-xs text-amber-600 dark:text-amber-400;
+}

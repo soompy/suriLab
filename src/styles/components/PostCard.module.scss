@@ -1,0 +1,64 @@
+// PostCard Component Styles
+.card {
+  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer;
+  
+  &:hover {
+    @apply transform hover:scale-[1.02];
+  }
+}
+
+.imageContainer {
+  @apply relative h-40 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 overflow-hidden;
+  
+  .image {
+    @apply object-cover group-hover:scale-105 transition-transform duration-300;
+  }
+  
+  .placeholder {
+    @apply w-full h-full flex items-center justify-center;
+    
+    .placeholderText {
+      @apply text-blue-600 dark:text-blue-400 text-3xl font-bold;
+    }
+  }
+  
+  .readTimeBadge {
+    @apply absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full font-medium;
+  }
+}
+
+.content {
+  @apply p-6;
+  
+  .tags {
+    @apply flex flex-wrap gap-2 mb-4;
+    
+    .tag {
+      @apply px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full font-medium;
+    }
+    
+    .moreTag {
+      @apply px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs rounded-full;
+    }
+  }
+  
+  .title {
+    @apply text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors;
+  }
+  
+  .summary {
+    @apply text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4 line-clamp-3;
+  }
+  
+  .meta {
+    @apply flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700;
+    
+    .metaInfo {
+      @apply flex items-center gap-4;
+    }
+    
+    .views {
+      // 뷰 수 스타일
+    }
+  }
+}
