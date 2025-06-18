@@ -140,135 +140,57 @@ export default function BlogMainPage({ posts, onPostClick }: BlogMainPageProps) 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white py-16 mb-8">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              개발 블로그
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              최신 웹 개발 기술과 경험을 공유합니다
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-600 font-semibold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors">
-                최신 포스트 보기
-              </button>
-              <button className="border-2 border-white text-white font-semibold py-3 px-8 rounded-full hover:bg-white hover:text-blue-600 transition-colors">
-                구독하기
-              </button>
-            </div>
-          </div>
+    <div className="">
+      {/* Clean Hero Section */}
+      <section className="py-16 mb-12">
+        <div className="text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Latest Posts
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Thoughts on software development, technology, and building things.
+          </p>
         </div>
       </section>
 
-      <div className="container mx-auto px-4">
-        {/* Search Filter */}
-        <div className="mb-8">
-          <SearchFilter
-            posts={enhancedPosts}
-            onFilter={setFilteredPosts}
-          />
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Sidebar - Categories */}
-          <aside className="lg:col-span-3 space-y-6">
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategorySelect={handleCategoryFilter}
-            />
-            
-            {/* Mobile: Hide on small screens */}
-            <div className="hidden lg:block">
-              <ProfileBox
-                author={authorProfile}
-                stats={authorStats}
-              />
-            </div>
-          </aside>
-
-          {/* Main Content - Posts */}
-          <main className="lg:col-span-6">
-            {filteredPosts.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-gray-400 dark:text-gray-500 mb-4">
-                  <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
-                  검색 결과가 없습니다
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  다른 키워드로 검색해보세요.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-6">
-                {filteredPosts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => onPostClick(post)}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Load More Button */}
-            {filteredPosts.length > 0 && (
-              <div className="text-center mt-12">
-                <button className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium py-3 px-8 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  더 많은 포스트 보기
-                </button>
-              </div>
-            )}
-          </main>
-
-          {/* Right Sidebar */}
-          <aside className="lg:col-span-3 space-y-6">
-            {/* Mobile: Show profile on large screens only */}
-            <div className="lg:hidden">
-              <ProfileBox
-                author={authorProfile}
-                stats={authorStats}
-              />
-            </div>
-
-            <PopularPosts
-              posts={popularPosts}
-              onPostClick={(postId) => {
-                const post = enhancedPosts.find(p => p.id === postId)
-                if (post) onPostClick(post)
-              }}
-            />
-
-            <SocialLinks links={socialLinks} />
-
-            {/* Newsletter Signup */}
-            <div className="bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg p-6 text-white">
-              <h3 className="text-lg font-semibold mb-2">뉴스레터 구독</h3>
-              <p className="text-purple-100 text-sm mb-4">
-                새로운 포스트와 개발 팁을 이메일로 받아보세요.
-              </p>
-              <div className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="이메일 주소"
-                  className="w-full px-4 py-2 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
-                />
-                <button className="w-full bg-white text-purple-600 font-medium py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors">
-                  구독하기
-                </button>
-              </div>
-            </div>
-          </aside>
-        </div>
+      {/* Search Filter */}
+      <div className="mb-8">
+        <SearchFilter
+          posts={enhancedPosts}
+          onFilter={setFilteredPosts}
+        />
       </div>
+
+      {/* Posts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPosts.length === 0 ? (
+          <div className="col-span-full text-center py-16">
+            <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
+              No posts found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Try adjusting your search criteria.
+            </p>
+          </div>
+        ) : (
+          filteredPosts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onClick={() => onPostClick(post)}
+            />
+          ))
+        )}
+      </div>
+
+      {/* Load More */}
+      {filteredPosts.length > 0 && (
+        <div className="text-center mt-12">
+          <button className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            Load more posts
+          </button>
+        </div>
+      )}
     </div>
   )
 }
