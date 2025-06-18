@@ -69,7 +69,7 @@ export default function SearchFilter({ posts, onFilter }: SearchFilterProps) {
 
   useEffect(() => {
     onFilter(filteredAndSortedPosts)
-  }, [filteredAndSortedPosts, onFilter])
+  }, [filteredAndSortedPosts]) // Remove onFilter from dependencies to prevent infinite loop
 
   const clearSearch = () => {
     setSearchTerm('')
