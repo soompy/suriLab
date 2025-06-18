@@ -30,8 +30,8 @@ export default function Contact() {
       <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
         <Header />
         
-        <main className="max-w-4xl mx-auto px-6 py-12">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-8">
+        <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-12">
+          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-8">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Contact</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
