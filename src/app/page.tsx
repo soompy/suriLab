@@ -7,6 +7,7 @@ import PostViewer from '@/components/PostViewer'
 import ThemeToggleWrapper from '@/components/ThemeToggleWrapper'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import BlogMainPage from '@/components/BlogMainPage'
+import Logo from '@/components/Logo'
 
 export default function Home() {
   const [content, setContent] = useState('# Welcome to SuriBlog\n\nStart writing your blog post here...\n\n```javascript\nfunction hello() {\n  console.log("Hello, World!")\n}\n```\n\nThis is a **bold** statement with `inline code`.')
@@ -88,72 +89,76 @@ This creates a simple DataFrame for analysis.`,
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <header className="flex items-center justify-between mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
-              SuriBlog
-            </h1>
-            
-            <div className="flex items-center gap-4">
-              <nav className="flex gap-2">
-                <button
-                  onClick={() => setCurrentView('editor')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    currentView === 'editor'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  Editor
-                </button>
-                <button
-                  onClick={() => setCurrentView('preview')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    currentView === 'preview'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  Preview
-                </button>
+      <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
+        {/* Clean Header */}
+        <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="flex items-center justify-between h-16">
+              <Logo size="md" />
+              
+              <nav className="flex items-center gap-8">
                 <button
                   onClick={() => setCurrentView('posts')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`text-sm font-medium transition-colors ${
                     currentView === 'posts'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+                      ? 'text-gray-900 dark:text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                   }`}
                 >
                   Posts
                 </button>
+                <button
+                  onClick={() => setCurrentView('editor')}
+                  className={`text-sm font-medium transition-colors ${
+                    currentView === 'editor'
+                      ? 'text-gray-900 dark:text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
+                >
+                  Write
+                </button>
+                <button
+                  onClick={() => setCurrentView('preview')}
+                  className={`text-sm font-medium transition-colors ${
+                    currentView === 'preview'
+                      ? 'text-gray-900 dark:text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
+                >
+                  Preview
+                </button>
+                <ThemeToggleWrapper />
               </nav>
-              
-              <ThemeToggleWrapper />
             </div>
-          </header>
+          </div>
+        </header>
+        
+        {/* Main Content */}
+        <main className="max-w-6xl mx-auto px-6 py-12">
 
-          {/* Content based on current view */}
+          {/* Editor View */}
           {currentView === 'editor' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-[600px]">
-                  <MarkdownEditor
-                    content={content}
-                    onSave={handleSave}
-                    onContentChange={setContent}
-                    autoSave={true}
-                    autoSaveDelay={2000}
-                  />
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <div className="lg:col-span-3">
+                {/* Clean Editor */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm overflow-hidden">
+                  <div className="h-[600px]">
+                    <MarkdownEditor
+                      content={content}
+                      onSave={handleSave}
+                      onContentChange={setContent}
+                      autoSave={true}
+                      autoSaveDelay={2000}
+                    />
+                  </div>
                 </div>
               </div>
               
+              {/* Clean Sidebar */}
               <div className="space-y-6">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-                    Tags
-                  </h2>
+                {/* Tags */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
                   <TagSystem
                     tags={tags}
                     onTagsChange={setTags}
@@ -163,56 +168,42 @@ This creates a simple DataFrame for analysis.`,
                   />
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-                    Post Settings
-                  </h2>
+                {/* Publish */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Publish</h3>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Status
                       </label>
-                      <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                      <select className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option>Draft</option>
                         <option>Published</option>
                         <option>Private</option>
                       </select>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Category
-                      </label>
-                      <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <option>Tech</option>
-                        <option>Tutorial</option>
-                        <option>Review</option>
-                        <option>News</option>
-                      </select>
-                    </div>
-                    
-                    <button className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                    <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium">
                       Publish Post
                     </button>
                   </div>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-                    Statistics
-                  </h2>
-                  <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                {/* Stats */}
+                <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Statistics</h3>
+                  <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span>Words:</span>
-                      <span>{content.split(' ').length}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Words</span>
+                      <span className="font-mono text-gray-900 dark:text-white">{content.split(' ').length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Characters:</span>
-                      <span>{content.length}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Characters</span>
+                      <span className="font-mono text-gray-900 dark:text-white">{content.length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Tags:</span>
-                      <span>{tags.length}/8</span>
+                      <span className="text-gray-600 dark:text-gray-400">Reading time</span>
+                      <span className="font-mono text-gray-900 dark:text-white">{Math.ceil(content.split(' ').length / 200)}min</span>
                     </div>
                   </div>
                 </div>
@@ -220,21 +211,27 @@ This creates a simple DataFrame for analysis.`,
             </div>
           )}
 
+          {/* Preview View */}
           {currentView === 'preview' && (
             <div className="max-w-4xl mx-auto">
-              <PostViewer
-                post={{
-                  id: 'preview',
-                  title: 'Post Preview',
-                  content: content,
-                  tags: tags,
-                  createdAt: new Date().toISOString(),
-                  author: 'You'
-                }}
-              />
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm">
+                <div className="p-8">
+                  <PostViewer
+                    post={{
+                      id: 'preview',
+                      title: 'Post Preview',
+                      content: content,
+                      tags: tags,
+                      createdAt: new Date().toISOString(),
+                      author: 'You'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           )}
 
+          {/* Posts View */}
           {currentView === 'posts' && (
             <BlogMainPage
               posts={samplePosts}
@@ -245,7 +242,7 @@ This creates a simple DataFrame for analysis.`,
               }}
             />
           )}
-        </div>
+        </main>
       </div>
     </ThemeProvider>
   )
