@@ -1,11 +1,27 @@
 'use client'
 
+import { useState } from 'react'
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Box,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
+import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import ThemeToggleWrapper from './ThemeToggleWrapper'
 
 export default function Header() {
   const pathname = usePathname()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState<null | HTMLElement>(null)
 
   const menuItems = [
     { href: '/', label: 'Posts' },
@@ -16,84 +32,137 @@ export default function Header() {
     { href: '/write', label: 'Write' }
   ]
 
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileMenuAnchor(event.currentTarget)
+  }
+
+  const handleMobileMenuClose = () => {
+    setMobileMenuAnchor(null)
+  }
+
   return (
-      <header className="bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50">
-          <div className="flex items-center justify-between max-w-[1400px] mx-auto">
-              <div className="flex items-center h-[60px] px-4 md:px-6">
-                  {/* Logo */}
-                  <Link href="/" className="flex items-center mr-8">
-                      <div className="text-xl font-bold text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-                          SuriBlog
-                      </div>
-                  </Link>
+    <AppBar position="sticky" elevation={0}>
+      <Box sx={{ maxWidth: '1300px', width: '100%', mx: 'auto', px: { xs: 2, md: 3 } }}>
+        <Toolbar sx={{ height: '56px', minHeight: '56px !important', px: '0 !important' }}>
+          {/* Logo */}
+          <Link href="/" passHref style={{ textDecoration: 'none' }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                fontWeight: 600,
+                fontSize: '1.125rem',
+                color: 'primary.main',
+                textDecoration: 'none',
+                '&:hover': {
+                  color: 'primary.dark',
+                },
+                transition: 'color 0.2s ease',
+              }}
+            >
+              SuriBlog
+            </Typography>
+          </Link>
 
-                  {/* Navigation - PC에서 왼쪽 정렬 */}
-                  <nav className="hidden md:flex items-center flex-1">
-                      <div className="flex items-center space-x-1">
-                          {menuItems.map((item) => (
-                              <Link
-                                  key={item.href}
-                                  href={item.href}
-                                  className={`relative px-4 py-2 text-[15px] font-medium transition-all duration-200 hover:scale-105 rounded-lg ${
-                                      pathname === item.href
-                                          ? "text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800"
-                                          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"
-                                  }`}
-                              >
-                                  {item.label}
-                                  {pathname === item.href && (
-                                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-900 dark:bg-white rounded-full" />
-                                  )}
-                              </Link>
-                          ))}
-                      </div>
-                  </nav>
+          {/* Desktop Navigation */}
+          {!isMobile && (
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', gap: '14px' }}>
+              {menuItems.map((item) => (
+                <Link key={item.href} href={item.href} passHref style={{ textDecoration: 'none' }}>
+                  <Button
+                    sx={{
+                      color: pathname === item.href ? 'primary.main' : 'text.secondary',
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      textTransform: 'none',
+                      minWidth: 'auto',
+                      px: 1.5,
+                      py: 1,
+                      position: 'relative',
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: 'primary.main',
+                      },
+                      '&::after': pathname === item.href ? {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: -8,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '24px',
+                        height: '2px',
+                        backgroundColor: 'primary.main',
+                      } : {},
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                </Link>
+              ))}
+            </Box>
+          )}
 
-                  {/* Theme Toggle - PC에서 오른쪽 정렬 */}
-                  <div className="hidden md:flex items-center ml-auto">
-                      <ThemeToggleWrapper />
-                  </div>
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <Box sx={{ ml: 'auto' }}>
+              <IconButton
+                size="large"
+                edge="end"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMobileMenuOpen}
+                sx={{ color: 'text.secondary' }}
+              >
+                {mobileMenuAnchor ? <CloseIcon /> : <MenuIcon />}
+              </IconButton>
+            </Box>
+          )}
 
-                  {/* Mobile Menu Button */}
-                  <div className="md:hidden flex items-center gap-3 ml-auto">
-                      <ThemeToggleWrapper />
-                      <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
-                          <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                          >
-                              <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M4 6h16M4 12h16M4 18h16"
-                              />
-                          </svg>
-                      </button>
-                  </div>
-              </div>
-
-              {/* Mobile Navigation */}
-              <div className="md:hidden dark:border-gray-800 bg-white dark:bg-gray-950">
-                  <nav className="flex px-4 py-2">
-                      {menuItems.map((item) => (
-                          <Link
-                              key={item.href}
-                              href={item.href}
-                              className={`block px-3 py-3 text-[15px] font-medium rounded-lg transition-colors ${
-                                  pathname === item.href
-                                      ? "text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800"
-                                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"
-                              }`}
-                          >
-                              {item.label}
-                          </Link>
-                      ))}
-                  </nav>
-              </div>
-          </div>
-      </header>
-  );
+          {/* Mobile Menu */}
+          <Menu
+            anchorEl={mobileMenuAnchor}
+            open={Boolean(mobileMenuAnchor)}
+            onClose={handleMobileMenuClose}
+            sx={{
+              mt: 1,
+              '& .MuiPaper-root': {
+                minWidth: '200px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e5e7eb',
+              },
+            }}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            {menuItems.map((item) => (
+              <Link key={item.href} href={item.href} passHref style={{ textDecoration: 'none' }}>
+                <MenuItem
+                  onClick={handleMobileMenuClose}
+                  sx={{
+                    color: pathname === item.href ? 'primary.main' : 'text.secondary',
+                    fontWeight: pathname === item.href ? 600 : 500,
+                    fontSize: '0.875rem',
+                    py: 1.5,
+                    px: 2,
+                    minHeight: '44px',
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                    },
+                  }}
+                >
+                  {item.label}
+                </MenuItem>
+              </Link>
+            ))}
+          </Menu>
+        </Toolbar>
+      </Box>
+    </AppBar>
+  )
 }
