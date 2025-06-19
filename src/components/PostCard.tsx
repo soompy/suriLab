@@ -1,6 +1,7 @@
 'use client'
 
-import Image from 'next/image'
+import { Card, CardMedia, CardContent, Typography, Chip, Box } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 
 interface Post {
   id: string
@@ -21,6 +22,8 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, onClick }: PostCardProps) {
+  const theme = useTheme()
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ko-KR', {
       year: 'numeric',
@@ -32,65 +35,146 @@ export default function PostCard({ post, onClick }: PostCardProps) {
   const summary = post.summary || post.content.slice(0, 120) + '...'
 
   return (
-    <article 
-      className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-200 overflow-hidden cursor-pointer group"
+    <Card 
       onClick={onClick}
+      sx={{
+        cursor: 'pointer',
+        transition: 'border 0.2s ease, background-color 0.2s ease, transform 0.2s ease',
+        border: '1px solid rgba(0, 29, 58, 0.18)',
+        borderRadius: '14px',
+        overflow: 'hidden',
+        mb: 3,
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+        },
+      }}
     >
-      {/* Minimal Image Header */}
-      <div className="relative h-40 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+      {/* Image Header */}
+      <Box sx={{ position: 'relative', height: 160 }}>
         {post.thumbnail ? (
-          <Image
-            src={post.thumbnail}
+          <CardMedia
+            component="img"
+            height="160"
+            image={post.thumbnail}
             alt={post.title}
-            fill
-            className="object-cover group-hover:scale-102 transition-transform duration-300"
+            sx={{
+              objectFit: 'cover',
+              transition: 'transform 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.02)',
+              },
+            }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-gray-400 dark:text-gray-500 text-2xl font-medium">
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.50',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                color: theme.palette.mode === 'dark' ? 'grey.500' : 'grey.400',
+                fontWeight: 500,
+              }}
+            >
               {post.title.charAt(0).toUpperCase()}
-            </div>
-          </div>
+            </Typography>
+          </Box>
         )}
         
-        {/* Minimal Category Badge */}
+        {/* Category Badge */}
         {post.tags[0] && (
-          <div className="absolute top-3 left-3 bg-white/90 dark:bg-gray-900/90 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded font-medium">
-            {post.tags[0]}
-          </div>
+          <Chip
+            label={post.tags[0]}
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 12,
+              left: 12,
+              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+              color: theme.palette.mode === 'dark' ? 'white' : 'grey.700',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+            }}
+          />
         )}
-      </div>
+      </Box>
 
-      {/* Clean Content */}
-      <div className="p-4">
+      {/* Content */}
+      <CardContent sx={{ p: 2 }}>
         {/* Title */}
-        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors duration-150 leading-snug">
+        <Typography
+          variant="h6"
+          component="h2"
+          sx={{
+            fontSize: '1rem',
+            fontWeight: 600,
+            mb: 1,
+            lineHeight: 1.4,
+            display: '-webkit-box',
+            overflow: 'hidden',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            transition: 'color 0.15s ease',
+            '&:hover': {
+              color: theme.palette.mode === 'dark' ? 'grey.300' : 'grey.600',
+            },
+          }}
+        >
           {post.title}
-        </h2>
+        </Typography>
 
         {/* Summary */}
-        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-3 line-clamp-2">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mb: 2,
+            lineHeight: 1.5,
+            display: '-webkit-box',
+            overflow: 'hidden',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+          }}
+        >
           {summary}
-        </p>
+        </Typography>
 
         {/* Meta info */}
-        <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-          <div className="flex items-center gap-2">
-            <span>{post.author}</span>
-            <span>•</span>
-            <span>{formatDate(post.createdAt)}</span>
-          </div>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              {post.author}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              •
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {formatDate(post.createdAt)}
+            </Typography>
+          </Box>
           
-          <div className="flex items-center gap-3">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             {post.readTime && (
-              <span>{post.readTime}분</span>
+              <Typography variant="caption" color="text.secondary">
+                {post.readTime}분
+              </Typography>
             )}
             {post.views && (
-              <span>{post.views.toLocaleString()}</span>
+              <Typography variant="caption" color="text.secondary">
+                {post.views.toLocaleString()}
+              </Typography>
             )}
-          </div>
-        </div>
-      </div>
-    </article>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
   )
 }
