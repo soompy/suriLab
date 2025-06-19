@@ -1,5 +1,7 @@
 'use client'
 
+import { Box, Typography, Container, Grid2 as Grid, Button } from '@mui/material'
+import { ExpandMore } from '@mui/icons-material'
 import PostCard from './PostCard'
 
 interface Post {
@@ -22,39 +24,191 @@ interface PostGridProps {
 
 export default function PostGrid({ posts, onPostClick }: PostGridProps) {
   return (
-    <section className="py-8 md:py-12">
-      <div className="max-w-[1300px] mx-auto px-4 md:px-6">
-        {/* Minimal Section Header */}
-        <div className="mb-8">
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+    <Box component="section" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="lg">
+        {/* Section Header */}
+        <Box sx={{ mb: 6 }}>
+          <Typography
+            variant="h2"
+            component="h2"
+            sx={{
+              fontSize: '27px',
+              fontWeight: 700,
+              mb: 1.5,
+              color: 'text.primary',
+            }}
+          >
             최근 포스트
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          </Typography>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ fontSize: { xs: '1rem', md: '1.125rem' } }}
+          >
             새로운 인사이트와 경험을 담은 최신 글들을 만나보세요.
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        {/* Clean Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onClick={() => onPostClick?.(post)}
-            />
-          ))}
-        </div>
+        {/* Content Categories */}
+        <Grid container spacing={6}>
+          {/* Tech Insights Section - Left Column */}
+          <Grid xs={12} lg={6}>
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="h3"
+                component="h3"
+                sx={{
+                  fontSize: { xs: '1.125rem', md: '1.25rem' },
+                  fontWeight: 600,
+                  mb: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    backgroundColor: '#3b82f6',
+                    borderRadius: '50%',
+                  }}
+                />
+                Tech Insights
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                최신 기술 동향과 깊이 있는 기술 분석
+              </Typography>
+            </Box>
+            <Box>
+              {posts
+                .filter(post => post.tags.some(tag => 
+                  ['React', 'TypeScript', 'Next.js', 'JavaScript', 'Frontend', 'WebDev'].includes(tag)
+                ))
+                .slice(0, 4)
+                .map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onClick={() => onPostClick?.(post)}
+                  />
+                ))}
+            </Box>
+          </Grid>
 
-        {/* Minimal Load More */}
-        <div className="mt-8 text-center">
-          <button className="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-150">
-            <span>더 많은 글 보기</span>
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </section>
+          {/* Right Column - Code Solutions & Developer Tips */}
+          <Grid xs={12} lg={6}>
+            {/* Code Solutions Section */}
+            <Box sx={{ mb: 4 }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography
+                  variant="h3"
+                  component="h3"
+                  sx={{
+                    fontSize: { xs: '1.125rem', md: '1.25rem' },
+                    fontWeight: 600,
+                    mb: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      backgroundColor: '#10b981',
+                      borderRadius: '50%',
+                    }}
+                  />
+                  Code Solutions
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  실무에서 사용할 수 있는 코드 솔루션과 패턴
+                </Typography>
+              </Box>
+              <Box>
+                {posts
+                  .filter(post => post.tags.some(tag => 
+                    ['Node.js', 'API', 'Backend', 'Performance', 'Optimization'].includes(tag)
+                  ))
+                  .slice(0, 2)
+                  .map((post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onClick={() => onPostClick?.(post)}
+                    />
+                  ))}
+              </Box>
+            </Box>
+
+            {/* Developer Tips Section */}
+            <Box>
+              <Box sx={{ mb: 3 }}>
+                <Typography
+                  variant="h3"
+                  component="h3"
+                  sx={{
+                    fontSize: { xs: '1.125rem', md: '1.25rem' },
+                    fontWeight: 600,
+                    mb: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      backgroundColor: '#8b5cf6',
+                      borderRadius: '50%',
+                    }}
+                  />
+                  Developer Tips
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  개발 생산성과 협업을 위한 실용적인 팁
+                </Typography>
+              </Box>
+              <Box>
+                {posts
+                  .filter(post => post.tags.some(tag => 
+                    ['Git', 'Workflow', 'Team', 'Docker', 'DevOps', 'Container', 'AWS', 'Cloud', 'Serverless'].includes(tag)
+                  ))
+                  .slice(0, 2)
+                  .map((post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onClick={() => onPostClick?.(post)}
+                    />
+                  ))}
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+
+        {/* Load More Button */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Button
+            variant="text"
+            endIcon={<ExpandMore />}
+            sx={{
+              color: 'text.secondary',
+              fontSize: '0.875rem',
+              textTransform: 'none',
+              '&:hover': {
+                color: 'text.primary',
+                backgroundColor: 'transparent',
+              },
+            }}
+          >
+            더 많은 글 보기
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   )
 }
