@@ -27,6 +27,7 @@ import {
 import { useTheme } from '@mui/material/styles'
 import Header from '@/components/Header'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
+import Footer from '@/components/Footer'
 
 export default function AboutPage() {
   const theme = useTheme()
@@ -412,6 +413,8 @@ export default function AboutPage() {
           </Box>
           </Container>
         </Box>
+        
+        <Footer />
       </div>
     </MuiThemeProvider>
   )
