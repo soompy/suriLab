@@ -29,77 +29,66 @@ export default function PostCard({ post, onClick }: PostCardProps) {
     })
   }
 
-  const summary = post.summary || post.content.slice(0, 150) + '...'
+  const summary = post.summary || post.content.slice(0, 120) + '...'
 
   return (
     <article 
-      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer group"
+      className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-200 overflow-hidden cursor-pointer group"
       onClick={onClick}
     >
-      {/* Clean Header */}
-      <div className="relative h-40 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 overflow-hidden">
+      {/* Minimal Image Header */}
+      <div className="relative h-40 bg-gray-50 dark:bg-gray-800 overflow-hidden">
         {post.thumbnail ? (
           <Image
             src={post.thumbnail}
             alt={post.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-102 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <div className="text-blue-600 dark:text-blue-400 text-3xl font-bold">
+            <div className="text-gray-400 dark:text-gray-500 text-2xl font-medium">
               {post.title.charAt(0).toUpperCase()}
             </div>
           </div>
         )}
         
-        {/* Reading time badge */}
-        {post.readTime && (
-          <div className="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full font-medium">
-            {post.readTime} min read
+        {/* Minimal Category Badge */}
+        {post.tags[0] && (
+          <div className="absolute top-3 left-3 bg-white/90 dark:bg-gray-900/90 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded font-medium">
+            {post.tags[0]}
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-6">
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {post.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full font-medium"
-            >
-              {tag}
-            </span>
-          ))}
-          {post.tags.length > 3 && (
-            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs rounded-full">
-              +{post.tags.length - 3}
-            </span>
-          )}
-        </div>
-
+      {/* Clean Content */}
+      <div className="p-4">
         {/* Title */}
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors duration-150 leading-snug">
           {post.title}
         </h2>
 
         {/* Summary */}
-        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4 line-clamp-3">
+        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-3 line-clamp-2">
           {summary}
         </p>
 
         {/* Meta info */}
-        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+          <div className="flex items-center gap-2">
             <span>{post.author}</span>
+            <span>•</span>
             <span>{formatDate(post.createdAt)}</span>
           </div>
           
-          {post.views && (
-            <span>{post.views.toLocaleString()} views</span>
-          )}
+          <div className="flex items-center gap-3">
+            {post.readTime && (
+              <span>{post.readTime}분</span>
+            )}
+            {post.views && (
+              <span>{post.views.toLocaleString()}</span>
+            )}
+          </div>
         </div>
       </div>
     </article>
