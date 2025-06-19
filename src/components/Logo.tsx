@@ -1,28 +1,52 @@
 'use client'
 
+import { Typography, Box } from '@mui/material'
+
 interface LogoProps {
-  className?: string
   size?: 'sm' | 'md' | 'lg'
 }
 
-export default function Logo({ className = '', size = 'md' }: LogoProps) {
-  const sizeClasses = {
-    sm: 'text-lg',
-    md: 'text-xl',
-    lg: 'text-2xl'
+export default function Logo({ size = 'md' }: LogoProps) {
+  const fontSize = {
+    sm: '1rem',
+    md: '1.3rem',
+    lg: '1.5rem'
   }
 
   return (
-    <div className={`flex items-center ${sizeClasses[size]} ${className}`}>
-      <span className="text-blue-600 dark:text-blue-400 font-mono font-bold mr-2">
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Typography
+        component="span"
+        sx={{
+          fontSize: fontSize[size],
+          fontFamily: 'monospace',
+          fontWeight: 700,
+          color: 'primary.main',
+          mr: 0.5,
+        }}
+      >
         &gt;_
-      </span>
-      <span className="text-gray-900 dark:text-white font-bold">
+      </Typography>
+      <Typography
+        component="span"
+        sx={{
+          fontSize: fontSize[size],
+          fontWeight: 700,
+          color: 'primary.main',
+        }}
+      >
         Suri
-      </span>
-      <span className="text-gray-600 dark:text-gray-400 font-normal">
+      </Typography>
+      <Typography
+        component="span"
+        sx={{
+          fontSize: fontSize[size],
+          fontWeight: 400,
+          color: 'text.secondary',
+        }}
+      >
         Blog
-      </span>
-    </div>
+      </Typography>
+    </Box>
   )
 }
