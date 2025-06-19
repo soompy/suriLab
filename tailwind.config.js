@@ -12,6 +12,9 @@ module.exports = {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
       },
+      scale: {
+        '102': '1.02',
+      },
     },
   },
   plugins: [],
