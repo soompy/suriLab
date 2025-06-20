@@ -62,7 +62,8 @@ export default function Write() {
         tags,
         category: formData.category,
         authorId: 'user-1',
-        featured: false
+        featured: false,
+        isPublished: false
       }
 
       const response = await fetch('/api/posts', {
@@ -96,7 +97,8 @@ export default function Write() {
         tags,
         category: formData.category,
         authorId: 'user-1',
-        featured: false
+        featured: false,
+        isPublished: true
       }
 
       const response = await fetch('/api/posts', {
