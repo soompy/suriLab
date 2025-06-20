@@ -46,7 +46,8 @@ export class InMemoryPostRepository implements PostRepository {
       authorId: 'user-1',
       readTime: 8,
       views: 1247,
-      featured: true
+      featured: true,
+      isPublished: true
     },
     {
       id: '2',
@@ -60,7 +61,8 @@ export class InMemoryPostRepository implements PostRepository {
       category: 'Tech Insights',
       authorId: 'user-1',
       readTime: 12,
-      views: 2103
+      views: 2103,
+      isPublished: true
     },
     {
       id: '3',
@@ -74,7 +76,8 @@ export class InMemoryPostRepository implements PostRepository {
       category: 'Code Solutions',
       authorId: 'user-1',
       readTime: 10,
-      views: 1856
+      views: 1856,
+      isPublished: true
     }
   ]
 
@@ -108,6 +111,9 @@ export class InMemoryPostRepository implements PostRepository {
       }
       if (filters.featured !== undefined) {
         filteredPosts = filteredPosts.filter(post => post.featured === filters.featured)
+      }
+      if (filters.isPublished !== undefined) {
+        filteredPosts = filteredPosts.filter(post => post.isPublished === filters.isPublished)
       }
     }
 
@@ -174,7 +180,8 @@ export class InMemoryPostRepository implements PostRepository {
       publishedAt: new Date(),
       updatedAt: new Date(),
       views: 0,
-      readTime: Math.ceil(input.content.split(' ').length / 200)
+      readTime: Math.ceil(input.content.split(' ').length / 200),
+      isPublished: input.isPublished ?? true
     }
 
     this.posts.push(newPost)
