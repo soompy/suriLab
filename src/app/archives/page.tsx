@@ -171,8 +171,8 @@ export default function Archives() {
   }
 
   const handlePostClick = (post: BlogPost) => {
-    console.log('Navigate to post:', post.title)
-    // 실제로는 포스트 상세 페이지로 이동
+    const slug = post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    window.location.href = `/posts/${slug}`
   }
 
   const totalViews = allPosts.reduce((sum, post) => sum + post.views, 0)
