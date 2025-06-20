@@ -7,7 +7,11 @@ export interface Post {
   publishedAt: Date
   updatedAt: Date
   tags: string[]
+  category: string
   author: User
+  readTime?: number
+  views?: number
+  featured?: boolean
 }
 
 export interface User {
