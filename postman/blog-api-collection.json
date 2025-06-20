@@ -1,0 +1,203 @@
+{
+  "info": {
+    "name": "Blog REST API",
+    "description": "블로그 포스트 관리를 위한 REST API 컬렉션",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "게시글 목록 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts?page=1&limit=10&isPublished=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "페이지 번호"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "페이지당 항목 수"
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "카테고리 필터",
+                  "disabled": true
+                },
+                {
+                  "key": "tags",
+                  "value": "",
+                  "description": "태그 필터 (콤마로 구분)",
+                  "disabled": true
+                },
+                {
+                  "key": "authorId",
+                  "value": "",
+                  "description": "작성자 필터",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "검색어",
+                  "disabled": true
+                },
+                {
+                  "key": "featured",
+                  "value": "",
+                  "description": "추천 글 필터",
+                  "disabled": true
+                },
+                {
+                  "key": "isPublished",
+                  "value": "true",
+                  "description": "공개 여부 필터"
+                },
+                {
+                  "key": "sortField",
+                  "value": "publishedAt",
+                  "description": "정렬 필드"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
+                  "description": "정렬 순서"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "게시글 상세 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "{{postId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "슬러그로 게시글 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/slug/{{slug}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "slug", "{{slug}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "게시글 생성",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"새로운 게시글\",\n  \"content\": \"# 새로운 게시글\\n\\n게시글 내용입니다.\",\n  \"excerpt\": \"게시글 요약\",\n  \"slug\": \"new-post\",\n  \"tags\": [\"Tag1\", \"Tag2\"],\n  \"category\": \"Technology\",\n  \"authorId\": \"user-1\",\n  \"featured\": false,\n  \"isPublished\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "게시글 수정",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"수정된 제목\",\n  \"content\": \"# 수정된 게시글\\n\\n수정된 내용입니다.\",\n  \"isPublished\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "{{postId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "게시글 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "{{postId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Blog Stats",
+      "item": [
+        {
+          "name": "블로그 통계 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "stats"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "postId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "slug",
+      "value": "react-hooks-guide",
+      "type": "string"
+    }
+  ]
+}
