@@ -1,109 +1,366 @@
 'use client'
 
 import { useState } from 'react'
-import { ThemeProvider } from '@/components/ThemeProvider'
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Grid,
+  TextField,
+  Button,
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Card,
+  CardContent,
+  Divider,
+  Stack,
+  IconButton,
+  Autocomplete
+} from '@mui/material'
+import {
+  Edit as EditIcon,
+  Publish as PublishIcon,
+  Save as SaveIcon,
+  Preview as PreviewIcon,
+  Tag as TagIcon,
+  Analytics as AnalyticsIcon,
+  Close as CloseIcon
+} from '@mui/icons-material'
+import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
-import MarkdownEditor from '@/components/MarkdownEditor'
-import TagSystem from '@/components/TagSystem'
+import Footer from '@/components/Footer'
 
 export default function Write() {
-  const [content, setContent] = useState('# Welcome to SuriBlog\n\nStart writing your blog post here...\n\n```javascript\nfunction hello() {\n  console.log("Hello, World!")\n}\n```\n\nThis is a **bold** statement with `inline code`.')
-  const [tags, setTags] = useState<string[]>(['react', 'javascript'])
+  const [formData, setFormData] = useState({
+    title: '',
+    summary: '',
+    content: '# 글 제목\n\n여기에 내용을 작성하세요...\n\n## 소제목\n\n본문 내용을 입력하세요.\n\n```javascript\nfunction example() {\n  console.log("코드 예제");\n}\n```',
+    category: '',
+    status: 'draft'
+  })
+  const [tags, setTags] = useState<string[]>(['React', 'JavaScript'])
+  const [isPreview, setIsPreview] = useState(false)
 
-  const handleSave = (content: string) => {
-    console.log('Saving content:', content)
-    console.log('Tags:', tags)
-    // Here you would typically save to your backend
-    alert('Post saved! (This is a demo)')
+  const handleInputChange = (field: string) => (e: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: e.target.value
+    }))
   }
 
-  const suggestions = [
-    'react', 'javascript', 'typescript', 'nextjs', 'tailwindcss',
-    'nodejs', 'python', 'web-development', 'programming', 'tutorial'
+  const handleSave = async () => {
+    try {
+      const postData = {
+        title: formData.title,
+        content: formData.content,
+        excerpt: formData.summary,
+        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        tags,
+        category: formData.category,
+        authorId: 'user-1',
+        featured: false
+      }
+
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save post')
+      }
+
+      const savedPost = await response.json()
+      console.log('Post saved:', savedPost)
+      alert('포스트가 저장되었습니다!')
+    } catch (error) {
+      console.error('Error saving post:', error)
+      alert('포스트 저장에 실패했습니다.')
+    }
+  }
+
+  const handlePublish = async () => {
+    try {
+      const postData = {
+        title: formData.title,
+        content: formData.content,
+        excerpt: formData.summary,
+        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        tags,
+        category: formData.category,
+        authorId: 'user-1',
+        featured: false
+      }
+
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to publish post')
+      }
+
+      const publishedPost = await response.json()
+      console.log('Post published:', publishedPost)
+      alert('포스트가 발행되었습니다!')
+      
+      // Reset form
+      setFormData({
+        title: '',
+        summary: '',
+        content: '# 글 제목\n\n여기에 내용을 작성하세요...\n\n## 소제목\n\n본문 내용을 입력하세요.\n\n```javascript\nfunction example() {\n  console.log("코드 예제");\n}\n```',
+        category: '',
+        status: 'draft'
+      })
+      setTags([])
+    } catch (error) {
+      console.error('Error publishing post:', error)
+      alert('포스트 발행에 실패했습니다.')
+    }
+  }
+
+  const tagSuggestions = [
+    'React', 'JavaScript', 'TypeScript', 'Next.js', 'Vue.js', 
+    'Node.js', 'Python', 'CSS', 'HTML', 'Web Development',
+    'Frontend', 'Backend', 'Tutorial', 'Guide', 'Tips'
   ]
 
+  const categories = ['기술', '튜토리얼', '리뷰', '일기', '기타']
+
+  const wordCount = formData.content.split(' ').length
+  const charCount = formData.content.length
+  const readingTime = Math.ceil(wordCount / 200)
+
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
+    <MuiThemeProvider>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         <Header />
         
-        <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              {/* Clean Editor */}
-              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm overflow-hidden">
-                <div className="h-[600px]">
-                  <MarkdownEditor
-                    content={content}
-                    onSave={handleSave}
-                    onContentChange={setContent}
-                    autoSave={true}
-                    autoSaveDelay={2000}
+        <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, py: 6 }}>
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Typography variant="h2" component="h1" gutterBottom>
+              새 글 작성
+            </Typography>
+            <Typography variant="h6" color="text.secondary">
+              새로운 아이디어와 경험을 공유해보세요
+            </Typography>
+          </Box>
+
+          <Grid container spacing={4}>
+            {/* Main Editor Section */}
+            <Grid item xs={12} lg={8}>
+              <Paper sx={{ p: 4, boxShadow: 'none' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <EditIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
+                  <Typography variant="h5" component="h2">
+                    글 작성
+                  </Typography>
+                  <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
+                    <Button
+                      variant={isPreview ? 'contained' : 'outlined'}
+                      size="small"
+                      startIcon={<PreviewIcon />}
+                      onClick={() => setIsPreview(!isPreview)}
+                    >
+                      {isPreview ? '에디터' : '미리보기'}
+                    </Button>
+                  </Box>
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="제목"
+                    value={formData.title}
+                    onChange={handleInputChange('title')}
+                    placeholder="포스트 제목을 입력하세요"
+                    variant="outlined"
+                    required
                   />
-                </div>
-              </div>
-            </div>
-            
-            {/* Clean Sidebar */}
-            <div className="space-y-6">
-              {/* Tags */}
-              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
-                <TagSystem
-                  tags={tags}
-                  onTagsChange={setTags}
-                  suggestions={suggestions}
-                  maxTags={8}
-                  placeholder="Add tags..."
-                />
-              </div>
-              
-              {/* Publish */}
-              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Publish</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Status
-                    </label>
-                    <select className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option>Draft</option>
-                      <option>Published</option>
-                      <option>Private</option>
-                    </select>
-                  </div>
-                  
-                  <button 
-                    onClick={() => handleSave(content)}
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-                  >
-                    Publish Post
-                  </button>
-                </div>
-              </div>
-              
-              {/* Stats */}
-              <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Statistics</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Words</span>
-                    <span className="font-mono text-gray-900 dark:text-white">{content.split(' ').length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Characters</span>
-                    <span className="font-mono text-gray-900 dark:text-white">{content.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Reading time</span>
-                    <span className="font-mono text-gray-900 dark:text-white">{Math.ceil(content.split(' ').length / 200)}min</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    </ThemeProvider>
+
+                  <TextField
+                    fullWidth
+                    label="요약"
+                    value={formData.summary}
+                    onChange={handleInputChange('summary')}
+                    placeholder="포스트의 간단한 요약을 입력하세요"
+                    variant="outlined"
+                    multiline
+                    rows={2}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="내용"
+                    value={formData.content}
+                    onChange={handleInputChange('content')}
+                    placeholder="마크다운 형식으로 내용을 작성하세요"
+                    variant="outlined"
+                    multiline
+                    rows={20}
+                    required
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                        fontSize: '14px',
+                        lineHeight: 1.5
+                      }
+                    }}
+                  />
+                </Box>
+              </Paper>
+            </Grid>
+
+            {/* Sidebar */}
+            <Grid item xs={12} lg={4}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {/* Publish Settings */}
+                <Paper sx={{ p: 3, boxShadow: 'none' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <PublishIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+                    <Typography variant="h6">
+                      발행 설정
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <FormControl fullWidth>
+                      <InputLabel>카테고리</InputLabel>
+                      <Select
+                        value={formData.category}
+                        onChange={handleInputChange('category')}
+                        label="카테고리"
+                      >
+                        {categories.map((category) => (
+                          <MenuItem key={category} value={category}>
+                            {category}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth>
+                      <InputLabel>상태</InputLabel>
+                      <Select
+                        value={formData.status}
+                        onChange={handleInputChange('status')}
+                        label="상태"
+                      >
+                        <MenuItem value="draft">초안</MenuItem>
+                        <MenuItem value="published">발행됨</MenuItem>
+                        <MenuItem value="private">비공개</MenuItem>
+                      </Select>
+                    </FormControl>
+
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<SaveIcon />}
+                        onClick={handleSave}
+                      >
+                        저장
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<PublishIcon />}
+                        onClick={handlePublish}
+                      >
+                        발행
+                      </Button>
+                    </Box>
+                  </Box>
+                </Paper>
+
+                {/* Tags */}
+                <Paper sx={{ p: 3, boxShadow: 'none' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <TagIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+                    <Typography variant="h6">
+                      태그
+                    </Typography>
+                  </Box>
+
+                  <Autocomplete
+                    multiple
+                    options={tagSuggestions}
+                    value={tags}
+                    onChange={(_, newValue) => setTags(newValue)}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Chip
+                          variant="outlined"
+                          label={option}
+                          {...getTagProps({ index })}
+                          key={option}
+                        />
+                      ))
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="태그 추가..."
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Paper>
+
+                {/* Statistics */}
+                <Paper sx={{ p: 3, boxShadow: 'none' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <AnalyticsIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+                    <Typography variant="h6">
+                      통계
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        단어 수
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {wordCount.toLocaleString()}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        문자 수
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {charCount.toLocaleString()}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        예상 읽기 시간
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {readingTime}분
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+        
+        <Footer />
+      </Box>
+    </MuiThemeProvider>
   )
 }
