@@ -1,102 +1,92 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { 
+  Container, 
+  Typography, 
+  Box, 
+  Grid, 
+  Card, 
+  CardContent, 
+  CardActions, 
+  Button, 
+  Chip, 
+  Tabs, 
+  Tab,
+  Paper,
+  Stack,
+  Divider
+} from '@mui/material'
+import {
+  TrendingUp as TrendingIcon,
+  Schedule as ScheduleIcon,
+  Visibility as ViewIcon,
+  Category as CategoryIcon
+} from '@mui/icons-material'
+import { useRouter } from 'next/navigation'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import HeroSection from '@/components/HeroSection'
-import PostGrid from '@/components/PostGrid'
 import Footer from '@/components/Footer'
+import { PostEntity } from '@/entities/Post'
+import { BLOG_CATEGORIES, CATEGORY_DESCRIPTIONS, CATEGORY_COLORS, BlogCategory } from '@/shared/constants/categories'
 
 export default function Home() {
-  const samplePosts = [
-    {
-      id: '1',
-      title: 'React Hooks로 시작하는 모던 React 개발',
-      content: `React Hooks는 함수형 컴포넌트에서 상태 관리와 생명주기를 다룰 수 있게 해주는 강력한 기능입니다. useState와 useEffect를 활용하여 더 깔끔하고 재사용 가능한 컴포넌트를 만들어보세요.`,
-      summary: 'React Hooks를 활용한 모던 컴포넌트 개발 방법과 실무 활용 팁',
-      tags: ['React', 'JavaScript', 'Frontend'],
-      createdAt: '2024-01-15T10:00:00Z',
-      author: 'SuriBlog',
-      readTime: 8,
-      views: 1247
-    },
-    {
-      id: '2',
-      title: 'TypeScript와 Next.js로 타입 안전한 웹 개발',
-      content: `TypeScript를 Next.js 프로젝트에 도입하여 타입 안전성을 확보하고 개발 경험을 향상시키는 방법을 알아봅니다. 실제 프로젝트 구성부터 고급 타입 활용까지 다룹니다.`,
-      summary: 'Next.js에서 TypeScript를 활용한 타입 안전한 개발 환경 구축',
-      tags: ['TypeScript', 'Next.js', 'WebDev'],
-      createdAt: '2024-01-12T14:30:00Z',
-      author: 'SuriBlog',
-      readTime: 12,
-      views: 2103
-    },
-    {
-      id: '3',
-      title: 'CSS Grid와 Flexbox: 모던 레이아웃 완벽 가이드',
-      content: `CSS Grid와 Flexbox를 조합하여 복잡한 레이아웃을 효율적으로 구현하는 방법을 학습합니다. 실제 사례와 함께 반응형 디자인 패턴도 함께 다룹니다.`,
-      summary: 'CSS Grid와 Flexbox를 활용한 현대적인 웹 레이아웃 구현 방법',
-      tags: ['CSS', 'Layout', 'Design'],
-      createdAt: '2024-01-08T09:15:00Z',
-      author: 'SuriBlog',
-      readTime: 10,
-      views: 1856
-    },
-    {
-      id: '4',
-      title: 'Node.js와 Express로 RESTful API 설계하기',
-      content: `Node.js와 Express 프레임워크를 사용하여 확장 가능한 RESTful API를 설계하고 구현하는 모범 사례를 소개합니다. 인증, 에러 처리, 데이터베이스 연동까지 포함합니다.`,
-      summary: 'Node.js 기반 RESTful API 설계와 구현을 위한 실무 가이드',
-      tags: ['Node.js', 'API', 'Backend'],
-      createdAt: '2024-01-05T16:45:00Z',
-      author: 'SuriBlog',
-      readTime: 15,
-      views: 3204
-    },
-    {
-      id: '5',
-      title: '웹 성능 최적화: 실무에서 바로 적용할 수 있는 기법들',
-      content: `웹사이트 성능을 향상시키기 위한 실무 중심의 최적화 기법들을 소개합니다. 이미지 최적화, 코드 스플리팅, 캐싱 전략 등을 다룹니다.`,
-      summary: '웹 성능 최적화를 위한 실용적인 기법과 도구 활용법',
-      tags: ['Performance', 'Optimization', 'Web'],
-      createdAt: '2024-01-02T11:20:00Z',
-      author: 'SuriBlog',
-      readTime: 11,
-      views: 1923
-    },
-    {
-      id: '6',
-      title: 'Git 워크플로우: 팀 개발을 위한 브랜치 전략',
-      content: `효율적인 팀 개발을 위한 Git 브랜치 전략과 워크플로우를 소개합니다. Git Flow, GitHub Flow 등 다양한 전략의 장단점을 비교분석합니다.`,
-      summary: '팀 개발 효율성을 높이는 Git 브랜치 전략과 워크플로우',
-      tags: ['Git', 'Workflow', 'Team'],
-      createdAt: '2023-12-28T13:30:00Z',
-      author: 'SuriBlog',
-      readTime: 9,
-      views: 1445
-    },
-    {
-      id: '7',
-      title: 'Docker로 개발 환경 표준화하기',
-      content: `Docker를 활용하여 개발 환경을 컨테이너화하고 팀 전체의 환경을 표준화하는 방법을 알아봅니다. Docker Compose를 통한 멀티 컨테이너 구성도 다룹니다.`,
-      summary: 'Docker를 활용한 개발 환경 컨테이너화와 표준화 가이드',
-      tags: ['Docker', 'DevOps', 'Container'],
-      createdAt: '2023-12-25T10:00:00Z',
-      author: 'SuriBlog',
-      readTime: 13,
-      views: 2567
-    },
-    {
-      id: '8',
-      title: 'AWS로 시작하는 클라우드 네이티브 개발',
-      content: `AWS 서비스를 활용하여 클라우드 네이티브 애플리케이션을 개발하는 방법을 학습합니다. Lambda, API Gateway, DynamoDB 등 핵심 서비스들을 다룹니다.`,
-      summary: 'AWS 클라우드 서비스를 활용한 서버리스 애플리케이션 개발',
-      tags: ['AWS', 'Cloud', 'Serverless'],
-      createdAt: '2023-12-20T15:45:00Z',
-      author: 'SuriBlog',
-      readTime: 16,
-      views: 2890
+  const router = useRouter()
+  const [selectedCategory, setSelectedCategory] = useState<BlogCategory | 'all'>('all')
+  const [posts, setPosts] = useState<PostEntity[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchPosts = async (category?: BlogCategory) => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams({
+        isPublished: 'true',
+        limit: '9',
+        sortField: 'publishedAt',
+        sortOrder: 'desc'
+      })
+      
+      if (category) {
+        params.append('category', category)
+      }
+
+      const response = await fetch(`/api/posts?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        setPosts(data.posts)
+      }
+    } catch (error) {
+      console.error('Failed to fetch posts:', error)
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
+
+  useEffect(() => {
+    fetchPosts(selectedCategory === 'all' ? undefined : selectedCategory)
+  }, [selectedCategory])
+
+  const handleCategoryChange = (_: React.SyntheticEvent, newValue: BlogCategory | 'all') => {
+    setSelectedCategory(newValue)
+  }
+
+  const handlePostClick = (post: PostEntity) => {
+    router.push(`/posts/${post.slug}`)
+  }
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  const getCategoryInfo = (category: BlogCategory) => ({
+    description: CATEGORY_DESCRIPTIONS[category],
+    color: CATEGORY_COLORS[category]
+  })
 
   return (
     <MuiThemeProvider>
@@ -105,12 +95,164 @@ export default function Home() {
         
         <main>
           <HeroSection />
-          <PostGrid
-            posts={samplePosts}
-            onPostClick={(post) => {
-              console.log('Post clicked:', post.title)
-            }}
-          />
+          
+          <Container maxWidth="lg" sx={{ py: 8 }}>
+            {/* Category Tabs */}
+            <Box sx={{ mb: 6 }}>
+              <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 4 }}>
+                Latest Posts
+              </Typography>
+              
+              <Paper sx={{ mb: 4 }}>
+                <Tabs
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                  variant="fullWidth"
+                  textColor="primary"
+                  indicatorColor="primary"
+                >
+                  <Tab label="All Posts" value="all" />
+                  {BLOG_CATEGORIES.map((category) => (
+                    <Tab key={category} label={category} value={category} />
+                  ))}
+                </Tabs>
+              </Paper>
+
+              {/* Category Description */}
+              {selectedCategory !== 'all' && (
+                <Box sx={{ mb: 4, textAlign: 'center' }}>
+                  <Chip
+                    icon={<CategoryIcon />}
+                    label={selectedCategory}
+                    sx={{
+                      backgroundColor: getCategoryInfo(selectedCategory).color,
+                      color: 'white',
+                      fontWeight: 'bold',
+                      mb: 2
+                    }}
+                  />
+                  <Typography variant="body1" color="text.secondary">
+                    {getCategoryInfo(selectedCategory).description}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            {/* Posts Grid */}
+            {loading ? (
+              <Box sx={{ textAlign: 'center', py: 8 }}>
+                <Typography>Loading posts...</Typography>
+              </Box>
+            ) : (
+              <Grid container spacing={4}>
+                {posts.map((post) => (
+                  <Grid item xs={12} md={6} lg={4} key={post.id}>
+                    <Card 
+                      sx={{ 
+                        height: '100%', 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: 4
+                        }
+                      }}
+                      onClick={() => handlePostClick(post)}
+                    >
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Box sx={{ mb: 2 }}>
+                          <Chip
+                            label={post.category}
+                            size="small"
+                            sx={{
+                              backgroundColor: getCategoryInfo(post.category as BlogCategory).color,
+                              color: 'white',
+                              fontWeight: 'bold',
+                              mb: 1
+                            }}
+                          />
+                          {post.featured && (
+                            <Chip
+                              label="Featured"
+                              size="small"
+                              color="secondary"
+                              sx={{ ml: 1 }}
+                            />
+                          )}
+                        </Box>
+                        
+                        <Typography variant="h6" component="h3" gutterBottom>
+                          {post.title}
+                        </Typography>
+                        
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                          {post.excerpt}
+                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                          {post.tags.slice(0, 3).map((tag) => (
+                            <Chip key={tag} label={tag} size="small" variant="outlined" />
+                          ))}
+                          {post.tags.length > 3 && (
+                            <Chip label={`+${post.tags.length - 3}`} size="small" variant="outlined" />
+                          )}
+                        </Box>
+                      </CardContent>
+                      
+                      <Divider />
+                      
+                      <CardActions sx={{ p: 2, justifyContent: 'space-between' }}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">
+                              {post.readTime}분
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <ViewIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">
+                              {post.views?.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                        
+                        <Typography variant="caption" color="text.secondary">
+                          {formatDate(post.publishedAt)}
+                        </Typography>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+
+            {posts.length === 0 && !loading && (
+              <Box sx={{ textAlign: 'center', py: 8 }}>
+                <Typography variant="h6" color="text.secondary">
+                  {selectedCategory === 'all' 
+                    ? '아직 게시된 포스트가 없습니다.' 
+                    : `${selectedCategory} 카테고리에 게시된 포스트가 없습니다.`
+                  }
+                </Typography>
+              </Box>
+            )}
+
+            {/* View All Posts Button */}
+            {posts.length > 0 && (
+              <Box sx={{ textAlign: 'center', mt: 6 }}>
+                <Button 
+                  variant="outlined" 
+                  size="large"
+                  onClick={() => router.push('/archives')}
+                >
+                  View All Posts
+                </Button>
+              </Box>
+            )}
+          </Container>
         </main>
         
         <Footer />
