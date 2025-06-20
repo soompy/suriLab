@@ -12,6 +12,7 @@ export interface PostEntity {
   readTime?: number
   views?: number
   featured?: boolean
+  isPublished: boolean
 }
 
 export interface CreatePostInput {
@@ -23,6 +24,7 @@ export interface CreatePostInput {
   category: string
   authorId: string
   featured?: boolean
+  isPublished?: boolean
 }
 
 export interface UpdatePostInput {
@@ -34,6 +36,7 @@ export interface UpdatePostInput {
   tags?: string[]
   category?: string
   featured?: boolean
+  isPublished?: boolean
 }
 
 export interface PostFilters {
@@ -42,6 +45,7 @@ export interface PostFilters {
   authorId?: string
   searchQuery?: string
   featured?: boolean
+  isPublished?: boolean
 }
 
 export interface PostSort {
