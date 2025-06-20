@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { BLOG_CATEGORIES } from '@/shared/constants/categories'
 import {
   Container,
   Typography,
@@ -53,6 +54,15 @@ export default function Write() {
   }
 
   const handleSave = async () => {
+    if (!formData.title.trim()) {
+      alert('제목을 입력해주세요.')
+      return
+    }
+    if (!formData.category) {
+      alert('카테고리를 선택해주세요.')
+      return
+    }
+
     try {
       const postData = {
         title: formData.title,
@@ -88,6 +98,15 @@ export default function Write() {
   }
 
   const handlePublish = async () => {
+    if (!formData.title.trim()) {
+      alert('제목을 입력해주세요.')
+      return
+    }
+    if (!formData.category) {
+      alert('카테고리를 선택해주세요.')
+      return
+    }
+
     try {
       const postData = {
         title: formData.title,
@@ -138,7 +157,7 @@ export default function Write() {
     'Frontend', 'Backend', 'Tutorial', 'Guide', 'Tips'
   ]
 
-  const categories = ['기술', '튜토리얼', '리뷰', '일기', '기타']
+  const categories = BLOG_CATEGORIES
 
   const wordCount = formData.content.split(' ').length
   const charCount = formData.content.length
@@ -237,12 +256,13 @@ export default function Write() {
                   </Box>
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <FormControl fullWidth>
-                      <InputLabel>카테고리</InputLabel>
+                    <FormControl fullWidth required>
+                      <InputLabel>카테고리 *</InputLabel>
                       <Select
                         value={formData.category}
                         onChange={handleInputChange('category')}
-                        label="카테고리"
+                        label="카테고리 *"
+                        required
                       >
                         {categories.map((category) => (
                           <MenuItem key={category} value={category}>
