@@ -37,6 +37,7 @@ import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { PostEntity } from '@/entities/Post'
+import { BLOG_CATEGORIES } from '@/shared/constants/categories'
 
 export default function AdminPostsPage() {
   const router = useRouter()
