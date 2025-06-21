@@ -10,7 +10,7 @@ import {
   Typography,
   Box,
   Paper,
-  Grid,
+  Grid2 as Grid,
   TextField,
   Button,
   Chip,
