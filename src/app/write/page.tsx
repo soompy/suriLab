@@ -43,7 +43,7 @@ export default function Write() {
     category: '',
     status: 'draft'
   })
-  const [tags, setTags] = useState<string[]>(['React', 'JavaScript'])
+  const [tags, setTags] = useState<string[]>([])
   const [isPreview, setIsPreview] = useState(false)
 
   const handleInputChange = (field: string) => (e: any) => {
@@ -60,6 +60,14 @@ export default function Write() {
     }
     if (!formData.category) {
       alert('카테고리를 선택해주세요.')
+      return
+    }
+    if (!formData.summary.trim()) {
+      alert('요약을 입력해주세요.')
+      return
+    }
+    if (tags.length === 0) {
+      alert('최소 1개의 태그를 입력해주세요.')
       return
     }
 
@@ -104,6 +112,14 @@ export default function Write() {
     }
     if (!formData.category) {
       alert('카테고리를 선택해주세요.')
+      return
+    }
+    if (!formData.summary.trim()) {
+      alert('요약을 입력해주세요.')
+      return
+    }
+    if (tags.length === 0) {
+      alert('최소 1개의 태그를 입력해주세요.')
       return
     }
 
@@ -180,7 +196,7 @@ export default function Write() {
 
           <Grid container spacing={4}>
             {/* Main Editor Section */}
-            <Grid item xs={12} lg={8}>
+            <Grid item xs={12} lg={8.4} sx={{ flex: 2 }}>
               <Paper sx={{ p: 4, boxShadow: 'none' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <EditIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
@@ -219,6 +235,7 @@ export default function Write() {
                     variant="outlined"
                     multiline
                     rows={2}
+                    required
                   />
 
                   <TextField
@@ -244,7 +261,7 @@ export default function Write() {
             </Grid>
 
             {/* Sidebar */}
-            <Grid item xs={12} lg={4}>
+            <Grid item xs={12} lg={3.6} sx={{ flex: 1 }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 {/* Publish Settings */}
                 <Paper sx={{ p: 3, boxShadow: 'none' }}>
