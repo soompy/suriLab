@@ -10,7 +10,7 @@ import {
   Typography,
   Box,
   Paper,
-  Grid2 as Grid,
+  Grid,
   TextField,
   Button,
   Chip,
@@ -440,7 +440,7 @@ export default function Write() {
 
           <Grid container spacing={4}>
             {/* Main Editor Section */}
-            <Grid xs={12} lg={8}>
+            <Grid item xs={12} lg={8}>
               <Paper sx={{ 
                 height: '100%',
                 borderRadius: 3,
@@ -665,7 +665,7 @@ export default function Write() {
             </Grid>
 
             {/* Sidebar */}
-            <Grid xs={12} lg={4}>
+            <Grid item xs={12} lg={4}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 {/* Action Buttons */}
                 <Paper sx={{ 
