@@ -1,6 +1,5 @@
-import { BLOG_CONFIG } from '@/config/blog'
-
 const AUTH_KEY = 'blog_auth'
+const SESSION_TIMEOUT = 24 * 60 * 60 * 1000 // 24시간
 
 export class AuthService {
   // 로그인 상태 확인
@@ -13,7 +12,7 @@ export class AuthService {
     try {
       const { timestamp } = JSON.parse(authData)
       const now = Date.now()
-      const isValid = now - timestamp < BLOG_CONFIG.auth.sessionTimeout
+      const isValid = now - timestamp < SESSION_TIMEOUT
 
       if (!isValid) {
         this.logout()
@@ -28,16 +27,31 @@ export class AuthService {
   }
 
   // 로그인
-  static login(password: string): boolean {
-    if (password === BLOG_CONFIG.auth.adminPassword) {
-      const authData = {
-        timestamp: Date.now(),
-        user: BLOG_CONFIG.owner
+  static async login(password: string): Promise<boolean> {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        const authData = {
+          timestamp: Date.now(),
+          user: data.user
+        }
+        localStorage.setItem(AUTH_KEY, JSON.stringify(authData))
+        return true
       }
-      localStorage.setItem(AUTH_KEY, JSON.stringify(authData))
-      return true
+      return false
+    } catch (error) {
+      console.error('Login error:', error)
+      return false
     }
-    return false
   }
 
   // 로그아웃

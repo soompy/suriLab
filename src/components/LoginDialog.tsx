@@ -32,7 +32,7 @@ export default function LoginDialog({ open, onClose, onSuccess }: LoginDialogPro
     setError('')
 
     try {
-      const success = AuthService.login(password)
+      const success = await AuthService.login(password)
       
       if (success) {
         onSuccess()
