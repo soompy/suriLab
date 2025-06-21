@@ -1,47 +1,51 @@
 # SuriBlog 🌟
 
-> **2025년 최신 기술 스택으로 구축된 현대적인 개인 블로그 플랫폼**
+> **완전한 블로그 시스템 - 인증, 데이터베이스, 보안까지 모든 것이 갖춰진 실제 운영 가능한 블로그 플랫폼**
 
-모던하고 미니멀한 디자인의 개인 블로그입니다. Next.js 15와 Material-UI v7을 기반으로 구축되었으며, 깔끔하고 프로페셔널한 UI/UX를 제공합니다.
+실제 운영 가능한 완전한 블로그 시스템입니다. Next.js 15, Prisma ORM, SQLite를 기반으로 구축되었으며, 관리자 인증부터 포스트 관리까지 모든 기능을 갖춘 실전 블로그 플랫폼입니다.
 
-## ✨ 주요 특징
+## ✨ 핵심 기능
 
-- **🎨 Modern Design**: 미니멀하고 세련된 프로페셔널 디자인
-- **📱 Fully Responsive**: 모바일부터 데스크톱까지 완벽한 반응형 레이아웃
-- **🚀 Cutting-edge Performance**: Next.js 15 App Router + React 19 최적화
-- **🎯 Material-UI v7**: 최신 디자인 시스템과 완벽한 접근성
-- **🌙 Dark Mode**: 완전한 다크모드 지원
-- **⚡ Full TypeScript**: 100% 타입 안전성 보장
-- **🔍 Advanced Search**: 실시간 검색 및 필터링
-- **📝 Rich Editor**: 마크다운 기반 글 작성 도구
-- **📊 Analytics Ready**: 통계 및 분석 기능 내장
+- **🔐 완전한 인증 시스템**: 관리자 전용 글 작성 및 관리
+- **💾 영구 데이터 저장**: Prisma ORM + SQLite/PostgreSQL 지원
+- **🛡️ 강력한 보안**: 환경변수 기반 비밀번호 관리, Git 보안
+- **📝 실시간 글 작성**: 마크다운 에디터 + 이미지 업로드
+- **🎨 완전한 UI 시스템**: Material-UI 기반 반응형 디자인
+- **📱 모바일 최적화**: 완벽한 반응형 레이아웃
+- **🚀 프로덕션 준비**: 실제 서비스 가능한 안정성
+- **⚡ 고성능**: Next.js 15 + React 19 최신 최적화
 
-## 🛠️ 2025 최신 기술 스택
+## 🛠️ 완전한 기술 스택
 
-### **Core Framework**
-- **React 19.1.0** - 최신 React 기능 (Server Components, Concurrent Features)
-- **Next.js 15.3.3** - App Router, Server Actions, 최신 최적화
-- **TypeScript 5.8.3** - 최신 타입 시스템
+### **Frontend Framework**
+- **React 19** - 최신 Server Components 및 Concurrent Features
+- **Next.js 15** - App Router, Server Actions, 최신 최적화
+- **TypeScript** - 100% 타입 안전성
 
-### **UI & Styling**
-- **Material-UI v7.1.1** - 2025년 최신 디자인 시스템
-- **Emotion 11.14.0** - 고성능 CSS-in-JS
-- **TailwindCSS 4.x** - 유틸리티 우선 CSS
+### **Database & ORM**
+- **Prisma ORM** - 타입 안전한 데이터베이스 클라이언트
+- **SQLite** - 개발용 (PostgreSQL 마이그레이션 준비)
+- **Database Migration** - 자동 스키마 관리
 
-### **State Management & Data**
-- **Zustand 5.0.5** - 경량화된 상태 관리
-- **TanStack Query 5.80.7** - 서버 상태 관리 및 캐싱
-- **React Hook Form** - 폼 상태 관리
+### **Authentication & Security**
+- **환경변수 기반 인증** - 안전한 비밀번호 관리
+- **localStorage 세션** - 24시간 자동 만료
+- **Git 보안** - .env 파일 완전 보호
 
-### **Content & Markdown**
-- **React Markdown 10.1.0** - 마크다운 렌더링
-- **Remark GFM 4.0.1** - GitHub Flavored Markdown
-- **Prism React Renderer 2.4.1** - 코드 하이라이팅
+### **UI & Design System**
+- **Material-UI (MUI)** - 완전한 컴포넌트 라이브러리
+- **Emotion** - CSS-in-JS 스타일링
+- **반응형 디자인** - 모바일 우선 접근
 
-### **Development & Testing**
-- **ESLint 9.29.0** - 최신 Flat Config
-- **Jest 30.0.0** - 테스트 프레임워크
-- **Testing Library** - React 컴포넌트 테스트
+### **Content Management**
+- **마크다운 에디터** - 실시간 미리보기
+- **이미지 업로드** - Multer 기반 파일 처리
+- **카테고리 & 태그** - 완전한 분류 시스템
+
+### **Development & Production**
+- **Clean Architecture** - 확장 가능한 코드 구조
+- **API Routes** - RESTful 엔드포인트
+- **빌드 최적화** - 프로덕션 준비 완료
 
 ## 🏗️ 프로젝트 구조
 
@@ -49,41 +53,45 @@
 suriBlog/
 ├── src/
 │   ├── app/                    # Next.js 15 App Router
-│   │   ├── page.tsx           # 🏠 메인 페이지 (블로그 홈)
+│   │   ├── api/               # 🔌 REST API 엔드포인트
+│   │   │   ├── posts/         # 포스트 CRUD, 조회수 관리
+│   │   │   └── upload/        # 이미지 업로드 처리
+│   │   ├── posts/[slug]/      # 📄 포스트 상세 페이지
+│   │   ├── write/             # ✍️ 관리자 글 작성 (인증 필요)
 │   │   ├── about/             # 👨‍💻 개인 소개 페이지
-│   │   ├── projects/          # 💼 프로젝트 포트폴리오 (페이지네이션)
-│   │   ├── contact/           # 📧 연락처 & 소셜 미디어
-│   │   ├── archives/          # 📚 블로그 아카이브 (검색/필터)
-│   │   ├── write/             # ✍️ 블로그 글 작성 도구
-│   │   ├── layout.tsx         # 전역 레이아웃
-│   │   └── globals.css        # 전역 스타일
-│   ├── components/            # 재사용 가능한 React 컴포넌트
-│   │   ├── Header.tsx         # 🧭 반응형 네비게이션 (다크모드 토글)
-│   │   ├── Footer.tsx         # 🦶 하단 푸터
-│   │   ├── HeroSection.tsx    # 🎯 메인 히어로 섹션
-│   │   ├── PostGrid.tsx       # 📋 포스트 그리드 레이아웃
-│   │   ├── PostCard.tsx       # 📄 개별 포스트 카드
-│   │   ├── Logo.tsx           # 🎨 브랜드 로고
-│   │   ├── MuiThemeProvider.tsx # 🎨 MUI 테마 컨텍스트
-│   │   └── ThemeContext.tsx   # 🌙 다크모드 컨텍스트
-│   ├── hooks/                 # 커스텀 React 훅
-│   ├── types/                 # TypeScript 타입 정의
-│   └── utils/                 # 유틸리티 함수들
-├── public/                    # 정적 파일들
-│   ├── images/               # 이미지 에셋
-│   └── icons/                # 아이콘 파일들
-├── package.json              # 프로젝트 설정 및 의존성
-├── tsconfig.json             # TypeScript 설정
-├── next.config.js            # Next.js 설정
-└── README.md                 # 프로젝트 문서
+│   │   ├── projects/          # 💼 프로젝트 포트폴리오
+│   │   ├── archives/          # 📚 포스트 아카이브
+│   │   └── page.tsx           # 🏠 메인 페이지
+│   ├── components/            # UI 컴포넌트
+│   │   ├── LoginDialog.tsx    # 🔐 관리자 로그인 다이얼로그
+│   │   ├── Header.tsx         # 🧭 네비게이션 바
+│   │   ├── PostCard.tsx       # 📄 포스트 카드
+│   │   └── PostGrid.tsx       # 📋 포스트 그리드
+│   ├── config/                # 설정 파일
+│   │   └── blog.ts           # 블로그 메타데이터 & 소유자 정보
+│   ├── lib/                   # 핵심 라이브러리
+│   │   ├── auth.ts           # 🔐 인증 서비스
+│   │   └── prisma.ts         # 💾 데이터베이스 클라이언트
+│   ├── repositories/          # 데이터 접근 계층
+│   │   └── PrismaPostRepository/ # 포스트 저장소 구현
+│   ├── usecases/             # 비즈니스 로직
+│   │   └── SearchPosts/      # 포스트 검색 기능
+│   └── entities/             # 도메인 엔티티
+├── prisma/                   # 🗄️ 데이터베이스 스키마
+│   ├── schema.prisma         # Prisma 스키마 정의
+│   ├── migrations/           # 데이터베이스 마이그레이션
+│   └── seed.ts              # 샘플 데이터 시드
+├── .env                     # 🔒 환경변수 (Git 제외)
+├── .gitignore               # 🛡️ Git 보안 설정
+└── package.json             # 프로젝트 의존성
 ```
 
 ## 🚀 빠른 시작
 
 ### 📋 환경 요구사항
-- **Node.js** 22.0+ (최신 LTS 권장)
-- **npm** 10.0+ 또는 **yarn** 4.0+
-- **Git** 2.40+
+- **Node.js** 18.0+ (최신 LTS 권장)
+- **npm** 9.0+ 또는 **yarn** 1.22+
+- **Git** 2.30+
 
 ### ⚡ 설치 및 실행
 
@@ -95,11 +103,21 @@ cd suriBlog
 # 2. 의존성 설치
 npm install
 
-# 3. 개발 서버 실행
+# 3. 환경변수 설정
+cp .env.example .env
+# .env 파일에서 BLOG_ADMIN_PASSWORD 설정
+
+# 4. 데이터베이스 설정
+npm run db:generate  # Prisma 클라이언트 생성
+npm run db:push      # 데이터베이스 스키마 적용
+npm run db:seed      # 샘플 데이터 추가
+
+# 5. 개발 서버 실행
 npm run dev
 
-# 4. 브라우저에서 확인
+# 6. 브라우저에서 확인
 # 🌐 http://localhost:3000
+# ✍️ 글 작성: http://localhost:3000/write (관리자 인증 필요)
 ```
 
 ### 🛠️ 사용 가능한 스크립트
@@ -109,10 +127,11 @@ npm run dev
 | `npm run dev` | 🔥 개발 서버 실행 (Hot Reload) |
 | `npm run build` | 🏗️ 프로덕션 빌드 |
 | `npm run start` | 🚀 프로덕션 서버 실행 |
-| `npm run lint` | 🔍 ESLint 코드 검사 |
-| `npm run type-check` | ✅ TypeScript 타입 검사 |
-| `npm run test` | 🧪 Jest 테스트 실행 |
-| `npm run test:watch` | 👀 Jest 워치 모드 |
+| `npm run db:generate` | 📦 Prisma 클라이언트 생성 |
+| `npm run db:push` | 🔄 데이터베이스 스키마 동기화 |
+| `npm run db:seed` | 🌱 샘플 데이터 시딩 |
+| `npm run db:studio` | 🎛️ Prisma Studio 실행 |
+| `npm run db:reset` | 🔄 데이터베이스 초기화 |
 
 ### 🌍 배포
 
@@ -189,36 +208,44 @@ npm run start
 - 실시간 통계 (단어수, 읽기시간)
 - 태그 시스템 및 발행 설정
 
-## 🔮 로드맵 & 향후 계획
+## ✅ 완성된 기능들
 
-### 🎯 **Phase 1: 핵심 기능 완성** (2025 Q1)
-- [x] ✅ 다크모드 완전 구현
-- [x] ✅ 반응형 레이아웃 최적화
-- [x] ✅ 페이지네이션 시스템
-- [x] ✅ 검색 및 필터링 기능
-- [ ] 🔄 실제 블로그 포스트 CRUD 기능
-- [ ] 🔄 마크다운 에디터 고도화
+### 🎯 **Core Features (완료)**
+- [x] ✅ **완전한 인증 시스템** - 관리자 전용 글 작성
+- [x] ✅ **영구 데이터 저장** - Prisma + SQLite 완전 구현
+- [x] ✅ **보안 시스템** - 환경변수 기반 + Git 보안
+- [x] ✅ **실제 블로그 CRUD** - 포스트 생성/수정/삭제/조회
+- [x] ✅ **마크다운 에디터** - 실시간 글 작성 도구
+- [x] ✅ **이미지 업로드** - 파일 업로드 시스템
+- [x] ✅ **반응형 UI** - Material-UI 완전 구현
+- [x] ✅ **카테고리 & 태그** - 완전한 분류 시스템
 
-### 🚀 **Phase 2: 고급 기능** (2025 Q2)
-- [ ] 📊 댓글 시스템 (Disqus/Utterances 연동)
-- [ ] 🔍 전문 검색 엔진 (Algolia/ElasticSearch)
-- [ ] 📡 RSS/Atom 피드 생성
+### 🚀 **Advanced Features (완료)**
+- [x] ✅ **작성자 정보 시스템** - 실제 작성자 표시
+- [x] ✅ **포스트 상세 페이지** - 완전한 렌더링
+- [x] ✅ **검색 기능** - 포스트 검색 UseCase
+- [x] ✅ **API 엔드포인트** - RESTful API 완성
+- [x] ✅ **Clean Architecture** - 확장 가능한 구조
+
+## 🔮 향후 확장 계획
+
+### 🎨 **Phase 1: UI/UX 강화**
+- [ ] 📊 대시보드 관리 페이지
 - [ ] 🎨 테마 커스터마이징
-- [ ] 📈 Google Analytics 통합
+- [ ] 🌙 다크모드 토글
+- [ ] 📱 PWA 지원
 
-### ⚡ **Phase 3: 성능 & PWA** (2025 Q3)
-- [ ] 🌐 PWA (Progressive Web App) 지원
-- [ ] ⚡ 이미지 최적화 및 CDN 연동
-- [ ] 🔧 Service Worker 캐싱
-- [ ] 📱 오프라인 읽기 지원
-- [ ] 🚀 Core Web Vitals 100점 달성
+### 🚀 **Phase 2: 고급 기능**
+- [ ] 📈 포스트 통계 및 분석
+- [ ] 🔍 고급 검색 (Algolia)
+- [ ] 📡 RSS 피드 생성
+- [ ] 💬 댓글 시스템
 
-### 🎨 **Phase 4: 확장 기능** (2025 Q4)
-- [ ] 🤖 AI 기반 포스트 추천
-- [ ] 🔗 소셜 미디어 자동 공유
-- [ ] 📧 뉴스레터 구독 시스템
-- [ ] 🏷️ 고급 태그 시스템
-- [ ] 🌍 다국어 지원 (i18n)
+### ⚡ **Phase 3: 성능 최적화**
+- [ ] 🌐 CDN 연동
+- [ ] ⚡ 이미지 최적화
+- [ ] 🔧 캐싱 시스템
+- [ ] 📊 성능 모니터링
 
 ## 🤝 기여하기
 
@@ -273,16 +300,22 @@ git push origin feature/amazing-feature
 
 ## 👨‍💻 개발자 정보
 
-**🌟 SuriBlog Development Team**
+**🌟 이수민 (SuriBlog Creator)**
 
-- **Main Developer**: [@soompy](https://github.com/soompy)
+- **GitHub**: [@soompy](https://github.com/soompy)
 - **Email**: yzsumin@naver.com
-- **Portfolio**: [SuriBlog Projects](https://your-domain.com/projects)
+- **Portfolio**: [SuriBlog](https://github.com/soompy/suriLab)
 
 ### 📞 **연락처**
 - 🐙 GitHub: [@soompy](https://github.com/soompy)
 - 💼 LinkedIn: [프로필 보기](https://buly.kr/1c8Bcxw)
 - 📧 Email: yzsumin@naver.com
+
+### 🎯 **전문 분야**
+- **Full-Stack Development**: React, Next.js, Node.js
+- **Database Design**: Prisma ORM, SQL
+- **Authentication & Security**: 보안 시스템 설계
+- **Modern Web Architecture**: Clean Architecture, TypeScript
 
 ---
 
@@ -298,8 +331,10 @@ git push origin feature/amazing-feature
 
 <div align="center">
 
-**🚀 2025년 최신 기술로 구축된 모던 블로그 플랫폼**
+**🚀 완전한 블로그 시스템 - 실제 운영 가능한 프로덕션 레벨**
 
-Made with ❤️ by [SuriBlog Team](https://github.com/soompy)
+Made with ❤️ by [이수민](https://github.com/soompy)
+
+**⭐ Star this repo if you found it helpful!**
 
 </div>
