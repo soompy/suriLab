@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PostEntity, CreatePostInput, UpdatePostInput, PostFilters, PostSort, PaginationOptions } from '../../entities/Post'
-import { InMemoryPostRepository } from '../../repositories/PostRepository'
+import { PrismaPostRepository } from '../../repositories/PrismaPostRepository'
 import { GetPostsUseCaseImpl, GetPostByIdUseCaseImpl, GetPostBySlugUseCaseImpl, GetBlogStatsUseCaseImpl } from '../../usecases/GetPosts'
 import { CreatePostUseCaseImpl } from '../../usecases/CreatePost'
 import { UpdatePostUseCaseImpl } from '../../usecases/UpdatePost'
 import { DeletePostUseCaseImpl } from '../../usecases/DeletePost'
+import { prisma } from '../../lib/prisma'
 
-const postRepository = new InMemoryPostRepository()
+const postRepository = new PrismaPostRepository(prisma)
 const getPostsUseCase = new GetPostsUseCaseImpl(postRepository)
 const getPostByIdUseCase = new GetPostByIdUseCaseImpl(postRepository)
 const getPostBySlugUseCase = new GetPostBySlugUseCaseImpl(postRepository)
