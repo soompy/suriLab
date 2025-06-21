@@ -48,7 +48,7 @@ export default function HeroSection() {
         },
       }}
     >
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
+      <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, position: 'relative', zIndex: 2 }}>
         <Box
           sx={{
             textAlign: 'center',

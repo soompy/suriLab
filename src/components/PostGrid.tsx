@@ -8,11 +8,12 @@ interface Post {
   id: string
   title: string
   content: string
-  summary?: string
+  excerpt?: string
   thumbnail?: string
   tags: string[]
-  createdAt: string
-  author: string
+  category: string
+  publishedAt: string
+  authorId: string
   readTime?: number
   views?: number
 }
@@ -25,7 +26,7 @@ interface PostGridProps {
 export default function PostGrid({ posts, onPostClick }: PostGridProps) {
   return (
     <Box component="section" sx={{ py: { xs: 4, md: 6 } }}>
-      <Container maxWidth="lg">
+      <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4 }}>
         {/* Section Header */}
         <Box sx={{ mb: 6 }}>
           <Typography
@@ -86,9 +87,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
               gap: 3 
             }}>
               {posts
-                .filter(post => post.tags.some(tag => 
-                  ['React', 'TypeScript', 'Next.js', 'JavaScript', 'Frontend', 'WebDev'].includes(tag)
-                ))
+                .filter(post => post.category === 'Tech Insights')
                 .slice(0, 3)
                 .map((post) => (
                   <PostCard
@@ -135,9 +134,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
               gap: 3 
             }}>
               {posts
-                .filter(post => post.tags.some(tag => 
-                  ['Node.js', 'API', 'Backend', 'Performance', 'Optimization'].includes(tag)
-                ))
+                .filter(post => post.category === 'Code Solutions')
                 .slice(0, 3)
                 .map((post) => (
                   <PostCard
@@ -184,9 +181,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
               gap: 3 
             }}>
               {posts
-                .filter(post => post.tags.some(tag => 
-                  ['Git', 'Workflow', 'Team', 'Docker', 'DevOps', 'Container', 'AWS', 'Cloud', 'Serverless'].includes(tag)
-                ))
+                .filter(post => post.category === 'Developer Tips')
                 .slice(0, 3)
                 .map((post) => (
                   <PostCard

@@ -7,11 +7,12 @@ interface Post {
   id: string
   title: string
   content: string
-  summary?: string
+  excerpt?: string
   thumbnail?: string
   tags: string[]
-  createdAt: string
-  author: string
+  category: string
+  publishedAt: string
+  authorId: string
   readTime?: number
   views?: number
 }
@@ -32,7 +33,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
     })
   }
 
-  const summary = post.summary || post.content.slice(0, 120) + '...'
+  const summary = post.excerpt || post.content.slice(0, 120) + '...'
 
   return (
     <Card 
@@ -151,13 +152,13 @@ export default function PostCard({ post, onClick }: PostCardProps) {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="caption" color="text.secondary">
-              {post.author}
+              {post.category}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               •
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {formatDate(post.createdAt)}
+              {formatDate(post.publishedAt)}
             </Typography>
           </Box>
           

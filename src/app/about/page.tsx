@@ -118,7 +118,7 @@ export default function AboutPage() {
       <div style={{ minHeight: '100vh' }}>
         <Header />
         <Box sx={{ py: { xs: 4, md: 8 }, minHeight: '100vh' }}>
-          <Container maxWidth="lg">
+          <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4 }}>
         {/* Header Section */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Avatar
@@ -168,7 +168,7 @@ export default function AboutPage() {
               fontSize: '1.1rem'
             }}
           >
-            "다양한 프로젝트 경험과 기술 역량으로 짜임새 있는 UI개발자가 되겠습니다."
+            &quot;다양한 프로젝트 경험과 기술 역량으로 짜임새 있는 UI개발자가 되겠습니다.&quot;
           </Typography>
         </Box>
 

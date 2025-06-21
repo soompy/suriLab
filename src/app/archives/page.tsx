@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Container,
   Typography,
@@ -42,10 +42,10 @@ import Footer from '@/components/Footer'
 interface BlogPost {
   id: string
   title: string
-  summary: string
+  excerpt: string
   tags: string[]
   category: string
-  createdAt: string
+  publishedAt: string
   readTime: number
   views: number
   featured?: boolean
@@ -56,95 +56,44 @@ export default function Archives() {
   const [selectedYear, setSelectedYear] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [expandedYears, setExpandedYears] = useState<string[]>(['2024'])
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // 더미 데이터 - 실제로는 API에서 가져올 데이터
-  const allPosts: BlogPost[] = [
-    {
-      id: '1',
-      title: 'React Hooks로 시작하는 모던 React 개발',
-      summary: 'React Hooks를 활용한 모던 컴포넌트 개발 방법과 실무 활용 팁',
-      tags: ['React', 'JavaScript', 'Frontend'],
-      category: 'Tech Insights',
-      createdAt: '2024-01-15T10:00:00Z',
-      readTime: 8,
-      views: 1247,
-      featured: true
-    },
-    {
-      id: '2',
-      title: 'TypeScript와 Next.js로 타입 안전한 웹 개발',
-      summary: 'Next.js에서 TypeScript를 활용한 타입 안전한 개발 환경 구축',
-      tags: ['TypeScript', 'Next.js', 'WebDev'],
-      category: 'Tech Insights',
-      createdAt: '2024-01-12T14:30:00Z',
-      readTime: 12,
-      views: 2103
-    },
-    {
-      id: '3',
-      title: 'CSS Grid와 Flexbox: 모던 레이아웃 완벽 가이드',
-      summary: 'CSS Grid와 Flexbox를 활용한 현대적인 웹 레이아웃 구현 방법',
-      tags: ['CSS', 'Layout', 'Design'],
-      category: 'Code Solutions',
-      createdAt: '2024-01-08T09:15:00Z',
-      readTime: 10,
-      views: 1856
-    },
-    {
-      id: '4',
-      title: 'Node.js와 Express로 RESTful API 설계하기',
-      summary: 'Node.js 기반 RESTful API 설계와 구현을 위한 실무 가이드',
-      tags: ['Node.js', 'API', 'Backend'],
-      category: 'Code Solutions',
-      createdAt: '2024-01-05T16:45:00Z',
-      readTime: 15,
-      views: 3204
-    },
-    {
-      id: '5',
-      title: '웹 성능 최적화: 실무에서 바로 적용할 수 있는 기법들',
-      summary: '웹 성능 최적화를 위한 실용적인 기법과 도구 활용법',
-      tags: ['Performance', 'Optimization', 'Web'],
-      category: 'Developer Tips',
-      createdAt: '2024-01-02T11:20:00Z',
-      readTime: 11,
-      views: 1923
-    },
-    {
-      id: '6',
-      title: 'Git 워크플로우: 팀 개발을 위한 브랜치 전략',
-      summary: '팀 개발 효율성을 높이는 Git 브랜치 전략과 워크플로우',
-      tags: ['Git', 'Workflow', 'Team'],
-      category: 'Developer Tips',
-      createdAt: '2023-12-28T13:30:00Z',
-      readTime: 9,
-      views: 1445
-    },
-    {
-      id: '7',
-      title: 'Docker로 개발 환경 표준화하기',
-      summary: 'Docker를 활용한 개발 환경 컨테이너화와 표준화 가이드',
-      tags: ['Docker', 'DevOps', 'Container'],
-      category: 'Developer Tips',
-      createdAt: '2023-12-25T10:00:00Z',
-      readTime: 13,
-      views: 2567
-    },
-    {
-      id: '8',
-      title: 'AWS로 시작하는 클라우드 네이티브 개발',
-      summary: 'AWS 클라우드 서비스를 활용한 서버리스 애플리케이션 개발',
-      tags: ['AWS', 'Cloud', 'Serverless'],
-      category: 'Tech Insights',
-      createdAt: '2023-12-20T15:45:00Z',
-      readTime: 16,
-      views: 2890
+  // API에서 포스트 데이터 가져오기
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('/api/posts?isPublished=true')
+        const data = await response.json()
+        
+        if (data.success && data.posts) {
+          // API 응답 데이터를 BlogPost 인터페이스에 맞게 변환
+          const transformedPosts: BlogPost[] = data.posts.map((post: any) => ({
+            id: post.id,
+            title: post.title,
+            excerpt: post.excerpt,
+            tags: post.tags,
+            category: post.category,
+            publishedAt: post.publishedAt,
+            readTime: post.readTime,
+            views: post.views || 0,
+            featured: post.featured || false
+          }))
+          setAllPosts(transformedPosts)
+        }
+      } catch (error) {
+        console.error('Failed to fetch posts:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchPosts()
+  }, [])
 
   // 연도별로 포스트 그룹화
   const postsByYear = allPosts.reduce((acc, post) => {
-    const year = new Date(post.createdAt).getFullYear().toString()
+    const year = new Date(post.publishedAt).getFullYear().toString()
     if (!acc[year]) acc[year] = []
     acc[year].push(post)
     return acc
@@ -156,7 +105,7 @@ export default function Archives() {
   // 필터링된 포스트
   const filteredPosts = allPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
     const matchesCategory = !selectedCategory || post.category === selectedCategory
     return matchesSearch && matchesCategory
@@ -177,6 +126,22 @@ export default function Archives() {
 
   const totalViews = allPosts.reduce((sum, post) => sum + post.views, 0)
   const totalTags = new Set(allPosts.flatMap(post => post.tags)).size
+
+  if (loading) {
+    return (
+      <MuiThemeProvider>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+          <Header />
+          <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, py: 6 }}>
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography variant="h6">Loading...</Typography>
+            </Box>
+          </Container>
+          <Footer />
+        </Box>
+      </MuiThemeProvider>
+    )
+  }
 
   return (
     <MuiThemeProvider>
@@ -288,7 +253,7 @@ export default function Archives() {
                       selectedCategory ? post.category === selectedCategory : true
                     ).filter(post =>
                       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      post.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
                       post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
                     )
 
@@ -343,7 +308,7 @@ export default function Archives() {
                                           )}
                                         </Box>
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                          {post.summary}
+                                          {post.excerpt}
                                         </Typography>
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
                                           {post.tags.map((tag) => (
@@ -369,7 +334,7 @@ export default function Archives() {
                                         </Box>
                                       </Box>
                                       <Typography variant="body2" color="text.secondary">
-                                        {new Date(post.createdAt).toLocaleDateString('ko-KR')}
+                                        {new Date(post.publishedAt).toLocaleDateString('ko-KR')}
                                       </Typography>
                                     </Box>
                                   </CardContent>

@@ -28,6 +28,7 @@ import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { PostEntity } from '@/entities/Post'
+import { BLOG_CONFIG } from '@/config/blog'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -215,46 +216,89 @@ export default function PostDetailPage() {
 
               {/* Content */}
               <Box>
-                <Typography 
-                  variant="body1" 
-                  component="div"
-                  sx={{ 
-                    lineHeight: 1.8,
-                    '& p': { mb: 2 },
-                    '& h1, & h2, & h3, & h4, & h5, & h6': { 
-                      mt: 4, 
-                      mb: 2,
-                      fontWeight: 'bold'
-                    },
-                    '& h1': { fontSize: '2rem' },
-                    '& h2': { fontSize: '1.5rem' },
-                    '& h3': { fontSize: '1.25rem' },
-                    '& pre': {
-                      bgcolor: 'grey.100',
-                      p: 2,
-                      borderRadius: 1,
-                      overflow: 'auto'
-                    },
+                <Box sx={{ 
+                  lineHeight: 1.8,
+                  '& p': { mb: 2 },
+                  '& h1, & h2, & h3, & h4, & h5, & h6': { 
+                    mt: 4, 
+                    mb: 2,
+                    fontWeight: 'bold'
+                  },
+                  '& h1': { fontSize: '2rem' },
+                  '& h2': { fontSize: '1.5rem' },
+                  '& h3': { fontSize: '1.25rem' },
+                  '& pre': {
+                    bgcolor: 'grey.100',
+                    p: 2,
+                    borderRadius: 1,
+                    overflow: 'auto',
                     '& code': {
-                      bgcolor: 'grey.100',
-                      px: 0.5,
-                      py: 0.25,
-                      borderRadius: 0.5,
-                      fontSize: '0.875rem'
-                    },
-                    '& blockquote': {
-                      borderLeft: '4px solid',
-                      borderColor: 'primary.main',
-                      pl: 2,
-                      ml: 0,
-                      fontStyle: 'italic',
-                      color: 'text.secondary'
+                      bgcolor: 'transparent',
+                      px: 0,
+                      py: 0
                     }
-                  }}
-                  dangerouslySetInnerHTML={{ 
-                    __html: post.content.replace(/\n/g, '<br>')
-                  }}
-                />
+                  },
+                  '& code': {
+                    bgcolor: 'grey.100',
+                    px: 0.5,
+                    py: 0.25,
+                    borderRadius: 0.5,
+                    fontSize: '0.875rem'
+                  },
+                  '& blockquote': {
+                    borderLeft: '4px solid',
+                    borderColor: 'primary.main',
+                    pl: 2,
+                    ml: 0,
+                    fontStyle: 'italic',
+                    color: 'text.secondary'
+                  },
+                  '& img': {
+                    maxWidth: '100%',
+                    height: 'auto',
+                    borderRadius: 1,
+                    my: 2
+                  }
+                }}>
+                  {post.content.split('\n').map((line, index) => {
+                    // 제목 처리
+                    if (line.startsWith('# ')) {
+                      return <Typography key={index} variant="h4" component="h1" sx={{ mt: 4, mb: 2, fontWeight: 'bold' }}>{line.substring(2)}</Typography>
+                    }
+                    if (line.startsWith('## ')) {
+                      return <Typography key={index} variant="h5" component="h2" sx={{ mt: 3, mb: 2, fontWeight: 'bold' }}>{line.substring(3)}</Typography>
+                    }
+                    if (line.startsWith('### ')) {
+                      return <Typography key={index} variant="h6" component="h3" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>{line.substring(4)}</Typography>
+                    }
+                    
+                    // 코드 블록 처리
+                    if (line.startsWith('```')) {
+                      return null // 코드 블록은 별도 처리 필요
+                    }
+                    
+                    // 이미지 처리
+                    const imageMatch = line.match(/!\[([^\]]*)\]\(([^)]+)\)/)
+                    if (imageMatch) {
+                      return (
+                        <Box key={index} sx={{ my: 3, textAlign: 'center' }}>
+                          <img
+                            src={imageMatch[2]}
+                            alt={imageMatch[1]}
+                            style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                          />
+                        </Box>
+                      )
+                    }
+                    
+                    // 일반 텍스트
+                    if (line.trim()) {
+                      return <Typography key={index} variant="body1" paragraph>{line}</Typography>
+                    }
+                    
+                    return <br key={index} />
+                  })}
+                </Box>
               </Box>
 
               <Divider />
@@ -265,15 +309,18 @@ export default function PostDetailPage() {
                   작성자 정보
                 </Typography>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Avatar sx={{ width: 56, height: 56 }}>
-                    A
+                  <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}>
+                    {BLOG_CONFIG.owner.name.charAt(0)}
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold">
-                      Administrator
+                      {BLOG_CONFIG.owner.name}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      블로그 관리자
+                      {BLOG_CONFIG.owner.bio}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {BLOG_CONFIG.owner.email}
                     </Typography>
                   </Box>
                 </Stack>
