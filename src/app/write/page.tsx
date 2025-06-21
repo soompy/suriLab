@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BLOG_CATEGORIES } from '@/shared/constants/categories'
+import { AuthService } from '@/lib/auth'
+import { BLOG_CONFIG } from '@/config/blog'
+import LoginDialog from '@/components/LoginDialog'
 import {
   Container,
   Typography,
@@ -29,13 +32,22 @@ import {
   Preview as PreviewIcon,
   Tag as TagIcon,
   Analytics as AnalyticsIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  CloudUpload as UploadIcon,
+  Image as ImageIcon,
+  Lock as LockIcon,
+  ExitToApp as LogoutIcon
 } from '@mui/icons-material'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 export default function Write() {
+  // 인증 상태 관리
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+
   const [formData, setFormData] = useState({
     title: '',
     summary: '',
@@ -45,6 +57,23 @@ export default function Write() {
   })
   const [tags, setTags] = useState<string[]>([])
   const [isPreview, setIsPreview] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+
+  // 인증 상태 확인
+  useEffect(() => {
+    const checkAuth = () => {
+      const authenticated = AuthService.isAuthenticated()
+      setIsAuthenticated(authenticated)
+      
+      if (authenticated) {
+        setCurrentUser(AuthService.getUser())
+      } else {
+        setShowLoginDialog(true)
+      }
+    }
+
+    checkAuth()
+  }, [])
 
   const handleInputChange = (field: string) => (e: any) => {
     setFormData(prev => ({
@@ -79,7 +108,7 @@ export default function Write() {
         slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         tags,
         category: formData.category,
-        authorId: 'user-1',
+        authorId: BLOG_CONFIG.owner.id,
         featured: false,
         isPublished: false
       }
@@ -131,7 +160,7 @@ export default function Write() {
         slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         tags,
         category: formData.category,
-        authorId: 'user-1',
+        authorId: BLOG_CONFIG.owner.id,
         featured: false,
         isPublished: true
       }
@@ -167,6 +196,63 @@ export default function Write() {
     }
   }
 
+  const handleImageUpload = async (file: File) => {
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error('Upload failed')
+      }
+
+      const result = await response.json()
+      
+      // 마크다운 이미지 문법으로 텍스트에 삽입
+      const imageMarkdown = `![${file.name}](${result.url})\n\n`
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content + imageMarkdown
+      }))
+
+      alert('이미지가 업로드되었습니다!')
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      alert('이미지 업로드에 실패했습니다.')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      handleImageUpload(file)
+    }
+  }
+
+  // 로그인 성공 핸들러
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+    setCurrentUser(AuthService.getUser())
+    setShowLoginDialog(false)
+  }
+
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    AuthService.logout()
+    setIsAuthenticated(false)
+    setCurrentUser(null)
+    setShowLoginDialog(true)
+  }
+
   const tagSuggestions = [
     'React', 'JavaScript', 'TypeScript', 'Next.js', 'Vue.js', 
     'Node.js', 'Python', 'CSS', 'HTML', 'Web Development',
@@ -179,6 +265,42 @@ export default function Write() {
   const charCount = formData.content.length
   const readingTime = Math.ceil(wordCount / 200)
 
+  // 인증되지 않은 경우 로그인 다이얼로그만 표시
+  if (!isAuthenticated) {
+    return (
+      <MuiThemeProvider>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+          <Header />
+          <Container maxWidth="md" sx={{ py: 8 }}>
+            <Box sx={{ textAlign: 'center' }}>
+              <LockIcon sx={{ fontSize: 80, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h4" gutterBottom>
+                로그인이 필요합니다
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                블로그 글 작성은 관리자만 가능합니다.
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={() => setShowLoginDialog(true)}
+                startIcon={<LockIcon />}
+              >
+                관리자 로그인
+              </Button>
+            </Box>
+          </Container>
+          <Footer />
+          
+          <LoginDialog
+            open={showLoginDialog}
+            onClose={() => setShowLoginDialog(false)}
+            onSuccess={handleLoginSuccess}
+          />
+        </Box>
+      </MuiThemeProvider>
+    )
+  }
+
   return (
     <MuiThemeProvider>
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -186,11 +308,26 @@ export default function Write() {
         
         <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, py: 6 }}>
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Typography variant="h2" component="h1" gutterBottom>
-              새 글 작성
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ flex: 1 }} />
+              <Box sx={{ flex: 1, textAlign: 'center' }}>
+                <Typography variant="h2" component="h1" gutterBottom>
+                  새 글 작성
+                </Typography>
+              </Box>
+              <Box sx={{ flex: 1, textAlign: 'right' }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleLogout}
+                  startIcon={<LogoutIcon />}
+                  size="small"
+                >
+                  로그아웃
+                </Button>
+              </Box>
+            </Box>
             <Typography variant="h6" color="text.secondary">
-              새로운 아이디어와 경험을 공유해보세요
+              안녕하세요, {currentUser?.name || '관리자'}님! 새로운 아이디어와 경험을 공유해보세요
             </Typography>
           </Box>
 
@@ -211,6 +348,23 @@ export default function Write() {
                       onClick={() => setIsPreview(!isPreview)}
                     >
                       {isPreview ? '에디터' : '미리보기'}
+                    </Button>
+                    
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      component="label"
+                      startIcon={<ImageIcon />}
+                      disabled={isUploading}
+                      sx={{ ml: 1 }}
+                    >
+                      {isUploading ? '업로드 중...' : '이미지'}
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                      />
                     </Button>
                   </Box>
                 </Box>
