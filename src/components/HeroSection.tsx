@@ -1,10 +1,46 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Box, Typography, Container } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import { BLOG_CATEGORIES } from '@/shared/constants/categories'
+
+interface CategoryStats {
+  [key: string]: number
+}
 
 export default function HeroSection() {
   const theme = useTheme()
+  const [categoryStats, setCategoryStats] = useState<CategoryStats>({})
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchCategoryStats = async () => {
+      try {
+        const response = await fetch('/api/posts')
+        if (response.ok) {
+          const data = await response.json()
+          const posts = data.posts || []
+          
+          // 카테고리별 게시글 수 계산
+          const stats: CategoryStats = {}
+          BLOG_CATEGORIES.forEach(category => {
+            stats[category] = posts.filter((post: any) => 
+              post.category === category && post.isPublished
+            ).length
+          })
+          
+          setCategoryStats(stats)
+        }
+      } catch (error) {
+        console.error('Failed to fetch category stats:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCategoryStats()
+  }, [])
 
   return (
     <Box
@@ -14,7 +50,7 @@ export default function HeroSection() {
         background: theme.palette.mode === 'dark' 
           ? 'linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 50%, #2a2f3e 100%)'
           : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
-        minHeight: '60vh',
+        minHeight: '40vh',
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
@@ -52,7 +88,7 @@ export default function HeroSection() {
         <Box
           sx={{
             textAlign: 'center',
-            py: { xs: 8, md: 12 },
+            py: { xs: 4, md: 6 },
           }}
         >
           {/* 장식적 요소 */}
@@ -152,7 +188,7 @@ export default function HeroSection() {
             함께 성장하는 개발자 커뮤니티를 만들어갑니다
           </Typography>
 
-          {/* 통계 또는 특징 */}
+          {/* 카테고리별 실시간 통계 */}
           <Box
             sx={{
               display: 'flex',
@@ -162,16 +198,17 @@ export default function HeroSection() {
               mt: 6,
             }}
           >
-            {[
-              { label: 'Tech Insights', value: '100+' },
-              { label: 'Code Solutions', value: '500+' },
-              { label: 'Developer Tips', value: '50+' },
-            ].map((stat, index) => (
+            {BLOG_CATEGORIES.map((category, index) => (
               <Box
                 key={index}
                 sx={{
                   textAlign: 'center',
                   opacity: 0.8,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    opacity: 1,
+                    transform: 'translateY(-2px)',
+                  },
                 }}
               >
                 <Typography
@@ -181,9 +218,14 @@ export default function HeroSection() {
                     color: 'primary.main',
                     fontSize: { xs: '1.5rem', md: '2rem' },
                     mb: 0.5,
+                    animation: loading ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                    '@keyframes pulse': {
+                      '0%, 100%': { opacity: 0.7 },
+                      '50%': { opacity: 1 },
+                    },
                   }}
                 >
-                  {stat.value}
+                  {loading ? '...' : categoryStats[category] || 0}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -193,7 +235,7 @@ export default function HeroSection() {
                     fontWeight: 500,
                   }}
                 >
-                  {stat.label}
+                  {category}
                 </Typography>
               </Box>
             ))}
