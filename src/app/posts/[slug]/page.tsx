@@ -41,6 +41,7 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [viewCounted, setViewCounted] = useState(false)
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -54,6 +55,12 @@ export default function PostDetailPage() {
         
         const postData = await response.json()
         setPost(postData)
+        
+        // 조회수 증가 (한 번만 실행)
+        if (!viewCounted) {
+          incrementViews(postData.id)
+          setViewCounted(true)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load post')
       } finally {
@@ -64,7 +71,25 @@ export default function PostDetailPage() {
     if (slug) {
       fetchPost()
     }
-  }, [slug])
+  }, [slug, viewCounted])
+
+  const incrementViews = async (postId: string) => {
+    try {
+      const response = await fetch(`/api/posts/${postId}/views`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (response.ok) {
+        const updatedPost = await response.json()
+        setPost(prev => prev ? { ...prev, views: updatedPost.views } : null)
+      }
+    } catch (error) {
+      console.error('Failed to increment views:', error)
+    }
+  }
 
   const handleBack = () => {
     router.back()

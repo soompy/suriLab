@@ -6,7 +6,6 @@ import {
   Typography, 
   IconButton, 
   Divider,
-  Grid,
   Link
 } from '@mui/material'
 import { 
@@ -76,9 +75,14 @@ export default function Footer() {
     >
       <Container maxWidth="lg">
         {/* Main Footer Content */}
-        <Grid container spacing={4} sx={{ mb: 4 }}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 2fr' }, 
+          gap: 4, 
+          mb: 4 
+        }}>
           {/* Logo & Description */}
-          <Grid item xs={12} md={4}>
+          <Box>
             <Box sx={{ mb: 3 }}>
               <Logo />
             </Box>
@@ -90,11 +94,11 @@ export default function Footer() {
               웹 퍼블리셔에서 프론트엔드 개발자로 성장하는 여정을 기록하는 공간입니다. 
               기술과 경험을 나누며 함께 배워가요.
             </Typography>
-          </Grid>
+          </Box>
 
           {/* Footer Links */}
           {footerLinks.map((section, index) => (
-            <Grid item xs={6} md={2} key={index}>
+            <Box key={index}>
               <Typography 
                 variant="h6" 
                 component="h3" 
@@ -127,11 +131,11 @@ export default function Footer() {
                   </Link>
                 ))}
               </Box>
-            </Grid>
+            </Box>
           ))}
 
           {/* Tech Stack & Contact */}
-          <Grid item xs={12} md={4}>
+          <Box>
             <Typography 
               variant="h6" 
               component="h3" 
@@ -191,8 +195,8 @@ export default function Footer() {
                 </IconButton>
               ))}
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         <Divider sx={{ my: 3 }} />
 

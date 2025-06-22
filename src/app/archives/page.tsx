@@ -6,19 +6,14 @@ import {
   Typography,
   Box,
   Paper,
-  Grid,
   Card,
   CardContent,
   Chip,
   Button,
-  Divider,
   Stack,
   TextField,
   InputAdornment,
-  IconButton,
   Collapse,
-  List,
-  ListItem,
   ListItemButton,
   ListItemText,
   Badge
@@ -30,7 +25,6 @@ import {
   FilterList as FilterIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
-  Article as ArticleIcon,
   Visibility as ViewIcon,
   Schedule as ScheduleIcon,
   TrendingUp as TrendingIcon
@@ -53,7 +47,6 @@ interface BlogPost {
 
 export default function Archives() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedYear, setSelectedYear] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [expandedYears, setExpandedYears] = useState<string[]>(['2024'])
   const [allPosts, setAllPosts] = useState<BlogPost[]>([])
@@ -68,7 +61,7 @@ export default function Archives() {
         
         if (data.success && data.posts) {
           // API 응답 데이터를 BlogPost 인터페이스에 맞게 변환
-          const transformedPosts: BlogPost[] = data.posts.map((post: any) => ({
+          const transformedPosts: BlogPost[] = data.posts.map((post: BlogPost) => ({
             id: post.id,
             title: post.title,
             excerpt: post.excerpt,
@@ -102,14 +95,6 @@ export default function Archives() {
   // 카테고리 목록
   const categories = Array.from(new Set(allPosts.map(post => post.category)))
 
-  // 필터링된 포스트
-  const filteredPosts = allPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesCategory = !selectedCategory || post.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
 
   const handleYearToggle = (year: string) => {
     setExpandedYears(prev => 
@@ -164,45 +149,55 @@ export default function Archives() {
             <Typography variant="h6" gutterBottom>
               블로그 현황
             </Typography>
-            <Grid container spacing={4} sx={{ mt: 2, justifyContent: 'center' }}>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+            <Box sx={{ 
+              mt: 2,
+              display: 'grid',
+              gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gap: 4,
+              justifyItems: 'center'
+            }}>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {allPosts.length}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   총 포스트
                 </Typography>
-              </Grid>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {categories.length}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   카테고리
                 </Typography>
-              </Grid>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {totalTags}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   태그
                 </Typography>
-              </Grid>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {(totalViews / 1000).toFixed(1)}k
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   총 조회수
                 </Typography>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Paper>
 
-          <Grid container spacing={4}>
+          <Box sx={{ 
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' },
+            gap: 4
+          }}>
             {/* 메인 콘텐츠 */}
-            <Grid item xs={12} lg={8}>
+            <Box>
               {/* 검색 및 필터 */}
               <Paper sx={{ p: 3, mb: 4, boxShadow: 'none' }}>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
@@ -347,10 +342,10 @@ export default function Archives() {
                     )
                   })}
               </Box>
-            </Grid>
+            </Box>
 
             {/* 사이드바 */}
-            <Grid item xs={12} lg={4}>
+            <Box>
               <Box sx={{ position: 'sticky', top: 24 }}>
                 {/* 인기 포스트 */}
                 <Paper sx={{ p: 3, mb: 3, boxShadow: 'none' }}>
@@ -433,8 +428,8 @@ export default function Archives() {
                   </Stack>
                 </Paper>
               </Box>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Container>
         
         <Footer />

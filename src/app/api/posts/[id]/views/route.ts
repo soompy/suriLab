@@ -3,9 +3,10 @@ import { prisma } from '../../../../../lib/prisma'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
     await prisma.post.update({
       where: { id: params.id },
       data: {

@@ -6,7 +6,6 @@ import {
   Typography,
   Box,
   Paper,
-  Grid,
   Card,
   CardContent,
   IconButton,
@@ -47,7 +46,7 @@ export default function Contact() {
       await navigator.clipboard.writeText(email)
       setSnackbarMessage('이메일이 클립보드에 복사되었습니다!')
       setSnackbarOpen(true)
-    } catch (err) {
+    } catch {
       setSnackbarMessage('복사에 실패했습니다.')
       setSnackbarOpen(true)
     }
@@ -90,7 +89,7 @@ export default function Contact() {
         subject: '',
         message: ''
       })
-    } catch (error) {
+    } catch {
       setSnackbarMessage('메일 전송에 실패했습니다.')
       setSnackbarOpen(true)
     } finally {
@@ -128,9 +127,19 @@ export default function Contact() {
             </Typography>
           </Box>
 
-          <Grid container spacing={4} sx={{ width: '100%' }}>
+          <Box 
+            sx={{ 
+              display: 'grid',
+              gridTemplateColumns: { 
+                xs: '1fr', 
+                md: '1.2fr 0.8fr' 
+              },
+              gap: 4,
+              width: '100%'
+            }}
+          >
             {/* Contact Form Section */}
-            <Grid item xs={12} md={7.2}>
+            <Box>
               <Paper sx={{ p: 4, height: '100%', boxShadow: 'none', width: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <SendIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
@@ -192,110 +201,108 @@ export default function Contact() {
                   </Button>
                 </Box>
               </Paper>
-            </Grid>
+            </Box>
 
             {/* Contact Info & Social Links Section */}
-            <Grid item xs={12} md={4.8}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%', width: '100%' }}>
-                {/* Email and Social Links in Column Layout */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  {/* Email Section */}
-                  <Paper sx={{ p: 3, boxShadow: 'none', width: '100%' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <EmailIcon sx={{ mr: 1.5, color: 'primary.main' }} />
-                      <Typography variant="h6">
-                        직접 연락
-                      </Typography>
-                    </Box>
-                    
-                    <Card 
-                      sx={{ 
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        boxShadow: 'none',
-                        '&:hover': {
-                          transform: 'translateY(-1px)'
-                        }
-                      }}
-                      onClick={handleEmailCopy}
-                    >
-                      <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 2 }}>
-                        <Box>
-                          <Typography variant="body1" color="primary" fontWeight="medium">
-                            {email}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            클릭하여 복사
-                          </Typography>
-                        </Box>
-                        <IconButton size="small">
-                          <CopyIcon />
-                        </IconButton>
-                      </CardContent>
-                    </Card>
-                  </Paper>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%', width: '100%' }}>
+              {/* Email and Social Links in Column Layout */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {/* Email Section */}
+                <Paper sx={{ p: 3, boxShadow: 'none', width: '100%' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <EmailIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+                    <Typography variant="h6">
+                      직접 연락
+                    </Typography>
+                  </Box>
+                  
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        transform: 'translateY(-1px)'
+                      }
+                    }}
+                    onClick={handleEmailCopy}
+                  >
+                    <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 2 }}>
+                      <Box>
+                        <Typography variant="body1" color="primary" fontWeight="medium">
+                          {email}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          클릭하여 복사
+                        </Typography>
+                      </Box>
+                      <IconButton size="small">
+                        <CopyIcon />
+                      </IconButton>
+                    </CardContent>
+                  </Card>
+                </Paper>
 
-                  {/* Social Links Section */}
-                  <Paper sx={{ p: 3, boxShadow: 'none', width: '100%' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <CodeIcon sx={{ mr: 1.5, color: 'primary.main' }} />
-                      <Typography variant="h6">
-                        소셜 미디어
-                      </Typography>
-                    </Box>
-                    
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                      {socialLinks.map((social) => (
-                        <Card key={social.name} sx={{ cursor: 'pointer', boxShadow: 'none' }}>
-                          <CardContent 
-                            sx={{ 
-                              display: 'flex', 
-                              alignItems: 'center',
-                              py: 2,
-                              transition: 'all 0.2s',
-                              '&:hover': {
-                                bgcolor: 'action.hover'
-                              }
-                            }}
-                            onClick={() => handleLinkClick(social.url)}
-                          >
-                            <Box sx={{ mr: 2, color: 'primary.main' }}>
-                              {social.icon}
-                            </Box>
-                            <Box sx={{ flexGrow: 1 }}>
-                              <Typography variant="subtitle2" fontWeight="medium">
-                                {social.name}
-                              </Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {social.description}
-                              </Typography>
-                            </Box>
-                            <LaunchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </Box>
-                  </Paper>
-                </Box>
+                {/* Social Links Section */}
+                <Paper sx={{ p: 3, boxShadow: 'none', width: '100%' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CodeIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+                    <Typography variant="h6">
+                      소셜 미디어
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {socialLinks.map((social) => (
+                      <Card key={social.name} sx={{ cursor: 'pointer', boxShadow: 'none' }}>
+                        <CardContent 
+                          sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            py: 2,
+                            transition: 'all 0.2s',
+                            '&:hover': {
+                              bgcolor: 'action.hover'
+                            }
+                          }}
+                          onClick={() => handleLinkClick(social.url)}
+                        >
+                          <Box sx={{ mr: 2, color: 'primary.main' }}>
+                            {social.icon}
+                          </Box>
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="subtitle2" fontWeight="medium">
+                              {social.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {social.description}
+                            </Typography>
+                          </Box>
+                          <LaunchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </Box>
+                </Paper>
               </Box>
-            </Grid>
+            </Box>
+          </Box>
 
-            {/* Additional Info */}
-            <Grid item xs={12} sx={{ width: '100%' }}>
-              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'background.paper', boxShadow: 'none', width: '100%' }}>
-                <Typography variant="h6" gutterBottom>
-                  새로운 프로젝트나 협업 기회에 대해 언제든 연락주세요. 
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                  창의적이고 혁신적인 아이디어를 현실로 만드는 것을 좋아합니다.
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="body2" color="text.secondary">
-                  📍 대한민국, 서울/성남 | 🌍 원격 근무 가능 | 🕐 응답 시간: 24시간 이내
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
+          {/* Additional Info */}
+          <Box sx={{ mt: 4, width: '100%' }}>
+            <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'background.paper', boxShadow: 'none', width: '100%' }}>
+              <Typography variant="h6" gutterBottom>
+                새로운 프로젝트나 협업 기회에 대해 언제든 연락주세요. 
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                창의적이고 혁신적인 아이디어를 현실로 만드는 것을 좋아합니다.
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="body2" color="text.secondary">
+                📍 대한민국, 서울/성남 | 🌍 원격 근무 가능 | 🕐 응답 시간: 24시간 이내
+              </Typography>
+            </Paper>
+          </Box>
         </Container>
         
         <Footer />

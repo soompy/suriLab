@@ -11,7 +11,7 @@ describe('ThemeToggle', () => {
   })
 
   it('renders toggle button with sun icon for light mode', () => {
-    render(<ThemeToggleButtonButton isDarkMode={false} onThemeChange={mockOnThemeChange} />)
+    render(<ThemeToggleButton isDarkMode={false} onThemeChange={mockOnThemeChange} />)
 
     const button = screen.getByRole('button', { name: /toggle dark mode/i })
     expect(button).toBeInTheDocument()
@@ -83,7 +83,7 @@ describe('ThemeToggle', () => {
 
   it('updates ARIA label based on current mode', () => {
     const { rerender } = render(
-      <ThemeToggle isDarkMode={false} onThemeChange={mockOnThemeChange} />
+      <ThemeToggleButton isDarkMode={false} onThemeChange={mockOnThemeChange} />
     )
 
     expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Toggle dark mode')

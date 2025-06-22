@@ -3,9 +3,10 @@ import { getPostBySlug } from '../../../../../infrastructure/api/posts'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const params = await context.params
     const post = await getPostBySlug(params.slug)
     if (!post) {
       return NextResponse.json(
@@ -14,7 +15,7 @@ export async function GET(
       )
     }
     return NextResponse.json(post)
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch post' },
       { status: 500 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PostEntity, CreatePostInput, UpdatePostInput, PostFilters, PostSort, PaginationOptions } from '../../entities/Post'
+import { CreatePostInput, UpdatePostInput, PostFilters, PostSort, PaginationOptions } from '../../entities/Post'
 import { PrismaPostRepository } from '../../repositories/PrismaPostRepository'
 import { GetPostsUseCaseImpl, GetPostByIdUseCaseImpl, GetPostBySlugUseCaseImpl, GetBlogStatsUseCaseImpl } from '../../usecases/GetPosts'
 import { CreatePostUseCaseImpl } from '../../usecases/CreatePost'
@@ -122,7 +122,7 @@ export class PostsAPIHandler {
 
       const result = await getPosts(filters, sort, pagination)
       return NextResponse.json(result)
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Failed to fetch posts' },
         { status: 500 }
@@ -135,10 +135,9 @@ export class PostsAPIHandler {
       const body = await request.json()
       const post = await createPost(body)
       return NextResponse.json(post, { status: 201 })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to create post'
+    } catch {
       return NextResponse.json(
-        { error: message },
+        { error: 'Failed to create post' },
         { status: 400 }
       )
     }
@@ -156,7 +155,7 @@ export class PostAPIHandler {
         )
       }
       return NextResponse.json(post)
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Failed to fetch post' },
         { status: 500 }
@@ -173,12 +172,10 @@ export class PostAPIHandler {
       }
       const post = await updatePost(updateInput)
       return NextResponse.json(post)
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to update post'
-      const status = message.includes('not found') ? 404 : 400
+    } catch {
       return NextResponse.json(
-        { error: message },
-        { status }
+        { error: 'Failed to update post' },
+        { status: 400 }
       )
     }
   }
@@ -187,12 +184,10 @@ export class PostAPIHandler {
     try {
       await deletePost(params.id)
       return NextResponse.json({ success: true })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to delete post'
-      const status = message.includes('not found') ? 404 : 400
+    } catch {
       return NextResponse.json(
-        { error: message },
-        { status }
+        { error: 'Failed to delete post' },
+        { status: 400 }
       )
     }
   }
@@ -203,7 +198,7 @@ export class BlogStatsAPIHandler {
     try {
       const stats = await getBlogStats()
       return NextResponse.json(stats)
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Failed to fetch blog stats' },
         { status: 500 }

@@ -37,7 +37,6 @@ import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { PostEntity } from '@/entities/Post'
-import { BLOG_CATEGORIES } from '@/shared/constants/categories'
 
 export default function AdminPostsPage() {
   const router = useRouter()
@@ -292,7 +291,7 @@ export default function AdminPostsPage() {
             <DialogTitle>포스트 삭제</DialogTitle>
             <DialogContent>
               <Typography>
-                "{deleteDialog.post?.title}" 포스트를 정말 삭제하시겠습니까?
+                &quot;{deleteDialog.post?.title}&quot; 포스트를 정말 삭제하시겠습니까?
                 이 작업은 되돌릴 수 없습니다.
               </Typography>
             </DialogContent>

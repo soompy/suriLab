@@ -11,7 +11,6 @@ import {
   Typography,
   Box,
   Paper,
-  Grid,
   TextField,
   Button,
   Chip,
@@ -19,8 +18,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Card,
-  CardContent,
   Divider,
   Stack,
   IconButton,
@@ -36,12 +33,8 @@ import {
   Edit as EditIcon,
   Publish as PublishIcon,
   Save as SaveIcon,
-  Preview as PreviewIcon,
   Tag as TagIcon,
   Analytics as AnalyticsIcon,
-  Close as CloseIcon,
-  CloudUpload as UploadIcon,
-  Image as ImageIcon,
   Lock as LockIcon,
   ExitToApp as LogoutIcon,
   FormatBold as BoldIcon,
@@ -69,7 +62,6 @@ export default function Write() {
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -92,7 +84,7 @@ export default function Write() {
         return
       }
 
-      setLoading(true)
+      // Loading post data
       try {
         const response = await fetch(`/api/posts/${editId}`)
         if (!response.ok) {
@@ -113,7 +105,7 @@ export default function Write() {
         console.error('Error loading post:', error)
         alert('포스트를 불러오는데 실패했습니다.')
       } finally {
-        setLoading(false)
+        // Post loading completed
       }
     }
 
@@ -184,11 +176,9 @@ export default function Write() {
   const insertBold = () => insertMarkdown('**', '굵은 텍스트')
   const insertItalic = () => insertMarkdown('*', '기울임 텍스트')
   const insertCode = () => insertMarkdown('`', '코드')
-  const insertCodeBlock = () => insertMarkdown('```\n', '코드 블록\n```')
   const insertQuote = () => insertMarkdown('> ', '인용문')
   const insertLink = () => insertMarkdown('[](url)', '링크 텍스트')
   const insertList = () => insertMarkdown('- ', '목록 항목')
-  const insertImage = () => insertMarkdown('![](url)', '이미지 설명')
 
   // 포커스 관리
   const handleFocus = (field: string) => () => setIsFocused(field)
@@ -488,9 +478,9 @@ export default function Write() {
             </Box>
           </Box>
 
-          <Grid container spacing={4}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 4 }}>
             {/* Main Editor Section */}
-            <Grid item xs={12} lg={8}>
+            <Box>
               <Paper sx={{ 
                 height: '100%',
                 borderRadius: 2,
@@ -510,7 +500,7 @@ export default function Write() {
                       에디터
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)} size="small">
+                      <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
                         <Tab label="편집" icon={<EditIcon />} iconPosition="start" />
                         <Tab label="미리보기" icon={<EyeIcon />} iconPosition="start" />
                       </Tabs>
@@ -732,10 +722,10 @@ export default function Write() {
                   )}
                 </Box>
               </Paper>
-            </Grid>
+            </Box>
 
             {/* Sidebar */}
-            <Grid item xs={12} lg={4}>
+            <Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 {/* Action Buttons */}
                 <Paper sx={{ 
@@ -1003,8 +993,8 @@ export default function Write() {
                   </Box>
                 </Paper>
               </Box>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Container>
         
         <Footer />

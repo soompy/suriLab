@@ -6,16 +6,10 @@ import {
   Typography,
   Box,
   Paper,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
   Button,
   Chip,
   Pagination,
   Stack,
-  Link,
-  CardActions
 } from '@mui/material'
 import {
   Work as WorkIcon,
@@ -160,40 +154,51 @@ export default function Projects() {
             <Typography variant="h6" gutterBottom>
               프로젝트 현황
             </Typography>
-            <Grid container spacing={4} sx={{ mt: 2, justifyContent: 'center' }}>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+            <Box
+              sx={{
+                mt: 2,
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(2, 1fr)',
+                  md: 'repeat(4, 1fr)'
+                },
+                gap: 4,
+                justifyItems: 'center'
+              }}
+            >
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {allProjects.length}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   총 프로젝트
                 </Typography>
-              </Grid>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {allProjects.filter(p => p.category === '웹 개발').length}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   웹 개발
                 </Typography>
-              </Grid>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {allProjects.filter(p => p.category === 'UI/UX 디자인').length}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   UI/UX 디자인
                 </Typography>
-              </Grid>
-              <Grid item xs={6} md={3} sx={{ textAlign: 'center' }}>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
                   {allProjects.filter(p => p.featured).length}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   추천 프로젝트
                 </Typography>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Paper>
 
           {/* 프로젝트 목록 */}
@@ -215,9 +220,18 @@ export default function Projects() {
                     />
                   )}
                   
-                  <Grid container spacing={4}>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: {
+                        xs: '1fr',
+                        md: '1fr 2fr'
+                      },
+                      gap: 4
+                    }}
+                  >
                     {/* 프로젝트 이미지 */}
-                    <Grid item xs={12} md={4}>
+                    <Box>
                       <Box
                         sx={{
                           width: '100%',
@@ -259,10 +273,10 @@ export default function Projects() {
                           <WorkIcon sx={{ fontSize: 48 }} />
                         </Box>
                       </Box>
-                    </Grid>
+                    </Box>
 
                     {/* 프로젝트 정보 */}
-                    <Grid item xs={12} md={8}>
+                    <Box>
                       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ mb: 2 }}>
                           <Typography variant="h4" component="h2" gutterBottom>
@@ -325,8 +339,8 @@ export default function Projects() {
                           )}
                         </Box>
                       </Box>
-                    </Grid>
-                  </Grid>
+                    </Box>
+                  </Box>
                 </Paper>
               ))}
             </Stack>

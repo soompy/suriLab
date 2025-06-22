@@ -1,73 +1,77 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { 
   Container, 
   Typography, 
   Box, 
-  Grid, 
   Card, 
   CardContent, 
-  CardActions, 
-  Button, 
   Chip, 
   Tabs, 
   Tab,
-  Paper,
-  Stack,
-  Divider
+  Stack
 } from '@mui/material'
 import {
-  TrendingUp as TrendingIcon,
   Schedule as ScheduleIcon,
   Visibility as ViewIcon,
   Category as CategoryIcon
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
+import { PostEntity } from '@/entities/Post'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
-import HeroSection from '@/components/HeroSection'
 import Footer from '@/components/Footer'
-import { PostEntity } from '@/entities/Post'
-import { BLOG_CATEGORIES, CATEGORY_DESCRIPTIONS, CATEGORY_COLORS, BlogCategory } from '@/shared/constants/categories'
+import HeroSection from '@/components/HeroSection'
+import { BLOG_CATEGORIES, CATEGORY_DESCRIPTIONS, CATEGORY_COLORS } from '@/shared/constants/categories'
 
-export default function Home() {
+type BlogCategory = typeof BLOG_CATEGORIES[number]
+
+export default function HomePage() {
   const router = useRouter()
-  const [selectedCategory, setSelectedCategory] = useState<BlogCategory | 'all'>('all')
   const [posts, setPosts] = useState<PostEntity[]>([])
   const [loading, setLoading] = useState(true)
-
-  const fetchPosts = async (category?: BlogCategory) => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams({
-        isPublished: 'true',
-        limit: '9',
-        sortField: 'publishedAt',
-        sortOrder: 'desc'
-      })
-      
-      if (category) {
-        params.append('category', category)
-      }
-
-      const response = await fetch(`/api/posts?${params.toString()}`)
-      if (response.ok) {
-        const data = await response.json()
-        setPosts(data.posts)
-      }
-    } catch (error) {
-      console.error('Failed to fetch posts:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [isSticky, setIsSticky] = useState(false)
+  const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    fetchPosts(selectedCategory === 'all' ? undefined : selectedCategory)
-  }, [selectedCategory])
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('/api/posts')
+        if (response.ok) {
+          const data = await response.json()
+          setPosts(data.posts || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch posts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const handleCategoryChange = (_: React.SyntheticEvent, newValue: BlogCategory | 'all') => {
+    fetchPosts()
+  }, [])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSticky(!entry.isIntersecting)
+      },
+      {
+        rootMargin: '-80px 0px 0px 0px',
+        threshold: 0
+      }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
+  const handleCategoryChange = (_: React.SyntheticEvent, newValue: string) => {
     setSelectedCategory(newValue)
   }
 
@@ -75,8 +79,13 @@ export default function Home() {
     router.push(`/posts/${post.slug}`)
   }
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ko-KR', {
+  const filteredPosts = selectedCategory === 'all' 
+    ? posts.filter(post => post.isPublished)
+    : posts.filter(post => post.isPublished && post.category === selectedCategory)
+
+  const formatDate = (dateString: string | Date) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -97,161 +106,166 @@ export default function Home() {
           <HeroSection />
           
           <Container maxWidth="lg" sx={{ py: 8 }}>
-            {/* Category Tabs */}
-            <Box sx={{ mb: 6 }}>
-              <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 4 }}>
+            <Box ref={sectionRef}>
+              <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 6 }}>
                 Latest Posts
               </Typography>
-              
-              <Paper sx={{ mb: 4 }}>
-                <Tabs
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                  variant="fullWidth"
-                  textColor="primary"
-                  indicatorColor="primary"
-                >
-                  <Tab label="All Posts" value="all" />
-                  {BLOG_CATEGORIES.map((category) => (
-                    <Tab key={category} label={category} value={category} />
-                  ))}
-                </Tabs>
-              </Paper>
-
-              {/* Category Description */}
-              {selectedCategory !== 'all' && (
-                <Box sx={{ mb: 4, textAlign: 'center' }}>
-                  <Chip
-                    icon={<CategoryIcon />}
-                    label={selectedCategory}
-                    sx={{
-                      background: getCategoryInfo(selectedCategory).color,
-                      color: 'black',
-                      fontWeight: 'bold',
-                      mb: 2
-                    }}
-                  />
-                  <Typography variant="body1" color="text.secondary">
-                    {getCategoryInfo(selectedCategory).description}
-                  </Typography>
-                </Box>
-              )}
             </Box>
-
-            {/* Posts Grid */}
-            {loading ? (
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Typography>Loading posts...</Typography>
-              </Box>
-            ) : (
-              <Grid container spacing={4}>
-                {posts.map((post) => (
-                  <Grid item xs={12} md={6} lg={4} key={post.id}>
-                    <Card 
-                      sx={{ 
-                        height: '100%', 
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
+            
+            <Box sx={{ display: 'flex', gap: 4 }}>
+              {/* Left Sidebar - Category Tabs */}
+              <Box sx={{ width: 280, flexShrink: 0 }}>
+                <Box sx={{ 
+                  position: isSticky ? 'fixed' : 'sticky', 
+                  top: isSticky ? 80 : 32,
+                  zIndex: 10,
+                  width: 280,
+                  maxHeight: isSticky ? 'calc(100vh - 100px)' : 'none',
+                  overflowY: isSticky ? 'auto' : 'visible'
+                }}>
+                  <Tabs
+                    value={selectedCategory}
+                    onChange={handleCategoryChange}
+                    orientation="vertical"
+                    textColor="primary"
+                    sx={{
+                      borderRight: 'none',
+                      '& .MuiTabs-indicator': {
+                        display: 'none'
+                      },
+                      '& .MuiTab-root': {
+                        borderRadius: '12px',
+                        margin: '4px 0',
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        transition: 'all 0.2s ease',
+                        alignItems: 'flex-start',
+                        textAlign: 'left',
+                        minHeight: 48,
+                        '&.Mui-selected': {
+                          backgroundColor: 'primary.main',
+                          color: 'white',
+                          fontWeight: 600
+                        },
                         '&:hover': {
-                          transform: 'translateY(-4px)',
-                          boxShadow: 4
+                          backgroundColor: 'primary.50'
                         }
-                      }}
-                      onClick={() => handlePostClick(post)}
-                    >
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Box sx={{ mb: 2 }}>
-                          <Chip
-                            label={post.category}
-                            size="small"
-                            sx={{
-                              background: getCategoryInfo(post.category as BlogCategory).color,
-                              color: 'black',
-                              fontWeight: 'bold',
-                              mb: 1
-                            }}
-                          />
-                          {post.featured && (
-                            <Chip
-                              label="Featured"
-                              size="small"
-                              color="secondary"
-                              sx={{ ml: 1 }}
-                            />
-                          )}
-                        </Box>
-                        
-                        <Typography variant="h6" component="h3" gutterBottom>
-                          {post.title}
-                        </Typography>
-                        
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                          {post.excerpt}
-                        </Typography>
-                        
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Chip key={tag} label={tag} size="small" variant="outlined" />
-                          ))}
-                          {post.tags.length > 3 && (
-                            <Chip label={`+${post.tags.length - 3}`} size="small" variant="outlined" />
-                          )}
-                        </Box>
-                      </CardContent>
-                      
-                      <Divider />
-                      
-                      <CardActions sx={{ p: 2, justifyContent: 'space-between' }}>
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            <Typography variant="caption" color="text.secondary">
-                              {post.readTime}분
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <ViewIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            <Typography variant="caption" color="text.secondary">
-                              {post.views?.toLocaleString()}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                        
-                        <Typography variant="caption" color="text.secondary">
-                          {formatDate(post.publishedAt)}
-                        </Typography>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
+                      }
+                    }}
+                  >
+                    <Tab label="All Posts" value="all" />
+                    {BLOG_CATEGORIES.map((category) => (
+                      <Tab key={category} label={category} value={category} />
+                    ))}
+                  </Tabs>
 
-            {posts.length === 0 && !loading && (
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Typography variant="h6" color="text.secondary">
-                  {selectedCategory === 'all' 
-                    ? '아직 게시된 포스트가 없습니다.' 
-                    : `${selectedCategory} 카테고리에 게시된 포스트가 없습니다.`
-                  }
-                </Typography>
+                  {/* Category Description */}
+                  {selectedCategory !== 'all' && (
+                    <Box sx={{ mt: 4, p: 3, backgroundColor: 'grey.50', borderRadius: 2 }}>
+                      <Chip
+                        icon={<CategoryIcon />}
+                        label={selectedCategory}
+                        sx={{
+                          background: getCategoryInfo(selectedCategory as BlogCategory).color,
+                          color: 'black',
+                          fontWeight: 'bold',
+                          mb: 2
+                        }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        {getCategoryInfo(selectedCategory as BlogCategory).description}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
               </Box>
-            )}
 
-            {/* View All Posts Button */}
-            {posts.length > 0 && (
-              <Box sx={{ textAlign: 'center', mt: 6 }}>
-                <Button 
-                  variant="outlined" 
-                  size="large"
-                  onClick={() => router.push('/archives')}
-                >
-                  View All Posts
-                </Button>
+              {/* Right Content - Posts Grid */}
+              <Box sx={{ flex: 1 }}>
+                {loading ? (
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography>Loading posts...</Typography>
+                  </Box>
+                ) : (
+                  <Box sx={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+                    gap: 3 
+                  }}>
+                    {filteredPosts.map((post) => (
+                      <Box key={post.id}>
+                        <Card 
+                          sx={{ 
+                            height: '100%', 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            border: 'none',
+                            boxShadow: 'none',
+                            '&:hover': {
+                              transform: 'translateY(-4px)',
+                              backgroundColor: 'grey.50'
+                            }
+                          }}
+                          onClick={() => handlePostClick(post)}
+                        >
+                          <CardContent sx={{ flexGrow: 1 }}>
+                            <Box sx={{ mb: 2 }}>
+                              <Chip
+                                label={post.category}
+                                size="small"
+                                sx={{
+                                  background: getCategoryInfo(post.category as BlogCategory).color,
+                                  color: 'black',
+                                  fontWeight: 'bold',
+                                  mb: 1
+                                }}
+                              />
+                              {post.featured && (
+                                <Chip
+                                  label="Featured"
+                                  size="small"
+                                  color="secondary"
+                                  sx={{ ml: 1 }}
+                                />
+                              )}
+                            </Box>
+                            
+                            <Typography variant="h6" component="h3" sx={{ mb: 1, fontWeight: 'bold' }}>
+                              {post.title}
+                            </Typography>
+                            
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                              {post.excerpt}
+                            </Typography>
+                            
+                            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                <Typography variant="caption" color="text.secondary">
+                                  {post.readTime}분 읽기
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <ViewIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                <Typography variant="caption" color="text.secondary">
+                                  {post.views?.toLocaleString()}
+                                </Typography>
+                              </Box>
+                            </Stack>
+                            
+                            <Typography variant="caption" color="text.secondary">
+                              {formatDate(post.publishedAt)}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
               </Box>
-            )}
+            </Box>
           </Container>
         </main>
         

@@ -2,10 +2,6 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import PostList from './PostList'
-import CategoryFilter from './CategoryFilter'
-import ProfileBox from './ProfileBox'
-import PopularPosts from './PopularPosts'
-import SocialLinks from './SocialLinks'
 import SearchFilter from './SearchFilter'
 
 interface Post {
