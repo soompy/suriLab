@@ -171,7 +171,15 @@ export default function HomePage() {
                           mb: 2
                         }}
                       />
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography 
+                        variant="body1" 
+                        color="text.primary"
+                        sx={{ 
+                          fontSize: '0.95rem',
+                          lineHeight: 1.6,
+                          fontWeight: 500
+                        }}
+                      >
                         {getCategoryInfo(selectedCategory as BlogCategory).description}
                       </Typography>
                     </Box>
@@ -235,7 +243,16 @@ export default function HomePage() {
                               {post.title}
                             </Typography>
                             
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            <Typography 
+                              variant="body1" 
+                              color="text.primary"
+                              sx={{ 
+                                mb: 2,
+                                fontSize: '0.9rem',
+                                lineHeight: 1.6,
+                                opacity: 0.8
+                              }}
+                            >
                               {post.excerpt}
                             </Typography>
                             

@@ -228,11 +228,12 @@ export default function HeroSection() {
                   {loading ? '...' : categoryStats[category] || 0}
                 </Typography>
                 <Typography
-                  variant="body2"
+                  variant="body1"
                   sx={{
-                    color: 'text.secondary',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
+                    color: 'text.primary',
+                    fontSize: '0.95rem',
+                    fontWeight: 600,
+                    opacity: 0.9
                   }}
                 >
                   {category}
