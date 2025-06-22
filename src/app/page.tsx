@@ -108,7 +108,7 @@ export default function HomePage() {
           <Container maxWidth="lg" sx={{ py: 8 }}>
             <Box ref={sectionRef} sx={{ height: '1px', mb: 6 }} />
             <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 6 }}>
-              Latest Posts
+              최신 포스트
             </Typography>
             
             <Box sx={{ display: 'flex', gap: 4 }}>
