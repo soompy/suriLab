@@ -6,9 +6,10 @@ html {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-inter), var(--font-noto-sans-kr), -apple-system, 
+    BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Malgun Gothic', '맑은 고딕', sans-serif;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'ss01' 1;
+  font-optical-sizing: auto;
 }
 
 img {
@@ -36,4 +37,27 @@ img {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+/* 코드 관련 스타일 */
+code, pre {
+  font-family: var(--font-jetbrains-mono), 'SF Mono', Monaco, Inconsolata, 
+    'Roboto Mono', 'Source Code Pro', Consolas, 'Liberation Mono', Menlo, 
+    Courier, monospace;
+  font-feature-settings: 'calt' 1, 'liga' 1;
+}
+
+/* 인라인 코드 스타일 개선 */
+code:not([class*="language-"]) {
+  background-color: rgba(175, 184, 193, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+/* 영문과 한글 사이 간격 최적화 */
+.optimize-text {
+  word-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }

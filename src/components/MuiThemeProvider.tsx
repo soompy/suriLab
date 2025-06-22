@@ -34,6 +34,8 @@ export default function MuiThemeProvider({ children }: MuiThemeProviderProps) {
     },
     typography: {
       fontFamily: [
+        'var(--font-inter)',
+        'var(--font-noto-sans-kr)',
         '-apple-system',
         'BlinkMacSystemFont',
         '"Segoe UI"',
