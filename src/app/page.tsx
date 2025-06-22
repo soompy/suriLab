@@ -106,11 +106,10 @@ export default function HomePage() {
           <HeroSection />
           
           <Container maxWidth="lg" sx={{ py: 8 }}>
-            <Box ref={sectionRef}>
-              <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 6 }}>
-                Latest Posts
-              </Typography>
-            </Box>
+            <Box ref={sectionRef} sx={{ height: '1px', mb: 6 }} />
+            <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 6 }}>
+              Latest Posts
+            </Typography>
             
             <Box sx={{ display: 'flex', gap: 4 }}>
               {/* Left Sidebar - Category Tabs */}
