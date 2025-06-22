@@ -152,7 +152,7 @@ export default function HeroSection() {
           <Typography
             variant="h1"
             sx={{
-              fontSize: { xs: '2.5rem', md: '3.5rem', lg: '4rem' },
+              fontSize: { xs: '2rem', md: '2.5rem', lg: '3rem' },
               fontWeight: 700,
               background: theme.palette.mode === 'dark'
                 ? 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)'
