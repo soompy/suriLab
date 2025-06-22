@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { BLOG_CATEGORIES } from '@/shared/constants/categories'
 import { AuthService } from '@/lib/auth'
 import { BLOG_CONFIG } from '@/config/blog'
@@ -60,11 +61,15 @@ import Footer from '@/components/Footer'
 export default function Write() {
   const theme = useTheme()
   const contentRef = useRef<HTMLTextAreaElement>(null)
+  const searchParams = useSearchParams()
+  const editId = searchParams.get('edit')
   
   // 인증 상태 관리
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -78,6 +83,42 @@ export default function Write() {
   const [isUploading, setIsUploading] = useState(false)
   const [isFocused, setIsFocused] = useState<string>('') // 현재 포커스된 필드
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+
+  // 수정할 포스트 로딩
+  useEffect(() => {
+    const loadPost = async () => {
+      if (!editId) {
+        setIsEditing(false)
+        return
+      }
+
+      setLoading(true)
+      try {
+        const response = await fetch(`/api/posts/${editId}`)
+        if (!response.ok) {
+          throw new Error('Post not found')
+        }
+        
+        const post = await response.json()
+        setIsEditing(true)
+        setFormData({
+          title: post.title,
+          summary: post.excerpt,
+          content: post.content,
+          category: post.category,
+          status: post.isPublished ? 'published' : 'draft'
+        })
+        setTags(post.tags || [])
+      } catch (error) {
+        console.error('Error loading post:', error)
+        alert('포스트를 불러오는데 실패했습니다.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadPost()
+  }, [editId])
 
   // 인증 상태 확인
   useEffect(() => {
@@ -185,8 +226,11 @@ export default function Write() {
         isPublished: false
       }
 
-      const response = await fetch('/api/posts', {
-        method: 'POST',
+      const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
+      const method = isEditing ? 'PUT' : 'POST'
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -194,7 +238,7 @@ export default function Write() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to save post')
+        throw new Error(`Failed to ${isEditing ? 'update' : 'save'} post`)
       }
 
       const savedPost = await response.json()
@@ -239,8 +283,11 @@ export default function Write() {
         isPublished: true
       }
 
-      const response = await fetch('/api/posts', {
-        method: 'POST',
+      const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
+      const method = isEditing ? 'PUT' : 'POST'
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -248,26 +295,28 @@ export default function Write() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to publish post')
+        throw new Error(`Failed to ${isEditing ? 'update' : 'publish'} post`)
       }
 
       const publishedPost = await response.json()
       console.log('Post published:', publishedPost)
-      alert('포스트가 발행되었습니다!')
+      alert(`포스트가 ${isEditing ? '수정' : '발행'}되었습니다!`)
       
-      // Reset form
-      setFormData({
-        title: '',
-        summary: '',
-        content: '',
-        category: '',
-        status: 'draft'
-      })
-      setTags([])
+      if (!isEditing) {
+        // Reset form only for new posts
+        setFormData({
+          title: '',
+          summary: '',
+          content: '',
+          category: '',
+          status: 'draft'
+        })
+        setTags([])
+      }
       setSaveStatus('idle')
     } catch (error) {
       console.error('Error publishing post:', error)
-      alert('포스트 발행에 실패했습니다.')
+      alert(`포스트 ${isEditing ? '수정' : '발행'}에 실패했습니다.`)
     }
   }
 
@@ -398,17 +447,18 @@ export default function Write() {
             justifyContent: 'space-between', 
             alignItems: 'center',
             mb: 4,
-            p: 3,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main}15, ${theme.palette.secondary.main}10)`,
-            borderRadius: 3,
+            p: 4,
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             border: `1px solid ${theme.palette.divider}`
           }}>
             <Box>
               <Typography variant="h3" component="h1" sx={{ fontWeight: 600, mb: 1 }}>
-                ✍️ 새 글 작성
+                {isEditing ? '✏️ 글 수정' : '✍️ 새 글 작성'}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                안녕하세요, {currentUser?.name || '관리자'}님! 새로운 이야기를 시작해보세요
+                안녕하세요, {currentUser?.name || '관리자'}님! {isEditing ? '글을 수정해보세요' : '새로운 이야기를 시작해보세요'}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -443,9 +493,10 @@ export default function Write() {
             <Grid item xs={12} lg={8}>
               <Paper sx={{ 
                 height: '100%',
-                borderRadius: 3,
+                borderRadius: 2,
                 border: `1px solid ${theme.palette.divider}`,
-                overflow: 'hidden'
+                overflow: 'hidden',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.05)'
               }}>
                 {/* Editor Header */}
                 <Box sx={{ 
@@ -473,8 +524,9 @@ export default function Write() {
                       flexWrap: 'wrap', 
                       gap: 1,
                       p: 2,
-                      background: theme.palette.background.default,
-                      borderRadius: 2
+                      bgcolor: 'grey.50',
+                      borderRadius: 1.5,
+                      border: `1px solid ${theme.palette.grey[200]}`
                     }}>
                       <Tooltip title="제목 (H1)">
                         <IconButton size="small" onClick={() => insertHeading(1)}>
@@ -551,10 +603,16 @@ export default function Write() {
                     variant="outlined"
                     required
                     sx={{
-                      '& .MuiOutlineaInput-root': {
-                        borderRadius: 2,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 1.5,
                         fontSize: '1.2rem',
-                        fontWeight: 500
+                        fontWeight: 500,
+                        bgcolor: 'background.paper',
+                        '&:hover': {
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'primary.main'
+                          }
+                        }
                       }
                     }}
                   />
@@ -573,7 +631,13 @@ export default function Write() {
                     required
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 2
+                        borderRadius: 1.5,
+                        bgcolor: 'background.paper',
+                        '&:hover': {
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'primary.main'
+                          }
+                        }
                       }
                     }}
                   />
@@ -594,12 +658,18 @@ export default function Write() {
                       inputRef={contentRef}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
+                          borderRadius: 1.5,
                           fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", monospace',
                           fontSize: '14px',
                           lineHeight: 1.6,
+                          bgcolor: 'background.paper',
                           '& textarea': {
                             resize: 'vertical'
+                          },
+                          '&:hover': {
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'primary.main'
+                            }
                           }
                         }
                       }}
@@ -612,8 +682,8 @@ export default function Write() {
                         minHeight: '500px',
                         p: 3,
                         border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 2,
-                        background: theme.palette.background.paper,
+                        borderRadius: 1.5,
+                        bgcolor: 'background.paper',
                         '& h1, & h2, & h3, & h4, & h5, & h6': {
                           fontWeight: 600,
                           mb: 2,
@@ -670,9 +740,10 @@ export default function Write() {
                 {/* Action Buttons */}
                 <Paper sx={{ 
                   p: 3, 
-                  borderRadius: 3,
+                  borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  background: `linear-gradient(135deg, ${theme.palette.success.main}08, ${theme.palette.primary.main}05)`
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
                     <PublishIcon sx={{ mr: 1, color: 'primary.main' }} />
@@ -688,10 +759,14 @@ export default function Write() {
                       onClick={handleSave}
                       disabled={saveStatus === 'saving'}
                       sx={{ 
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         py: 1.5,
                         textTransform: 'none',
-                        fontSize: '1rem'
+                        fontSize: '1rem',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          bgcolor: 'primary.50'
+                        }
                       }}
                     >
                       {saveStatus === 'saving' ? '저장 중...' : '임시 저장'}
@@ -703,14 +778,18 @@ export default function Write() {
                       startIcon={<PublishIcon />}
                       onClick={handlePublish}
                       sx={{ 
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         py: 1.5,
                         textTransform: 'none',
                         fontSize: '1rem',
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+                        fontWeight: 600,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        '&:hover': {
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                        }
                       }}
                     >
-                      발행하기
+                      {isEditing ? '수정 완료' : '발행하기'}
                     </Button>
                   </Stack>
                 </Paper>
@@ -718,8 +797,10 @@ export default function Write() {
                 {/* Category & Status */}
                 <Paper sx={{ 
                   p: 3, 
-                  borderRadius: 3,
-                  border: `1px solid ${theme.palette.divider}`
+                  borderRadius: 2,
+                  border: `1px solid ${theme.palette.divider}`,
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
                     📂 분류 설정
@@ -733,7 +814,16 @@ export default function Write() {
                         onChange={handleInputChange('category')}
                         label="카테고리 *"
                         required
-                        sx={{ borderRadius: 2 }}
+                        sx={{ 
+                          borderRadius: 1.5,
+                          '& .MuiOutlinedInput-root': {
+                            '&:hover': {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'primary.main'
+                              }
+                            }
+                          }
+                        }}
                       >
                         {categories.map((category) => (
                           <MenuItem key={category} value={category}>
@@ -749,7 +839,16 @@ export default function Write() {
                         value={formData.status}
                         onChange={handleInputChange('status')}
                         label="상태"
-                        sx={{ borderRadius: 2 }}
+                        sx={{ 
+                          borderRadius: 1.5,
+                          '& .MuiOutlinedInput-root': {
+                            '&:hover': {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'primary.main'
+                              }
+                            }
+                          }
+                        }}
                       >
                         <MenuItem value="draft">📝 초안</MenuItem>
                         <MenuItem value="published">🌍 발행됨</MenuItem>
@@ -762,8 +861,10 @@ export default function Write() {
                 {/* Tags */}
                 <Paper sx={{ 
                   p: 3, 
-                  borderRadius: 3,
-                  border: `1px solid ${theme.palette.divider}`
+                  borderRadius: 2,
+                  border: `1px solid ${theme.palette.divider}`,
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
                     <TagIcon sx={{ mr: 1, color: 'primary.main' }} />
@@ -785,7 +886,13 @@ export default function Write() {
                             label={option}
                             {...tagProps}
                             key={key}
-                            sx={{ borderRadius: 2 }}
+                            sx={{ 
+                              borderRadius: 1.5,
+                              '&:hover': {
+                                borderColor: 'primary.main',
+                                bgcolor: 'primary.50'
+                              }
+                            }}
                           />
                         )
                       })
@@ -797,7 +904,12 @@ export default function Write() {
                         variant="outlined"
                         sx={{
                           '& .MuiOutlinedInput-root': {
-                            borderRadius: 2
+                            borderRadius: 1.5,
+                            '&:hover': {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'primary.main'
+                              }
+                            }
                           }
                         }}
                       />
@@ -811,9 +923,10 @@ export default function Write() {
                 {/* Statistics */}
                 <Paper sx={{ 
                   p: 3, 
-                  borderRadius: 3,
+                  borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  background: `linear-gradient(135deg, ${theme.palette.info.main}08, ${theme.palette.primary.main}05)`
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
                     <AnalyticsIcon sx={{ mr: 1, color: 'primary.main' }} />
@@ -824,9 +937,9 @@ export default function Write() {
                     <Box sx={{ 
                       textAlign: 'center', 
                       p: 2, 
-                      background: theme.palette.background.paper,
-                      borderRadius: 2,
-                      border: `1px solid ${theme.palette.divider}`
+                      bgcolor: 'grey.50',
+                      borderRadius: 1.5,
+                      border: `1px solid ${theme.palette.grey[200]}`
                     }}>
                       <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
                         {wordCount.toLocaleString()}
@@ -838,9 +951,9 @@ export default function Write() {
                     <Box sx={{ 
                       textAlign: 'center', 
                       p: 2, 
-                      background: theme.palette.background.paper,
-                      borderRadius: 2,
-                      border: `1px solid ${theme.palette.divider}`
+                      bgcolor: 'grey.50',
+                      borderRadius: 1.5,
+                      border: `1px solid ${theme.palette.grey[200]}`
                     }}>
                       <Typography variant="h4" sx={{ fontWeight: 700, color: 'secondary.main' }}>
                         {readingTime}
@@ -851,7 +964,7 @@ export default function Write() {
                     </Box>
                   </Box>
                   
-                  <Box sx={{ mt: 2, p: 2, background: theme.palette.background.paper, borderRadius: 2 }}>
+                  <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1.5 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Typography variant="body2" color="text.secondary">
                         문자 수
@@ -866,9 +979,10 @@ export default function Write() {
                 {/* Writing Tips */}
                 <Paper sx={{ 
                   p: 3, 
-                  borderRadius: 3,
+                  borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  background: `linear-gradient(135deg, ${theme.palette.warning.main}08, ${theme.palette.primary.main}03)`
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                     💡 작성 팁

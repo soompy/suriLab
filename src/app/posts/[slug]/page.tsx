@@ -21,7 +21,9 @@ import {
   Share as ShareIcon,
   Bookmark as BookmarkIcon,
   ArrowBack as ArrowBackIcon,
-  CalendarToday as CalendarIcon
+  CalendarToday as CalendarIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
@@ -38,6 +40,7 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<PostEntity | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -80,6 +83,37 @@ export default function PostDetailPage() {
       }
     } else {
       navigator.clipboard.writeText(window.location.href)
+    }
+  }
+
+  const handleEdit = () => {
+    if (post?.id) {
+      router.push(`/write?edit=${post.id}`)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!post?.id) return
+    
+    const confirmed = window.confirm('정말로 이 글을 삭제하시겠습니까?')
+    if (!confirmed) return
+    
+    try {
+      setIsDeleting(true)
+      const response = await fetch(`/api/posts/${post.id}`, {
+        method: 'DELETE'
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete post')
+      }
+      
+      router.push('/')
+    } catch (error) {
+      console.error('Error deleting post:', error)
+      alert('글 삭제에 실패했습니다.')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -209,6 +243,21 @@ export default function PostDetailPage() {
                   <IconButton title="북마크">
                     <BookmarkIcon />
                   </IconButton>
+                  <IconButton 
+                    onClick={handleEdit} 
+                    title="수정하기"
+                    color="primary"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton 
+                    onClick={handleDelete} 
+                    title="삭제하기"
+                    color="error"
+                    disabled={isDeleting}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </Stack>
 
                 <Divider />
@@ -309,7 +358,11 @@ export default function PostDetailPage() {
                   작성자 정보
                 </Typography>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}>
+                  <Avatar 
+                    src={BLOG_CONFIG.owner.avatar}
+                    alt={BLOG_CONFIG.owner.name}
+                    sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}
+                  >
                     {BLOG_CONFIG.owner.name.charAt(0)}
                   </Avatar>
                   <Box>

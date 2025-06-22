@@ -13,7 +13,7 @@ export const CATEGORY_DESCRIPTIONS = {
 } as const
 
 export const CATEGORY_COLORS = {
-  'Tech Insights': '#2196F3',
-  'Code Solutions': '#4CAF50',
-  'Developer Tips': '#FF9800'
+  'Tech Insights': 'linear-gradient(135deg, #B3E5FC, #81D4FA)',
+  'Code Solutions': 'linear-gradient(135deg, #FFB5A7, #FCD29F)', 
+  'Developer Tips': 'linear-gradient(135deg, #F8BBD9, #E2E2FD)'
 } as const

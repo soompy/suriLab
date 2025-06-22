@@ -5,7 +5,7 @@ export const BLOG_CONFIG = {
     name: '이수민', // 여기에 실제 이름 입력
     email: 'soomin@example.com', // 여기에 실제 이메일 입력
     bio: '개발자이자 블로거입니다.',
-    avatar: '/images/avatar.jpg', // 프로필 이미지 경로
+    avatar: '/images/profile.jpg', // 프로필 이미지 경로
     social: {
       github: 'https://github.com/yourusername',
       linkedin: 'https://linkedin.com/in/yourusername',

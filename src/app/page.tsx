@@ -125,8 +125,8 @@ export default function Home() {
                     icon={<CategoryIcon />}
                     label={selectedCategory}
                     sx={{
-                      backgroundColor: getCategoryInfo(selectedCategory).color,
-                      color: 'white',
+                      background: getCategoryInfo(selectedCategory).color,
+                      color: 'black',
                       fontWeight: 'bold',
                       mb: 2
                     }}
@@ -167,8 +167,8 @@ export default function Home() {
                             label={post.category}
                             size="small"
                             sx={{
-                              backgroundColor: getCategoryInfo(post.category as BlogCategory).color,
-                              color: 'white',
+                              background: getCategoryInfo(post.category as BlogCategory).color,
+                              color: 'black',
                               fontWeight: 'bold',
                               mb: 1
                             }}
