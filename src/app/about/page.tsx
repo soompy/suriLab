@@ -123,7 +123,7 @@ export default function AboutPage() {
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Avatar
             src="/images/profile.jpg" // 이미지 경로
-            alt="이수민 프로필 사진"
+            alt="Suri 프로필 사진"
             sx={{
               width: 120,
               height: 120,
@@ -134,7 +134,7 @@ export default function AboutPage() {
               fontWeight: 'bold'
             }}
           >
-            이수민
+            Suri
           </Avatar>
           <Typography
             variant="h3"
@@ -145,7 +145,7 @@ export default function AboutPage() {
               color: 'text.primary',
             }}
           >
-            이수민
+            Suri
           </Typography>
           <Typography
             variant="h5"
@@ -168,7 +168,7 @@ export default function AboutPage() {
               fontSize: '1.1rem'
             }}
           >
-            &quot;다양한 프로젝트 경험과 기술 역량으로 짜임새 있는 UI개발자가 되겠습니다.&quot;
+            &quot;코드엔 논리, UI엔 감성. 그 둘 사이에서 말끔한 화면을 짓는 사람입니다.&quot;
           </Typography>
         </Box>
 
@@ -191,7 +191,7 @@ export default function AboutPage() {
                 소개
               </Typography>
               <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7 }}>
-                안녕하세요, 6년 차 웹 퍼블리셔 이수민입니다.
+                안녕하세요, 6년 차 웹 퍼블리셔 Suri입니다.
               </Typography>
               <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7 }}>
                 저는 시맨틱하고 유지보수가 용이한 마크업과 CSS 레이아웃 구성에 강점을 가지고 있으며, UX를 고려한 유연한 구조 설계로 추후 기획 변경에도 효과적으로 대응할 수 있는 컴포넌트화된 웹 환경을 지향합니다.

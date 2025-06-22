@@ -91,8 +91,8 @@ export default function Footer() {
               color="text.secondary" 
               sx={{ lineHeight: 1.6 }}
             >
-              웹 퍼블리셔에서 프론트엔드 개발자로 성장하는 여정을 기록하는 공간입니다. 
-              기술과 경험을 나누며 함께 배워가요.
+              무언가를 만들지 않으면 손이 근질거리는 사람. <br />
+              자주 삽질, 그리고 매일 기록.
             </Typography>
           </Box>
 
@@ -214,7 +214,7 @@ export default function Footer() {
             </Typography>
             <FavoriteRounded sx={{ fontSize: 16, color: '#e91e63' }} />
             <Typography variant="body2" color="text.secondary">
-              by 이수민
+              by Suri
             </Typography>
           </Box>
 
