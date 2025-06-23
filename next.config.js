@@ -6,6 +6,7 @@ const nextConfig = {
   experimental: {
     mdxRs: true,
   },
+  transpilePackages: ['@mui/material', '@mui/icons-material'],
   images: {
     formats: ['image/avif', 'image/webp'],
     domains: [
