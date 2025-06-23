@@ -6,11 +6,12 @@ export async function initializeDatabase() {
     await prisma.$connect()
     console.log('Database connected successfully')
 
-    // 프로덕션에서는 기본 데이터 생성
-    if (process.env.NODE_ENV === 'production') {
-      // 기본 데이터 생성 (스키마는 이미 존재한다고 가정)
-      await createDefaultData()
-    }
+    // 데이터베이스 타입 확인
+    const dbProvider = process.env.DATABASE_URL?.startsWith('postgresql') ? 'postgresql' : 'sqlite'
+    console.log(`Database provider: ${dbProvider}`)
+
+    // 기본 데이터 생성
+    await createDefaultData()
   } catch (error) {
     console.error('Database initialization failed:', error)
     // 에러가 발생해도 계속 진행
