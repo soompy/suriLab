@@ -3,13 +3,13 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params
+    const params = await segmentData.params
     const comments = await prisma.comment.findMany({
       where: {
-        postId: resolvedParams.id
+        postId: params.id
       },
       orderBy: {
         createdAt: 'desc'
@@ -28,10 +28,10 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params
+    const params = await segmentData.params
     const { content, authorName, authorEmail } = await request.json()
 
     if (!content || !authorName) {
@@ -46,7 +46,7 @@ export async function POST(
         content,
         authorName,
         authorEmail,
-        postId: resolvedParams.id
+        postId: params.id
       }
     })
 

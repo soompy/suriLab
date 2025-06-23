@@ -1,6 +1,6 @@
 'use client'
 
-import { useTheme } from './ThemeProvider'
+import { useTheme } from './ThemeContext'
 import ThemeToggleButton from './ThemeToggleButton'
 
 export default function ThemeToggleWrapper() {

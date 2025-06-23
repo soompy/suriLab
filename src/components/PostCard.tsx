@@ -11,9 +11,9 @@ interface Post {
   excerpt?: string
   thumbnail?: string
   tags: string[]
-  category: string
-  publishedAt: string
-  authorId: string
+  category?: string
+  publishedAt?: string
+  authorId?: string
   readTime?: number
   views?: number
 }
@@ -132,13 +132,13 @@ export default function PostCard({ post, onClick }: PostCardProps) {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="caption" color="text.secondary">
-              {post.category}
+              {post.category || '일반'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               •
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {formatDate(post.publishedAt)}
+              {post.publishedAt ? formatDate(post.publishedAt) : '날짜 미상'}
             </Typography>
           </Box>
           

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -67,7 +67,7 @@ import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
-export default function Write() {
+function WriteContent() {
   const theme = useTheme()
   const router = useRouter()
   const contentRef = useRef<HTMLTextAreaElement>(null)
@@ -1567,5 +1567,22 @@ export default function Write() {
         <Footer />
       </Box>
     </MuiThemeProvider>
+  )
+}
+
+export default function Write() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        로딩 중...
+      </div>
+    }>
+      <WriteContent />
+    </Suspense>
   )
 }

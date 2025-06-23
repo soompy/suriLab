@@ -21,7 +21,7 @@ export default function OptimizedMarkdown({
 }: OptimizedMarkdownProps) {
   const customComponents: Components = {
     img: ({ src, alt, title }) => {
-      if (!src) return null
+      if (!src || typeof src !== 'string') return null
       
       return (
         <ContentImage

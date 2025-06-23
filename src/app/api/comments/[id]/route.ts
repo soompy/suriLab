@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params
+    const params = await segmentData.params
     const { content, authorName, authorEmail } = await request.json()
 
     if (!content || !authorName) {
@@ -18,7 +18,7 @@ export async function PUT(
 
     const comment = await prisma.comment.update({
       where: {
-        id: resolvedParams.id
+        id: params.id
       },
       data: {
         content,
@@ -39,13 +39,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params
+    const params = await segmentData.params
     await prisma.comment.delete({
       where: {
-        id: resolvedParams.id
+        id: params.id
       }
     })
 

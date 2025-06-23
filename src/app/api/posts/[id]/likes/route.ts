@@ -13,18 +13,19 @@ function getClientIP(request: NextRequest): string {
     return realIP
   }
   
-  return request.ip || 'unknown'
+  // Fallback to a default value in production
+  return 'unknown'
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params
+    const params = await segmentData.params
     const likesCount = await prisma.like.count({
       where: {
-        postId: resolvedParams.id
+        postId: params.id
       }
     })
 
@@ -32,7 +33,7 @@ export async function GET(
     const userLiked = await prisma.like.findUnique({
       where: {
         postId_ipAddress: {
-          postId: resolvedParams.id,
+          postId: params.id,
           ipAddress: clientIP
         }
       }
@@ -53,16 +54,16 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params
+    const params = await segmentData.params
     const clientIP = getClientIP(request)
 
     const existingLike = await prisma.like.findUnique({
       where: {
         postId_ipAddress: {
-          postId: resolvedParams.id,
+          postId: params.id,
           ipAddress: clientIP
         }
       }
@@ -76,7 +77,7 @@ export async function POST(
       })
       
       const likesCount = await prisma.like.count({
-        where: { postId: resolvedParams.id }
+        where: { postId: params.id }
       })
 
       return NextResponse.json({
@@ -87,13 +88,13 @@ export async function POST(
     } else {
       await prisma.like.create({
         data: {
-          postId: resolvedParams.id,
+          postId: params.id,
           ipAddress: clientIP
         }
       })
 
       const likesCount = await prisma.like.count({
-        where: { postId: resolvedParams.id }
+        where: { postId: params.id }
       })
 
       return NextResponse.json({
