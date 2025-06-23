@@ -10,11 +10,13 @@
 - **💾 영구 데이터 저장**: Prisma ORM + SQLite/PostgreSQL 지원
 - **🛡️ 강력한 보안**: 환경변수 기반 비밀번호 관리, Git 보안
 - **📝 AI 지원 글 작성**: 실시간 AI 요약 생성 + 마크다운 에디터
+- **💬 댓글 시스템**: 실시간 댓글 작성/수정/삭제 기능
+- **❤️ 좋아요 기능**: IP 기반 중복 방지 좋아요 시스템
 - **🔍 스마트 검색**: 헤더 및 아카이브 실시간 검색 기능
 - **📧 이메일 시스템**: 실제 이메일 전송 (Nodemailer + Naver SMTP)
 - **🎨 완전한 UI 시스템**: Material-UI 기반 반응형 디자인
 - **📱 모바일 최적화**: 완벽한 반응형 레이아웃
-- **🚀 프로덕션 준비**: 실제 서비스 가능한 안정성
+- **🚀 프로덕션 배포**: Vercel 실제 서비스 운영 중
 - **⚡ 고성능**: Next.js 15 + React 19 최신 최적화
 
 ## 🛠️ 완전한 기술 스택
@@ -137,10 +139,20 @@ npm run dev
 
 ### 🌍 배포
 
+**🚀 현재 운영 중인 프로덕션 사이트**
+- **Production URL**: https://suri-blog.vercel.app
+- **상태**: ✅ 실제 서비스 운영 중
+
 ```bash
-# Vercel (권장)
+# Vercel 배포 (권장)
 npm install -g vercel
 vercel
+
+# 환경 변수 설정
+vercel env add DATABASE_URL production
+vercel env add BLOG_ADMIN_PASSWORD production
+vercel env add EMAIL_USER production
+vercel env add EMAIL_PASS production
 
 # 또는 다른 플랫폼
 npm run build
@@ -223,10 +235,13 @@ npm run start
 - [x] ✅ **카테고리 & 태그** - 완전한 분류 시스템
 
 ### 🚀 **Advanced Features (완료)**
+- [x] ✅ **댓글 시스템** - 실시간 댓글 CRUD 기능
+- [x] ✅ **좋아요 기능** - IP 기반 중복 방지 시스템
 - [x] ✅ **작성자 정보 시스템** - 실제 작성자 표시
 - [x] ✅ **포스트 상세 페이지** - 완전한 렌더링
 - [x] ✅ **검색 기능** - 포스트 검색 UseCase
 - [x] ✅ **API 엔드포인트** - RESTful API 완성
+- [x] ✅ **Vercel 프로덕션 배포** - 실제 서비스 운영
 - [x] ✅ **Clean Architecture** - 확장 가능한 구조
 
 ## 🔮 향후 확장 계획
@@ -241,7 +256,7 @@ npm run start
 - [ ] 📈 포스트 통계 및 분석
 - [ ] 🔍 고급 검색 (Algolia)
 - [ ] 📡 RSS 피드 생성
-- [ ] 💬 댓글 시스템
+- [ ] 🔔 실시간 알림 시스템
 
 ### ⚡ **Phase 3: 성능 최적화**
 - [ ] 🌐 CDN 연동
