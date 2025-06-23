@@ -1,357 +1,216 @@
-# SuriBlog 🌟
+# 🚀 Suri Blog - 현대적 개발자 블로그
 
-> **완전한 블로그 시스템 - 인증, 데이터베이스, 보안까지 모든 것이 갖춰진 실제 운영 가능한 블로그 플랫폼**
+[![Vercel Deploy](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://suri-blog-suris-projects.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)](https://prisma.io/)
 
-실제 운영 가능한 완전한 블로그 시스템입니다. Next.js 15, Prisma ORM, SQLite를 기반으로 구축되었으며, 관리자 인증부터 포스트 관리까지 모든 기능을 갖춘 실전 블로그 플랫폼입니다.
+> **함께 성장하는 개발자 커뮤니티**를 만들어가는 현대적 블로그 플랫폼
 
-## ✨ 핵심 기능
+## 🌟 주요 특징
 
-- **🔐 완전한 인증 시스템**: 관리자 전용 글 작성 및 관리
-- **💾 영구 데이터 저장**: Prisma ORM + SQLite/PostgreSQL 지원
-- **🛡️ 강력한 보안**: 환경변수 기반 비밀번호 관리, Git 보안
-- **📝 AI 지원 글 작성**: 실시간 AI 요약 생성 + 마크다운 에디터
-- **💬 댓글 시스템**: 실시간 댓글 작성/수정/삭제 기능
-- **❤️ 좋아요 기능**: IP 기반 중복 방지 좋아요 시스템
-- **🔍 스마트 검색**: 헤더 및 아카이브 실시간 검색 기능
-- **📧 이메일 시스템**: 실제 이메일 전송 (Nodemailer + Naver SMTP)
-- **🎨 완전한 UI 시스템**: Material-UI 기반 반응형 디자인
-- **📱 모바일 최적화**: 완벽한 반응형 레이아웃
-- **🚀 프로덕션 배포**: Vercel 실제 서비스 운영 중
-- **⚡ 고성능**: Next.js 15 + React 19 최신 최적화
+### ✨ 핵심 기능
+- 🎨 **Velog 수준 마크다운 에디터** - 실시간 미리보기, 코드 하이라이팅
+- 💬 **완전한 댓글 시스템** - 실시간 댓글 작성/수정/삭제
+- ❤️ **IP 기반 좋아요 기능** - 중복 방지, 애니메이션 효과
+- 🏷️ **카테고리 & 태그 시스템** - 체계적인 콘텐츠 분류
+- 🌙 **다크모드 완전 지원** - 전체 사이트 테마 전환
+- 📱 **완전 반응형 디자인** - 모바일 퍼스트 접근
 
-## 🛠️ 완전한 기술 스택
-
-### **Frontend Framework**
-- **React 19** - 최신 Server Components 및 Concurrent Features
-- **Next.js 15** - App Router, Server Actions, 최신 최적화
-- **TypeScript** - 100% 타입 안전성
-
-### **Database & ORM**
-- **Prisma ORM** - 타입 안전한 데이터베이스 클라이언트
-- **SQLite** - 개발용 (PostgreSQL 마이그레이션 준비)
-- **Database Migration** - 자동 스키마 관리
-
-### **Authentication & Security**
-- **환경변수 기반 인증** - 안전한 비밀번호 관리
-- **localStorage 세션** - 24시간 자동 만료
-- **Git 보안** - .env 파일 완전 보호
-
-### **UI & Design System**
-- **Material-UI (MUI)** - 완전한 컴포넌트 라이브러리
-- **Emotion** - CSS-in-JS 스타일링
-- **반응형 디자인** - 모바일 우선 접근
-
-### **Content Management**
-- **마크다운 에디터** - 실시간 미리보기
-- **이미지 업로드** - Multer 기반 파일 처리
-- **카테고리 & 태그** - 완전한 분류 시스템
-
-### **Development & Production**
-- **Clean Architecture** - 확장 가능한 코드 구조
-- **API Routes** - RESTful 엔드포인트
-- **빌드 최적화** - 프로덕션 준비 완료
-
-## 🏗️ 프로젝트 구조
-
-```
-suriBlog/
-├── src/
-│   ├── app/                    # Next.js 15 App Router
-│   │   ├── api/               # 🔌 REST API 엔드포인트
-│   │   │   ├── posts/         # 포스트 CRUD, 조회수 관리
-│   │   │   └── upload/        # 이미지 업로드 처리
-│   │   ├── posts/[slug]/      # 📄 포스트 상세 페이지
-│   │   ├── write/             # ✍️ 관리자 글 작성 (인증 필요)
-│   │   ├── about/             # 👨‍💻 개인 소개 페이지
-│   │   ├── projects/          # 💼 프로젝트 포트폴리오
-│   │   ├── archives/          # 📚 포스트 아카이브
-│   │   └── page.tsx           # 🏠 메인 페이지
-│   ├── components/            # UI 컴포넌트
-│   │   ├── LoginDialog.tsx    # 🔐 관리자 로그인 다이얼로그
-│   │   ├── Header.tsx         # 🧭 네비게이션 바
-│   │   ├── PostCard.tsx       # 📄 포스트 카드
-│   │   └── PostGrid.tsx       # 📋 포스트 그리드
-│   ├── config/                # 설정 파일
-│   │   └── blog.ts           # 블로그 메타데이터 & 소유자 정보
-│   ├── lib/                   # 핵심 라이브러리
-│   │   ├── auth.ts           # 🔐 인증 서비스
-│   │   └── prisma.ts         # 💾 데이터베이스 클라이언트
-│   ├── repositories/          # 데이터 접근 계층
-│   │   └── PrismaPostRepository/ # 포스트 저장소 구현
-│   ├── usecases/             # 비즈니스 로직
-│   │   └── SearchPosts/      # 포스트 검색 기능
-│   └── entities/             # 도메인 엔티티
-├── prisma/                   # 🗄️ 데이터베이스 스키마
-│   ├── schema.prisma         # Prisma 스키마 정의
-│   ├── migrations/           # 데이터베이스 마이그레이션
-│   └── seed.ts              # 샘플 데이터 시드
-├── .env                     # 🔒 환경변수 (Git 제외)
-├── .gitignore               # 🛡️ Git 보안 설정
-└── package.json             # 프로젝트 의존성
-```
+### 🔧 기술적 특징
+- ⚡ **Next.js 15** - 최신 App Router 및 서버 컴포넌트
+- 🎯 **Clean Architecture** - 확장 가능한 아키텍처 설계
+- 🛡️ **TypeScript 100%** - 완전한 타입 안전성
+- 🗄️ **Prisma ORM** - 타입 안전 데이터베이스 액세스
+- 🎨 **Material-UI** - 현대적 컴포넌트 라이브러리
 
 ## 🚀 빠른 시작
 
-### 📋 환경 요구사항
-- **Node.js** 18.0+ (최신 LTS 권장)
-- **npm** 9.0+ 또는 **yarn** 1.22+
-- **Git** 2.30+
+### 필수 요구사항
+- Node.js 18.0.0 이상
+- npm 또는 yarn
 
-### ⚡ 설치 및 실행
+### 로컬 설정
 
 ```bash
-# 1. 저장소 클론
+# 저장소 클론
 git clone https://github.com/soompy/suriLab.git
-cd suriBlog
+cd suriLab
 
-# 2. 의존성 설치
+# 의존성 설치
 npm install
 
-# 3. 환경변수 설정
+# 환경 변수 설정
 cp .env.example .env
-# .env 파일에서 BLOG_ADMIN_PASSWORD 설정
+# .env 파일에서 필요한 값들 설정
 
-# 4. 데이터베이스 설정
-npm run db:generate  # Prisma 클라이언트 생성
-npm run db:push      # 데이터베이스 스키마 적용
-npm run db:seed      # 샘플 데이터 추가
+# 데이터베이스 초기화
+npm run db:migrate
+npm run db:seed
 
-# 5. 개발 서버 실행
+# 개발 서버 시작
 npm run dev
-
-# 6. 브라우저에서 확인
-# 🌐 http://localhost:3000
-# ✍️ 글 작성: http://localhost:3000/write (관리자 인증 필요)
 ```
 
-### 🛠️ 사용 가능한 스크립트
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
 
-| 명령어 | 설명 |
-|--------|------|
-| `npm run dev` | 🔥 개발 서버 실행 (Hot Reload) |
-| `npm run build` | 🏗️ 프로덕션 빌드 |
-| `npm run start` | 🚀 프로덕션 서버 실행 |
-| `npm run db:generate` | 📦 Prisma 클라이언트 생성 |
-| `npm run db:push` | 🔄 데이터베이스 스키마 동기화 |
-| `npm run db:seed` | 🌱 샘플 데이터 시딩 |
-| `npm run db:studio` | 🎛️ Prisma Studio 실행 |
-| `npm run db:reset` | 🔄 데이터베이스 초기화 |
+## 📦 프로젝트 구조
 
-### 🌍 배포
+```
+src/
+├── app/                    # Next.js 15 App Router
+│   ├── api/               # API 라우트
+│   ├── posts/             # 게시글 페이지
+│   └── write/             # 글 작성 페이지
+├── components/            # UI 컴포넌트
+│   ├── CommentSection.tsx # 댓글 시스템
+│   ├── LikeButton.tsx     # 좋아요 버튼
+│   └── ...
+├── entities/              # 도메인 엔티티
+├── usecases/             # 비즈니스 로직
+├── repositories/         # 데이터 액세스
+└── infrastructure/       # 외부 인터페이스
+```
 
-**🚀 현재 운영 중인 프로덕션 사이트**
-- **Production URL**: https://suri-blog.vercel.app
-- **상태**: ✅ 실제 서비스 운영 중
+## 🗄️ 데이터베이스 스키마
+
+### 핵심 모델
+```prisma
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  slug        String   @unique
+  comments    Comment[]
+  likes       Like[]
+  // ... 기타 필드
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  authorName  String
+  authorEmail String?
+  post        Post     @relation(fields: [postId], references: [id])
+  postId      String
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  ipAddress String
+  @@unique([postId, ipAddress])
+}
+```
+
+## 🌐 배포 정보
+
+### Production
+- **URL**: https://suri-blog-suris-projects.vercel.app
+- **플랫폼**: Vercel
+- **자동 배포**: GitHub 연동
+
+### 환경 변수
+```env
+DATABASE_URL=              # 데이터베이스 연결 문자열
+BLOG_ADMIN_PASSWORD=       # 관리자 비밀번호
+EMAIL_USER=               # 이메일 사용자
+EMAIL_PASS=               # 이메일 앱 비밀번호
+```
+
+## 📊 API 엔드포인트
+
+### 게시글 API
+- `GET /api/posts` - 게시글 목록 조회
+- `POST /api/posts` - 새 게시글 작성
+- `GET /api/posts/[id]` - 특정 게시글 조회
+- `PUT /api/posts/[id]` - 게시글 수정
+- `DELETE /api/posts/[id]` - 게시글 삭제
+
+### 댓글 API
+- `GET /api/posts/[id]/comments` - 댓글 목록 조회
+- `POST /api/posts/[id]/comments` - 댓글 작성
+- `PUT /api/comments/[id]` - 댓글 수정
+- `DELETE /api/comments/[id]` - 댓글 삭제
+
+### 좋아요 API
+- `GET /api/posts/[id]/likes` - 좋아요 수 조회
+- `POST /api/posts/[id]/likes` - 좋아요 토글
+
+## 🛠️ 사용 가능한 스크립트
 
 ```bash
-# Vercel 배포 (권장)
-npm install -g vercel
-vercel
+# 개발
+npm run dev              # 개발 서버 시작
+npm run build            # 프로덕션 빌드
+npm run start            # 프로덕션 서버 시작
 
-# 환경 변수 설정
-vercel env add DATABASE_URL production
-vercel env add BLOG_ADMIN_PASSWORD production
-vercel env add EMAIL_USER production
-vercel env add EMAIL_PASS production
+# 데이터베이스
+npm run db:migrate       # 마이그레이션 실행
+npm run db:seed          # 시드 데이터 생성
+npm run db:studio        # Prisma Studio 실행
+npm run db:reset         # 데이터베이스 리셋
 
-# 또는 다른 플랫폼
-npm run build
-npm run start
+# 코드 품질
+npm run lint             # ESLint 실행
+npm run type-check       # TypeScript 타입 체크
+npm run test             # 테스트 실행
 ```
 
-## 🎨 디자인 시스템
+## 🔄 PostgreSQL 마이그레이션
 
-### 🎭 컬러 팔레트
-| 색상 | Light Mode | Dark Mode | 용도 |
-|------|------------|-----------|------|
-| **Primary** | `rgb(25, 31, 40)` | `rgb(144, 202, 249)` | 브랜드 색상 |
-| **Secondary** | `rgb(107, 114, 128)` | `rgb(158, 158, 158)` | 보조 텍스트 |
-| **Background** | `#ffffff` | `rgb(18, 18, 18)` | 페이지 배경 |
-| **Surface** | `#fafafa` | `rgb(33, 33, 33)` | 카드 배경 |
-| **Text Primary** | `rgba(0, 0, 0, 0.87)` | `rgba(255, 255, 255, 0.87)` | 주요 텍스트 |
+현재 메모리 데이터베이스를 사용 중입니다. 영구 저장을 위해서는:
 
-### ✍️ 타이포그래피
-- **Font Family**: `system-ui, -apple-system, "Segoe UI", Roboto`
-- **Font Weights**: 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold)
-- **Font Sizes**: 14px - 48px (반응형 스케일링)
+1. 📖 **[PostgreSQL 마이그레이션 가이드](./POSTGRESQL_MIGRATION_GUIDE.md)** 참조
+2. Neon PostgreSQL 무료 계정 생성
+3. 환경 변수 업데이트
+4. 스키마 마이그레이션 실행
 
-### 📐 레이아웃 시스템
-- **Max Width**: `1300px` (전체 컨테이너)
-- **Grid System**: CSS Grid 기반 반응형 레이아웃
-- **Spacing**: Material-UI 8px 기반 간격 시스템
-- **Border Radius**: `8px` (카드), `4px` (버튼)
+## 📝 문서
 
-## 📱 반응형 브레이크포인트
+- 📋 **[배포 현황](./DEPLOYMENT_STATUS.md)** - 현재 배포 상태 및 기능 목록
+- 📖 **[기능 변경 로그](./FEATURE_CHANGELOG.md)** - 상세 버전 히스토리
+- 🗄️ **[PostgreSQL 마이그레이션 가이드](./POSTGRESQL_MIGRATION_GUIDE.md)** - 데이터베이스 전환 방법
 
-| 기기 | 화면 크기 | 레이아웃 | 그리드 |
-|------|-----------|----------|--------|
-| **📱 Mobile** | `< 768px` | 1열, 햄버거 메뉴 | 1열 |
-| **📟 Tablet** | `768px - 1024px` | 2열 레이아웃 | 2열 |
-| **💻 Desktop** | `1024px - 1440px` | 3열 레이아웃 | 3열 |
-| **🖥️ Large** | `> 1440px` | 4열 레이아웃 | 4열 |
+## 🎯 향후 계획
 
-## 🎯 페이지별 주요 기능
+### v1.4.0 - 데이터 영속성
+- [ ] PostgreSQL 완전 전환
+- [ ] 백업 시스템 구축
+- [ ] 데이터 마이그레이션 완료
 
-### 🏠 **메인 페이지**
-- 히어로 섹션 + 최신 포스트 그리드
-- 반응형 카드 레이아웃
-- 무한 스크롤 대응
-
-### 👨‍💻 **About 페이지**
-- 개인 프로필 및 경력 소개
-- 기술 스택 시각화
-- 반응형 프로필 레이아웃
-
-### 💼 **Projects 페이지**
-- 프로젝트 포트폴리오 갤러리
-- 페이지네이션 (5개씩)
-- 프로젝트 상세 정보 및 링크
-
-### 📧 **Contact 페이지**
-- 직접 연락 폼 (mailto 연동)
-- 소셜 미디어 링크
-- 이메일 클립보드 복사
-
-### 📚 **Archives 페이지**
-- 전체 포스트 아카이브
-- 실시간 검색 및 필터링
-- 연도별/카테고리별 정리
-
-### ✍️ **Write 페이지**
-- 마크다운 기반 에디터
-- 실시간 통계 (단어수, 읽기시간)
-- 태그 시스템 및 발행 설정
-
-## ✅ 완성된 기능들
-
-### 🎯 **Core Features (완료)**
-- [x] ✅ **완전한 인증 시스템** - 관리자 전용 글 작성
-- [x] ✅ **영구 데이터 저장** - Prisma + SQLite 완전 구현
-- [x] ✅ **보안 시스템** - 환경변수 기반 + Git 보안
-- [x] ✅ **실제 블로그 CRUD** - 포스트 생성/수정/삭제/조회
-- [x] ✅ **마크다운 에디터** - 실시간 글 작성 도구
-- [x] ✅ **이미지 업로드** - 파일 업로드 시스템
-- [x] ✅ **반응형 UI** - Material-UI 완전 구현
-- [x] ✅ **카테고리 & 태그** - 완전한 분류 시스템
-
-### 🚀 **Advanced Features (완료)**
-- [x] ✅ **댓글 시스템** - 실시간 댓글 CRUD 기능
-- [x] ✅ **좋아요 기능** - IP 기반 중복 방지 시스템
-- [x] ✅ **작성자 정보 시스템** - 실제 작성자 표시
-- [x] ✅ **포스트 상세 페이지** - 완전한 렌더링
-- [x] ✅ **검색 기능** - 포스트 검색 UseCase
-- [x] ✅ **API 엔드포인트** - RESTful API 완성
-- [x] ✅ **Vercel 프로덕션 배포** - 실제 서비스 운영
-- [x] ✅ **Clean Architecture** - 확장 가능한 구조
-
-## 🔮 향후 확장 계획
-
-### 🎨 **Phase 1: UI/UX 강화**
-- [ ] 📊 대시보드 관리 페이지
-- [ ] 🎨 테마 커스터마이징
-- [ ] 🌙 다크모드 토글
-- [ ] 📱 PWA 지원
-
-### 🚀 **Phase 2: 고급 기능**
-- [ ] 📈 포스트 통계 및 분석
-- [ ] 🔍 고급 검색 (Algolia)
-- [ ] 📡 RSS 피드 생성
-- [ ] 🔔 실시간 알림 시스템
-
-### ⚡ **Phase 3: 성능 최적화**
-- [ ] 🌐 CDN 연동
-- [ ] ⚡ 이미지 최적화
-- [ ] 🔧 캐싱 시스템
-- [ ] 📊 성능 모니터링
+### v1.5.0 - 추가 기능
+- [ ] 고급 검색 기능
+- [ ] RSS 피드 생성
+- [ ] 소셜 미디어 공유
+- [ ] 방문자 통계
 
 ## 🤝 기여하기
 
-우리는 모든 형태의 기여를 환영합니다! 🎉
-
-### 🐛 **버그 리포트**
-```bash
-# 이슈 생성 시 포함할 정보
-- 운영체제 및 브라우저 버전
-- 재현 단계
-- 예상 동작 vs 실제 동작
-- 스크린샷 (가능한 경우)
-```
-
-### 🔧 **개발 기여**
-```bash
-# 1. 포크 및 클론
-git clone https://github.com/[your-username]/suriLab.git
-
-# 2. 기능 브랜치 생성
-git checkout -b feature/amazing-feature
-
-# 3. 변경사항 커밋
-git commit -m 'feat: Add some amazing feature'
-
-# 4. 푸시 후 PR 생성
-git push origin feature/amazing-feature
-```
-
-### 📝 **커밋 컨벤션**
-- `feat`: 새로운 기능 추가
-- `fix`: 버그 수정
-- `docs`: 문서 업데이트
-- `style`: 코드 스타일 변경
-- `refactor`: 코드 리팩토링
-- `test`: 테스트 추가/수정
-- `chore`: 빌드 프로세스 등 기타 변경
-
-## 🙏 스페셜 띵스
-
-### 🎨 **영감을 받은 프로젝트들**
-- [Next.js](https://nextjs.org) - 프레임워크 기반
-- [Material-UI](https://mui.com) - 디자인 시스템
-- [Vercel](https://vercel.com) - 배포 플랫폼
-
-### 🔧 **사용된 오픈소스**
-모든 의존성은 `package.json`에서 확인할 수 있습니다.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📄 라이선스
 
-이 프로젝트는 [ISC License](LICENSE)로 배포됩니다.
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
 
-## 👨‍💻 개발자 정보
+## 👨‍💻 개발자
 
-**🌟 이수민 (SuriBlog Creator)**
-
-- **GitHub**: [@soompy](https://github.com/soompy)
-- **Email**: yzsumin@naver.com
-- **Portfolio**: [SuriBlog](https://github.com/soompy/suriLab)
-
-### 📞 **연락처**
-- 🐙 GitHub: [@soompy](https://github.com/soompy)
-- 💼 LinkedIn: [프로필 보기](https://buly.kr/1c8Bcxw)
-- 📧 Email: yzsumin@naver.com
-
-### 🎯 **전문 분야**
-- **Full-Stack Development**: React, Next.js, Node.js
-- **Database Design**: Prisma ORM, SQL
-- **Authentication & Security**: 보안 시스템 설계
-- **Modern Web Architecture**: Clean Architecture, TypeScript
+**이수민 (Soomin Lee)**
+- GitHub: [@soompy](https://github.com/soompy)
+- Email: yzsumin@naver.com
+- Blog: https://suri-blog-suris-projects.vercel.app
 
 ---
 
-### 💝 **프로젝트가 도움이 되셨나요?**
+⭐ 이 프로젝트가 도움이 되었다면 Star를 눌러주세요!
 
-⭐ **스타를 눌러주세요!** 여러분의 스타가 개발자에게 큰 힘이 됩니다.
+<p align="center">
+  <strong>함께 성장하는 개발자 커뮤니티</strong><br>
+  무언가를 만들지 않으면 손이 근질거리는 개발자의 블로그
+</p>
 
-🐛 **버그를 발견하셨나요?** [이슈 생성](https://github.com/soompy/suriLab/issues)으로 알려주세요.
-
-💡 **새로운 아이디어가 있으신가요?** [디스커션](https://github.com/soompy/suriLab/discussions)에서 공유해주세요.
-
----
-
-<div align="center">
-
-**🚀 완전한 블로그 시스템 - 실제 운영 가능한 프로덕션 레벨**
-
-Made with ❤️ by [이수민](https://github.com/soompy)
-
-**⭐ Star this repo if you found it helpful!**
-
-</div>
