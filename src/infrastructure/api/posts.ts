@@ -133,11 +133,16 @@ export class PostsAPIHandler {
 
   static async POST(request: NextRequest) {
     try {
-      // 데이터베이스 초기화 확인
-      await initializeDatabase()
-      
       const body = await request.json()
       console.log('Creating post with data:', body)
+      
+      // 데이터베이스 초기화 시도 (실패해도 계속 진행)
+      try {
+        await initializeDatabase()
+      } catch (initError) {
+        console.warn('Database initialization failed, continuing...', initError)
+      }
+      
       const post = await createPost(body)
       console.log('Post created successfully:', post)
       return NextResponse.json(post, { status: 201 })
@@ -145,7 +150,7 @@ export class PostsAPIHandler {
       console.error('Error creating post:', error)
       return NextResponse.json(
         { error: 'Failed to create post', details: error instanceof Error ? error.message : 'Unknown error' },
-        { status: 400 }
+        { status: 500 }
       )
     }
   }
