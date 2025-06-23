@@ -1,18 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "regions": ["icn1"],
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "BLOG_ADMIN_PASSWORD": "@blog_admin_password",
-    "EMAIL_USER": "@email_user",
-    "EMAIL_PASS": "@email_pass"
-  }
+  "buildCommand": "npm run vercel-build",
+  "regions": ["icn1"]
 }

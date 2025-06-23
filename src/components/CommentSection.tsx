@@ -9,7 +9,6 @@ import {
   Paper,
   Stack,
   Avatar,
-  Divider,
   IconButton,
   Dialog,
   DialogTitle,
@@ -97,7 +96,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       } else {
         setError('댓글 작성에 실패했습니다.')
       }
-    } catch (error) {
+    } catch {
       setError('댓글 작성 중 오류가 발생했습니다.')
     } finally {
       setSubmitting(false)
