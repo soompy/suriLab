@@ -6,6 +6,7 @@ import { CreatePostUseCaseImpl } from '../../usecases/CreatePost'
 import { UpdatePostUseCaseImpl } from '../../usecases/UpdatePost'
 import { DeletePostUseCaseImpl } from '../../usecases/DeletePost'
 import { prisma } from '../../lib/prisma'
+import { initializeDatabase } from '../../lib/database-init'
 
 const postRepository = new PrismaPostRepository(prisma)
 const getPostsUseCase = new GetPostsUseCaseImpl(postRepository)
@@ -132,12 +133,18 @@ export class PostsAPIHandler {
 
   static async POST(request: NextRequest) {
     try {
+      // 데이터베이스 초기화 확인
+      await initializeDatabase()
+      
       const body = await request.json()
+      console.log('Creating post with data:', body)
       const post = await createPost(body)
+      console.log('Post created successfully:', post)
       return NextResponse.json(post, { status: 201 })
-    } catch {
+    } catch (error) {
+      console.error('Error creating post:', error)
       return NextResponse.json(
-        { error: 'Failed to create post' },
+        { error: 'Failed to create post', details: error instanceof Error ? error.message : 'Unknown error' },
         { status: 400 }
       )
     }
