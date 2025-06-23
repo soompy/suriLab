@@ -32,6 +32,8 @@ import { PostEntity } from '@/entities/Post'
 import { BLOG_CONFIG } from '@/config/blog'
 import { AvatarImage } from '@/components/image'
 import OptimizedMarkdown from '@/components/OptimizedMarkdown'
+import CommentSection from '@/components/CommentSection'
+import LikeButton from '@/components/LikeButton'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -317,7 +319,9 @@ export default function PostDetailPage() {
                 </Box>
 
                 {/* Action Buttons */}
-                <Stack direction="row" spacing={1} sx={{ mb: 4 }}>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 4 }}>
+                  <LikeButton postId={post.id} />
+                  <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
                   <IconButton onClick={handleShare} title="공유하기">
                     <ShareIcon />
                   </IconButton>
@@ -380,6 +384,9 @@ export default function PostDetailPage() {
                   </Box>
                 </Stack>
               </Box>
+
+              {/* Comment Section */}
+              <CommentSection postId={post.id} />
             </Stack>
           </Paper>
         </Container>
