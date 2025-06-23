@@ -6,19 +6,9 @@ export async function initializeDatabase() {
     await prisma.$connect()
     console.log('Database connected successfully')
 
-    // 프로덕션에서는 메모리 데이터베이스 스키마 생성
+    // 프로덕션에서는 기본 데이터 생성
     if (process.env.NODE_ENV === 'production') {
-      try {
-        // 스키마가 존재하는지 확인
-        await prisma.user.findFirst()
-        console.log('Database schema already exists')
-      } catch (error) {
-        console.log('Database schema not found, creating schema...')
-        // 메모리 데이터베이스에 스키마 생성
-        await createSchema()
-      }
-      
-      // 기본 데이터 생성
+      // 기본 데이터 생성 (스키마는 이미 존재한다고 가정)
       await createDefaultData()
     }
   } catch (error) {
@@ -121,8 +111,8 @@ async function createSchema() {
 async function createDefaultData() {
   try {
     // 기본 사용자 확인/생성
-    const userCount = await prisma.user.count()
-    if (userCount === 0) {
+    const existingUser = await prisma.user.findFirst({ where: { email: 'yzsumin@naver.com' } })
+    if (!existingUser) {
       await prisma.user.create({
         data: {
           id: 'admin-user-id',
@@ -134,8 +124,8 @@ async function createDefaultData() {
     }
 
     // 기본 카테고리 확인/생성
-    const categoryCount = await prisma.category.count()
-    if (categoryCount === 0) {
+    const existingCategory = await prisma.category.findFirst({ where: { name: '기술' } })
+    if (!existingCategory) {
       await prisma.category.createMany({
         data: [
           { id: 'tech', name: '기술', description: '기술 관련 포스트', color: '#3b82f6' },
@@ -147,8 +137,8 @@ async function createDefaultData() {
     }
 
     // 기본 태그 확인/생성
-    const tagCount = await prisma.tag.count()
-    if (tagCount === 0) {
+    const existingTag = await prisma.tag.findFirst({ where: { name: 'React' } })
+    if (!existingTag) {
       await prisma.tag.createMany({
         data: [
           { name: 'React' },
