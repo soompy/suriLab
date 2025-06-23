@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono, Noto_Sans_KR } from 'next/font/google'
 import { CustomThemeProvider } from '@/components/ThemeContext'
 import './globals.css'
+import 'highlight.js/styles/github.css'
 
 // Inter 폰트 설정 (본문용)
 const inter = Inter({
