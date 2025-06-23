@@ -87,6 +87,9 @@ export async function deletePost(id: string) {
 export class PostsAPIHandler {
   static async GET(request: NextRequest) {
     try {
+      // 데이터베이스 초기화 (첫 요청시에만)
+      await initializeDatabase()
+      
       const { searchParams } = new URL(request.url)
       
       const category = searchParams.get('category') || undefined

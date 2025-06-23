@@ -54,6 +54,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/contact": {
       "experimentalBypassFor": [
         {
@@ -150,30 +174,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/write": {
       "experimentalBypassFor": [
         {
@@ -202,8 +202,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "aa4e41817f869f67e217129ae7f658c5",
-    "previewModeSigningKey": "40ed70591c01a42b8d05951796ad3c1ef1b2db82d16d30ad8e556f23d88c6d91",
-    "previewModeEncryptionKey": "6abf9c7c63ae080d591fd7c8dc856ee947ccb9fd31234323ba23e15a35c6ce9f"
+    "previewModeId": "6d32424488e123810b8daa0d3ab86ba0",
+    "previewModeSigningKey": "b9bb91ed5832e0dae55f90a2dbc974495bd8482ac6fe619053a946117aa09a43",
+    "previewModeEncryptionKey": "ba5d1fa05d81a361f8ecaba1ecf0ed4ec99e5c0bfe7704f6f6ad253fbd94391c"
   }
 }

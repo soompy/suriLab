@@ -60,7 +60,6 @@ async function migrateData() {
     if (users.length > 0) {
       await postgresqlPrisma.user.createMany({
         data: users,
-        skipDuplicates: true
       })
       console.log(`✅ 사용자 ${users.length}개 마이그레이션 완료`)
     }
@@ -69,7 +68,6 @@ async function migrateData() {
     if (categories.length > 0) {
       await postgresqlPrisma.category.createMany({
         data: categories,
-        skipDuplicates: true
       })
       console.log(`✅ 카테고리 ${categories.length}개 마이그레이션 완료`)
     }
@@ -78,7 +76,6 @@ async function migrateData() {
     if (tags.length > 0) {
       await postgresqlPrisma.tag.createMany({
         data: tags,
-        skipDuplicates: true
       })
       console.log(`✅ 태그 ${tags.length}개 마이그레이션 완료`)
     }
@@ -112,7 +109,6 @@ async function migrateData() {
     if (comments.length > 0) {
       await postgresqlPrisma.comment.createMany({
         data: comments,
-        skipDuplicates: true
       })
       console.log(`✅ 댓글 ${comments.length}개 마이그레이션 완료`)
     }
@@ -121,7 +117,6 @@ async function migrateData() {
     if (likes.length > 0) {
       await postgresqlPrisma.like.createMany({
         data: likes,
-        skipDuplicates: true
       })
       console.log(`✅ 좋아요 ${likes.length}개 마이그레이션 완료`)
     }

@@ -10,6 +10,13 @@ export async function initializeDatabase() {
     const dbUrl = process.env.DATABASE_URL || ''
     console.log(`Database URL: ${dbUrl.substring(0, 30)}...`)
 
+    // Vercel 환경에서 데이터베이스 파일 생성
+    if (process.env.VERCEL && dbUrl.includes('file:')) {
+      console.log('Vercel environment detected, creating database...')
+      // Prisma가 자동으로 데이터베이스 파일을 생성하도록 함
+      await prisma.$executeRaw`SELECT 1;`
+    }
+
     // 기본 데이터 생성 (영구 저장)
     await createDefaultData()
     console.log('Database initialization completed')
