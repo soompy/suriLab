@@ -16,7 +16,7 @@
     "db:reset": "prisma migrate reset --force",
     "db:migrate-to-postgresql": "tsx scripts/migrate-to-postgresql.ts",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma db push --accept-data-loss && next build"
+    "vercel-build": "prisma generate && next build"
   },
   "keywords": [],
   "author": "",
