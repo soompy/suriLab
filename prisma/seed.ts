@@ -11,12 +11,12 @@ async function main() {
     where: { id: 'owner-soomin' },
     update: {
       name: 'Suri',
-      email: 'soomin@suriblog.com'
+      email: 'yzsumin@naver.com'
     },
     create: {
       id: 'owner-soomin',
       name: 'Suri',
-      email: 'soomin@suriblog.com'
+      email: 'yzsumin@naver.com'
     }
   })
 

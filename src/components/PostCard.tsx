@@ -1,7 +1,8 @@
 'use client'
 
-import { Card, CardMedia, CardContent, Typography, Chip, Box } from '@mui/material'
+import { Card, CardContent, Typography, Chip, Box } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import { ThumbnailImage } from './image'
 
 interface Post {
   id: string
@@ -53,42 +54,20 @@ export default function PostCard({ post, onClick }: PostCardProps) {
     >
       {/* Image Header */}
       <Box sx={{ position: 'relative', height: 160 }}>
-        {post.thumbnail ? (
-          <CardMedia
-            component="img"
-            height="160"
-            image={post.thumbnail}
-            alt={post.title}
-            sx={{
-              objectFit: 'cover',
-              transition: 'transform 0.3s ease',
-              '&:hover': {
-                transform: 'scale(1.02)',
-              },
-            }}
-          />
-        ) : (
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.50',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Typography
-              variant="h4"
-              sx={{
-                color: theme.palette.mode === 'dark' ? 'grey.500' : 'grey.400',
-                fontWeight: 500,
-              }}
-            >
-              {post.title.charAt(0).toUpperCase()}
-            </Typography>
-          </Box>
-        )}
+        <ThumbnailImage
+          src={post.thumbnail}
+          alt={post.title}
+          width={400}
+          height={160}
+          fallbackText={post.title.charAt(0).toUpperCase()}
+          quality={75}
+          borderRadius="0"
+          hoverEffect={false}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
         
         {/* Category Badge */}
         {post.tags[0] && (
@@ -103,6 +82,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
               color: theme.palette.mode === 'dark' ? 'white' : 'grey.700',
               fontSize: '0.75rem',
               fontWeight: 500,
+              zIndex: 2,
             }}
           />
         )}

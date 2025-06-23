@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -69,6 +69,7 @@ import Footer from '@/components/Footer'
 
 export default function Write() {
   const theme = useTheme()
+  const router = useRouter()
   const contentRef = useRef<HTMLTextAreaElement>(null)
   const searchParams = useSearchParams()
   const editId = searchParams.get('edit')
@@ -512,6 +513,16 @@ export default function Write() {
           status: 'draft'
         })
         setTags([])
+        
+        // 새 포스트 발행 후 메인페이지로 리다이렉트
+        setTimeout(() => {
+          router.push('/')
+        }, 1000)
+      } else {
+        // 기존 포스트 수정 후 해당 포스트 페이지로 리다이렉트
+        setTimeout(() => {
+          router.push(`/posts/${publishedPost.slug || editId}`)
+        }, 1000)
       }
       setSaveStatus('idle')
     } catch (error) {

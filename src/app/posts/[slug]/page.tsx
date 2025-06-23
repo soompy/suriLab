@@ -10,7 +10,6 @@ import {
   Chip,
   Divider,
   Stack,
-  Avatar,
   IconButton,
   Skeleton,
   Alert
@@ -31,6 +30,8 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { PostEntity } from '@/entities/Post'
 import { BLOG_CONFIG } from '@/config/blog'
+import { AvatarImage } from '@/components/image'
+import OptimizedMarkdown from '@/components/OptimizedMarkdown'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -345,89 +346,9 @@ export default function PostDetailPage() {
 
               {/* Content */}
               <Box>
-                <Box sx={{ 
-                  lineHeight: 1.8,
-                  '& p': { mb: 2 },
-                  '& h1, & h2, & h3, & h4, & h5, & h6': { 
-                    mt: 4, 
-                    mb: 2,
-                    fontWeight: 'bold'
-                  },
-                  '& h1': { fontSize: '2rem' },
-                  '& h2': { fontSize: '1.5rem' },
-                  '& h3': { fontSize: '1.25rem' },
-                  '& pre': {
-                    bgcolor: 'grey.100',
-                    p: 2,
-                    borderRadius: 1,
-                    overflow: 'auto',
-                    '& code': {
-                      bgcolor: 'transparent',
-                      px: 0,
-                      py: 0
-                    }
-                  },
-                  '& code': {
-                    bgcolor: 'grey.100',
-                    px: 0.5,
-                    py: 0.25,
-                    borderRadius: 0.5,
-                    fontSize: '0.875rem'
-                  },
-                  '& blockquote': {
-                    borderLeft: '4px solid',
-                    borderColor: 'primary.main',
-                    pl: 2,
-                    ml: 0,
-                    fontStyle: 'italic',
-                    color: 'text.secondary'
-                  },
-                  '& img': {
-                    maxWidth: '100%',
-                    height: 'auto',
-                    borderRadius: 1,
-                    my: 2
-                  }
-                }}>
-                  {post.content.split('\n').map((line, index) => {
-                    // 제목 처리
-                    if (line.startsWith('# ')) {
-                      return <Typography key={index} variant="h4" component="h1" sx={{ mt: 4, mb: 2, fontWeight: 'bold' }}>{line.substring(2)}</Typography>
-                    }
-                    if (line.startsWith('## ')) {
-                      return <Typography key={index} variant="h5" component="h2" sx={{ mt: 3, mb: 2, fontWeight: 'bold' }}>{line.substring(3)}</Typography>
-                    }
-                    if (line.startsWith('### ')) {
-                      return <Typography key={index} variant="h6" component="h3" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>{line.substring(4)}</Typography>
-                    }
-                    
-                    // 코드 블록 처리
-                    if (line.startsWith('```')) {
-                      return null // 코드 블록은 별도 처리 필요
-                    }
-                    
-                    // 이미지 처리
-                    const imageMatch = line.match(/!\[([^\]]*)\]\(([^)]+)\)/)
-                    if (imageMatch) {
-                      return (
-                        <Box key={index} sx={{ my: 3, textAlign: 'center' }}>
-                          <img
-                            src={imageMatch[2]}
-                            alt={imageMatch[1]}
-                            style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
-                          />
-                        </Box>
-                      )
-                    }
-                    
-                    // 일반 텍스트
-                    if (line.trim()) {
-                      return <Typography key={index} variant="body1" paragraph>{line}</Typography>
-                    }
-                    
-                    return <br key={index} />
-                  })}
-                </Box>
+                <OptimizedMarkdown 
+                  content={post.content}
+                />
               </Box>
 
               <Divider />
@@ -438,13 +359,14 @@ export default function PostDetailPage() {
                   작성자 정보
                 </Typography>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Avatar 
+                  <AvatarImage 
                     src={BLOG_CONFIG.owner.avatar}
                     alt={BLOG_CONFIG.owner.name}
-                    sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}
-                  >
-                    {BLOG_CONFIG.owner.name.charAt(0)}
-                  </Avatar>
+                    size={56}
+                    fallbackText={BLOG_CONFIG.owner.name.charAt(0)}
+                    priority={true}
+                    quality={90}
+                  />
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold">
                       {BLOG_CONFIG.owner.name}

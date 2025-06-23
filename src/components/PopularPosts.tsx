@@ -1,5 +1,7 @@
 'use client'
 
+import { ThumbnailImage } from './image'
+
 interface PopularPost {
   id: string
   title: string
@@ -67,18 +69,21 @@ export default function PopularPosts({ posts, onPostClick, className = '' }: Pop
             </div>
 
             {/* Thumbnail */}
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600">
-              {post.thumbnail ? (
-                <img
-                  src={post.thumbnail}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-white text-lg font-bold">
-                  {post.title.charAt(0).toUpperCase()}
-                </div>
-              )}
+            <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+              <ThumbnailImage
+                src={post.thumbnail}
+                alt={post.title}
+                width={48}
+                height={48}
+                fallbackText={post.title.charAt(0).toUpperCase()}
+                quality={75}
+                borderRadius="8px"
+                hoverEffect={false}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
             </div>
 
             {/* Content */}

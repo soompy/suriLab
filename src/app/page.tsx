@@ -10,7 +10,9 @@ import {
   Chip, 
   Tabs, 
   Tab,
-  Stack
+  Stack,
+  Snackbar,
+  Alert
 } from '@mui/material'
 import {
   Schedule as ScheduleIcon,
@@ -33,25 +35,50 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [isSticky, setIsSticky] = useState(false)
+  const [newPostAdded, setNewPostAdded] = useState(false)
+  const [previousPostCount, setPreviousPostCount] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch('/api/posts')
-        if (response.ok) {
-          const data = await response.json()
-          setPosts(data.posts || [])
+  const fetchPosts = async (showNotification = false) => {
+    try {
+      if (showNotification) setLoading(false) // 알림용 새로고침일 때는 로딩 표시하지 않음
+      else setLoading(true)
+      
+      const response = await fetch('/api/posts?sortField=publishedAt&sortOrder=desc&limit=50')
+      if (response.ok) {
+        const data = await response.json()
+        const newPosts = data.posts || []
+        
+        // 새 포스트가 추가되었는지 확인
+        if (showNotification && previousPostCount > 0 && newPosts.length > previousPostCount) {
+          setNewPostAdded(true)
         }
-      } catch (error) {
-        console.error('Failed to fetch posts:', error)
-      } finally {
-        setLoading(false)
+        
+        setPosts(newPosts)
+        setPreviousPostCount(newPosts.length)
       }
+    } catch (error) {
+      console.error('Failed to fetch posts:', error)
+    } finally {
+      if (!showNotification) setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPosts()
+
+    // 페이지가 포커스를 받을 때 포스트 목록 새로고침
+    const handleFocus = () => {
+      fetchPosts(true)
     }
 
-    fetchPosts()
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+    }
   }, [])
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,6 +117,28 @@ export default function HomePage() {
       month: 'short',
       day: 'numeric'
     })
+  }
+
+  const getRelativeTime = (dateString: string | Date) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    const diffInDays = Math.floor(diffInHours / 24)
+
+    if (diffInMinutes < 1) return '방금 전'
+    if (diffInMinutes < 60) return `${diffInMinutes}분 전`
+    if (diffInHours < 24) return `${diffInHours}시간 전`
+    if (diffInDays < 7) return `${diffInDays}일 전`
+    
+    return formatDate(dateString)
+  }
+
+  const isNewPost = (dateString: string | Date) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    return diffInHours < 24 // 24시간 이내를 새 포스트로 간주
   }
 
   const getCategoryInfo = (category: BlogCategory) => ({
@@ -237,6 +286,24 @@ export default function HomePage() {
                                   sx={{ ml: 1 }}
                                 />
                               )}
+                              {isNewPost(post.publishedAt) && (
+                                <Chip
+                                  label="NEW"
+                                  size="small"
+                                  sx={{ 
+                                    ml: 1,
+                                    backgroundColor: '#ff4444',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    animation: 'pulse 2s infinite',
+                                    '@keyframes pulse': {
+                                      '0%': { opacity: 1 },
+                                      '50%': { opacity: 0.7 },
+                                      '100%': { opacity: 1 },
+                                    }
+                                  }}
+                                />
+                              )}
                             </Box>
                             
                             <Typography variant="h6" component="h3" sx={{ mb: 1, fontWeight: 'bold' }}>
@@ -272,7 +339,7 @@ export default function HomePage() {
                             </Stack>
                             
                             <Typography variant="caption" color="text.secondary">
-                              {formatDate(post.publishedAt)}
+                              {getRelativeTime(post.publishedAt)}
                             </Typography>
                           </CardContent>
                         </Card>
@@ -286,6 +353,22 @@ export default function HomePage() {
         </main>
         
         <Footer />
+
+        {/* 새 포스트 알림 */}
+        <Snackbar
+          open={newPostAdded}
+          autoHideDuration={6000}
+          onClose={() => setNewPostAdded(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert 
+            onClose={() => setNewPostAdded(false)} 
+            severity="success" 
+            sx={{ width: '100%' }}
+          >
+            🎉 새로운 포스트가 추가되었습니다!
+          </Alert>
+        </Snackbar>
       </div>
     </MuiThemeProvider>
   )

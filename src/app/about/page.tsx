@@ -6,7 +6,6 @@ import {
   Container, 
   Paper, 
   Chip, 
-  Avatar,
   Divider,
   List,
   ListItem,
@@ -24,13 +23,12 @@ import {
   LinkedIn,
   LocationOn
 } from '@mui/icons-material'
-import { useTheme } from '@mui/material/styles'
 import Header from '@/components/Header'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Footer from '@/components/Footer'
+import { AvatarImage } from '@/components/image'
 
 export default function AboutPage() {
-  const theme = useTheme()
 
   const skillColors = {
     // Frontend - 파스텔 톤으로 변경
@@ -121,21 +119,16 @@ export default function AboutPage() {
           <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4 }}>
         {/* Header Section */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
-          <Avatar
-            src="/images/profile.jpg" // 이미지 경로
-            alt="Suri 프로필 사진"
-            sx={{
-              width: 120,
-              height: 120,
-              mx: 'auto',
-              mb: 3,
-              backgroundColor: theme.palette.primary.main,
-              fontSize: '3rem',
-              fontWeight: 'bold'
-            }}
-          >
-            Suri
-          </Avatar>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+            <AvatarImage
+              src="/images/profile.jpg"
+              alt="Suri 프로필 사진"
+              size={120}
+              fallbackText="S"
+              priority={true}
+              quality={95}
+            />
+          </Box>
           <Typography
             variant="h3"
             component="h1"
@@ -168,7 +161,7 @@ export default function AboutPage() {
               fontSize: '1.1rem'
             }}
           >
-            &quot;코드엔 논리, UI엔 감성. 그 둘 사이에서 말끔한 화면을 짓는 사람입니다.&quot;
+            &quot;기술의 구조와 사용자 경험 사이에서, 자연스럽고 정제된 인터페이스를 만들어갑니다.&quot;
           </Typography>
         </Box>
 

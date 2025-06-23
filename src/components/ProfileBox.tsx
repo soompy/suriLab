@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import { AvatarImage } from './image'
 
 interface ProfileBoxProps {
   author: {
@@ -26,20 +26,14 @@ export default function ProfileBox({ author, stats, className = '' }: ProfileBox
       <div className="text-center mb-6">
         {/* Avatar */}
         <div className="relative w-20 h-20 mx-auto mb-4">
-          {author.avatar ? (
-            <Image
-              src={author.avatar}
-              alt={author.name}
-              fill
-              className="rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">
-                {author.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
+          <AvatarImage
+            src={author.avatar}
+            alt={author.name}
+            size={80}
+            fallbackText={author.name.charAt(0).toUpperCase()}
+            priority={true}
+            quality={90}
+          />
           <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
         </div>
 

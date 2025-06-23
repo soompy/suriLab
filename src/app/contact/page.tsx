@@ -31,6 +31,7 @@ import Footer from '@/components/Footer'
 export default function Contact() {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -66,31 +67,70 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // 폼 유효성 검사
+    if (!formData.name.trim()) {
+      setSnackbarMessage('⚠️ 이름을 입력해주세요.')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    if (!formData.email.trim()) {
+      setSnackbarMessage('⚠️ 이메일을 입력해주세요.')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    if (!formData.message.trim()) {
+      setSnackbarMessage('⚠️ 메시지를 입력해주세요.')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    if (formData.message.trim().length < 10) {
+      setSnackbarMessage('⚠️ 메시지는 최소 10자 이상 입력해주세요.')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      // 실제 이메일 서비스 연동 예정
-      // 현재는 데모 버전
-      const subject = encodeURIComponent(formData.subject || '블로그 문의')
-      const body = encodeURIComponent(
-        `이름: ${formData.name}\n이메일: ${formData.email}\n\n메시지:\n${formData.message}`
-      )
-      const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`
-      
-      window.location.href = mailtoLink
-      
-      setSnackbarMessage('메일 클라이언트가 열렸습니다!')
-      setSnackbarOpen(true)
-      
-      // 폼 초기화
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       })
-    } catch {
-      setSnackbarMessage('메일 전송에 실패했습니다.')
+
+      const result = await response.json()
+
+      if (response.ok) {
+        setSnackbarMessage(result.message || '✅ 메시지가 성공적으로 전송되었습니다! 24시간 이내 답변드리겠습니다.')
+        setSnackbarSeverity('success')
+        setSnackbarOpen(true)
+        
+        // 폼 초기화
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        })
+      } else {
+        setSnackbarMessage(result.error || '❌ 메시지 전송에 실패했습니다.')
+        setSnackbarSeverity('error')
+        setSnackbarOpen(true)
+      }
+    } catch (error) {
+      console.error('Submit error:', error)
+      setSnackbarMessage('🌐 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      setSnackbarSeverity('error')
       setSnackbarOpen(true)
     } finally {
       setIsSubmitting(false)
@@ -176,18 +216,28 @@ export default function Contact() {
                     onChange={handleInputChange}
                     variant="outlined"
                   />
-                  <TextField
-                    fullWidth
-                    label="메시지"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    multiline
-                    rows={6}
-                    variant="outlined"
-                    placeholder="궁금한 점이나 협업 제안, 피드백 등 무엇이든 자유롭게 작성해주세요."
-                  />
+                  <Box>
+                    <TextField
+                      fullWidth
+                      label="메시지"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      multiline
+                      rows={6}
+                      variant="outlined"
+                      placeholder="궁금한 점이나 협업 제안, 피드백 등 무엇이든 자유롭게 작성해주세요."
+                    />
+                    <Typography 
+                      variant="caption" 
+                      color={formData.message.trim().length < 10 ? 'error' : 'text.secondary'}
+                      sx={{ display: 'block', mt: 0.5, textAlign: 'right' }}
+                    >
+                      {formData.message.trim().length}/최소 10자 
+                      {formData.message.trim().length < 10 && ' (현재 ' + (10 - formData.message.trim().length) + '자 더 필요)'}
+                    </Typography>
+                  </Box>
                   
                   <Button
                     type="submit"
@@ -199,6 +249,21 @@ export default function Contact() {
                   >
                     {isSubmitting ? '전송 중...' : '메시지 전송'}
                   </Button>
+                  
+                  <Box sx={{ mt: 2, p: 2, bgcolor: 'info.50', borderRadius: 1, border: '1px solid', borderColor: 'info.200' }}>
+                    <Typography variant="body2" color="info.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      📧 <strong>실제 이메일 전송 서비스:</strong>
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.875rem' }}>
+                      • 메시지는 실제로 yzsumin@naver.com으로 즉시 전송됩니다
+                      <br />
+                      • 24시간 이내 답변 보장 (평일 기준 더 빠른 응답)
+                      <br />
+                      • 답장은 입력하신 이메일 주소로 직접 발송됩니다
+                      <br />
+                      • 전송 실패 시 자동으로 재시도 및 오류 알림
+                    </Typography>
+                  </Box>
                 </Box>
               </Paper>
             </Box>
@@ -316,7 +381,7 @@ export default function Contact() {
       >
         <Alert 
           onClose={() => setSnackbarOpen(false)} 
-          severity="success" 
+          severity={snackbarSeverity} 
           sx={{ width: '100%' }}
         >
           {snackbarMessage}

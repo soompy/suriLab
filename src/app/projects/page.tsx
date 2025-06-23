@@ -12,7 +12,6 @@ import {
   Stack,
 } from '@mui/material'
 import {
-  Work as WorkIcon,
   GitHub as GitHubIcon,
   Launch as LaunchIcon,
   Code as CodeIcon,
@@ -21,6 +20,7 @@ import {
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { ProjectImage } from '@/components/image'
 
 interface Project {
   id: number
@@ -101,6 +101,53 @@ export default function Projects() {
 
   const handleLinkClick = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  const getTagColor = (tag: string) => {
+    const colors: { [key: string]: string } = {
+      // Frontend & Core Technologies (Light Blue/Cyan family)
+      'html': '#ffebee',
+      'html5': '#ffebee',
+      'css': '#e3f2fd', 
+      'css3': '#e3f2fd',
+      'javascript': '#fff9c4',
+      'vanilla javascript': '#fff9c4',
+      'typescript': '#e8f5ff',
+      'react': '#e0f7fa',
+      'nextjs': '#f3e5f5',
+      'next.js': '#f3e5f5',
+      'vue': '#e8f5e8',
+      'vue.js': '#e8f5e8',
+      'nuxt': '#f1f8e9',
+      'nuxt.js': '#f1f8e9',
+      'frontend': '#e1f5fe',
+      'vite': '#f1f8e9',
+      
+      // Backend & Database (Green/Purple family)
+      'backend': '#f1f8e9',
+      'database': '#fff8e1',
+      'node': '#e8f5e8',
+      'python': '#fff3e0',
+      'ssr': '#f1f8e9',
+      
+      // Development & Tools (Purple/Pink family)
+      'development': '#f3e5f5',
+      'tools': '#e8eaf6',
+      'git': '#ffebee',
+      'devops': '#e8eaf6',
+      
+      // Design & UI (Orange/Pink family)
+      'responsive design': '#ffebee',
+      'interactive design': '#fce4ec',
+      'tailwind css': '#e8f5ff',
+      'scss': '#e3f2fd',
+      
+      // AI & Modern Tech (Light Green/Yellow)
+      'ai': '#f9fbe7'
+    }
+    
+    const normalizedTag = tag.toLowerCase().trim()
+    return colors[normalizedTag] || '#f5f5f5'
   }
 
   return (
@@ -245,94 +292,21 @@ export default function Projects() {
                                   >
                                       {/* 프로젝트 이미지 */}
                                       <Box>
-                                          <Box
-                                              sx={{
-                                                  width: "100%",
-                                                  height: 250,
-                                                  bgcolor: "grey.100",
-                                                  borderRadius: 2,
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                  justifyContent: "center",
-                                                  position: "relative",
-                                                  overflow: "hidden",
-                                                  cursor: "pointer",
-                                                  transition: "all 0.3s ease",
-                                                  border: "1px solid rgba(0,0,0,0.1)",
-                                                  "&:hover": {
-                                                      transform: "scale(1.02)",
-                                                      boxShadow: "0 8px 25px rgba(0,0,0,0.15)"
-                                                  }
-                                              }}
+                                          <ProjectImage
+                                              src={project.image}
+                                              alt={`${project.title} 프로젝트 스크린샷`}
+                                              projectName={project.title}
+                                              width={400}
+                                              height={250}
+                                              priority={project.featured}
+                                              quality={85}
                                               onClick={() => project.demo && handleLinkClick(project.demo)}
-                                          >
-                                              {project.image ? (
-                                                  <Box
-                                                      component="img"
-                                                      src={project.image}
-                                                      alt={`${project.title} 프로젝트 스크린샷`}
-                                                      sx={{
-                                                          width: "100%",
-                                                          height: "100%",
-                                                          objectFit: "cover",
-                                                          transition: "all 0.3s ease"
-                                                      }}
-                                                      onError={(e) => {
-                                                          const target = e.target as HTMLImageElement;
-                                                          target.style.display = "none";
-                                                      }}
-                                                      onLoad={(e) => {
-                                                          const target = e.target as HTMLImageElement;
-                                                          target.style.opacity = "1";
-                                                      }}
-                                                      style={{ opacity: 0 }}
-                                                  />
-                                              ) : null}
-                                              {/* 로딩 및 fallback 아이콘 */}
-                                              <Box
-                                                  sx={{
-                                                      position: "absolute",
-                                                      top: "50%",
-                                                      left: "50%",
-                                                      transform: "translate(-50%, -50%)",
-                                                      color: "text.secondary",
-                                                      zIndex: 1
-                                                  }}
-                                              >
-                                                  <WorkIcon sx={{ fontSize: 48, opacity: 0.3 }} />
-                                              </Box>
-                                              {/* 오버레이 */}
-                                              <Box
-                                                  sx={{
-                                                      position: "absolute",
-                                                      top: 0,
-                                                      left: 0,
-                                                      right: 0,
-                                                      bottom: 0,
-                                                      background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%)",
-                                                      opacity: 0,
-                                                      transition: "opacity 0.3s ease",
-                                                      display: "flex",
-                                                      alignItems: "flex-end",
-                                                      justifyContent: "center",
-                                                      pb: 2,
-                                                      "&:hover": {
-                                                          opacity: 1
-                                                      }
-                                                  }}
-                                              >
-                                                  <Typography 
-                                                      variant="body2" 
-                                                      sx={{ 
-                                                          color: "white", 
-                                                          fontWeight: 600,
-                                                          textAlign: "center"
-                                                      }}
-                                                  >
-                                                      클릭하여 프로젝트 보기
-                                                  </Typography>
-                                              </Box>
-                                          </Box>
+                                              borderRadius="12px"
+                                              showOverlay={true}
+                                              style={{
+                                                  border: "1px solid rgba(0,0,0,0.1)",
+                                              }}
+                                          />
                                       </Box>
 
                                       {/* 프로젝트 정보 */}
@@ -384,6 +358,7 @@ export default function Projects() {
                                                           <Typography
                                                               variant="body2"
                                                               color="text.secondary"
+                                                              sx={{ fontSize: '0.875rem' }}
                                                           >
                                                               {project.date}
                                                           </Typography>
@@ -429,8 +404,13 @@ export default function Projects() {
                                                                   label={tech}
                                                                   size="small"
                                                                   sx={{
-                                                                      fontSize:
-                                                                          "0.75rem",
+                                                                      fontSize: "0.75rem",
+                                                                      backgroundColor: getTagColor(tech),
+                                                                      border: '1px solid #e0e0e0',
+                                                                      color: '#555',
+                                                                      '&:hover': {
+                                                                          backgroundColor: getTagColor(tech)
+                                                                      }
                                                                   }}
                                                               />
                                                           )

@@ -55,7 +55,7 @@ export default function MuiThemeProvider({ children }: MuiThemeProviderProps) {
         lineHeight: 1.3,
       },
       body1: {
-        fontSize: '0.875rem',
+        fontSize: '1rem',
         lineHeight: 1.6,
       },
       body2: {
