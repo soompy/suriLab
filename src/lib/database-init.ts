@@ -6,14 +6,16 @@ export async function initializeDatabase() {
     await prisma.$connect()
     console.log('Database connected successfully')
 
-    // 프로덕션에서는 스키마 푸시와 기본 데이터 생성
+    // 프로덕션에서는 메모리 데이터베이스 스키마 생성
     if (process.env.NODE_ENV === 'production') {
       try {
         // 스키마가 존재하는지 확인
         await prisma.user.findFirst()
+        console.log('Database schema already exists')
       } catch (error) {
-        console.log('Database schema not found, creating...')
-        // 스키마 푸시 시뮬레이션 (실제로는 마이그레이션이 이미 적용되어야 함)
+        console.log('Database schema not found, creating schema...')
+        // 메모리 데이터베이스에 스키마 생성
+        await createSchema()
       }
       
       // 기본 데이터 생성
@@ -23,6 +25,96 @@ export async function initializeDatabase() {
     console.error('Database initialization failed:', error)
     // 에러가 발생해도 계속 진행
     console.log('Continuing without database initialization...')
+  }
+}
+
+async function createSchema() {
+  try {
+    console.log('Creating database schema...')
+    
+    // 스키마 생성을 위한 Raw SQL 실행
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "users" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "name" TEXT NOT NULL,
+        "email" TEXT NOT NULL UNIQUE
+      )
+    `
+    
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "categories" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "name" TEXT NOT NULL UNIQUE,
+        "description" TEXT,
+        "color" TEXT
+      )
+    `
+    
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "tags" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "name" TEXT NOT NULL UNIQUE
+      )
+    `
+    
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "posts" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "title" TEXT NOT NULL,
+        "content" TEXT NOT NULL,
+        "excerpt" TEXT NOT NULL,
+        "slug" TEXT NOT NULL UNIQUE,
+        "publishedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "readTime" INTEGER,
+        "views" INTEGER NOT NULL DEFAULT 0,
+        "featured" BOOLEAN NOT NULL DEFAULT 0,
+        "isPublished" BOOLEAN NOT NULL DEFAULT 0,
+        "categoryId" TEXT NOT NULL,
+        "authorId" TEXT NOT NULL,
+        FOREIGN KEY ("categoryId") REFERENCES "categories" ("id"),
+        FOREIGN KEY ("authorId") REFERENCES "users" ("id")
+      )
+    `
+    
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "comments" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "content" TEXT NOT NULL,
+        "authorName" TEXT NOT NULL,
+        "authorEmail" TEXT,
+        "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "postId" TEXT NOT NULL,
+        FOREIGN KEY ("postId") REFERENCES "posts" ("id") ON DELETE CASCADE
+      )
+    `
+    
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "likes" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "postId" TEXT NOT NULL,
+        "ipAddress" TEXT NOT NULL,
+        FOREIGN KEY ("postId") REFERENCES "posts" ("id") ON DELETE CASCADE,
+        UNIQUE("postId", "ipAddress")
+      )
+    `
+    
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "_PostToTag" (
+        "A" TEXT NOT NULL,
+        "B" TEXT NOT NULL,
+        FOREIGN KEY ("A") REFERENCES "posts" ("id") ON DELETE CASCADE,
+        FOREIGN KEY ("B") REFERENCES "tags" ("id") ON DELETE CASCADE,
+        UNIQUE("A", "B")
+      )
+    `
+    
+    console.log('Database schema created successfully')
+  } catch (error) {
+    console.error('Error creating schema:', error)
+    throw error
   }
 }
 
