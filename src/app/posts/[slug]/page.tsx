@@ -142,6 +142,54 @@ export default function PostDetailPage() {
     }
   }
 
+  const getTagColor = (tag: string) => {
+    const colors: { [key: string]: string } = {
+      // Frontend & Core Technologies (Light Blue/Cyan family)
+      'html': '#ffebee',
+      'css': '#e3f2fd', 
+      'javascript': '#fff9c4',
+      'typescript': '#e8f5ff',
+      'react': '#e0f7fa',
+      'nextjs': '#f3e5f5',
+      'vue': '#e8f5e8',
+      'nuxt': '#f1f8e9',
+      'frontend': '#e1f5fe',
+      
+      // Backend & Database (Green/Purple family)
+      'backend': '#f1f8e9',
+      'database': '#fff8e1',
+      'node': '#e8f5e8',
+      'python': '#fff3e0',
+      
+      // Development & Tools (Purple/Pink family)
+      'development': '#f3e5f5',
+      'tools': '#e8eaf6',
+      'git': '#ffebee',
+      'devops': '#e8eaf6',
+      
+      // Content Categories (Warm tones)
+      'tutorial': '#e8f5e8',
+      'review': '#fff3e0',
+      'tech insights': '#e3f2fd',
+      'personal': '#fce4ec',
+      'career': '#fce4ec',
+      'productivity': '#f3e5f5',
+      
+      // AI & Modern Tech (Light Green/Yellow)
+      'ai': '#f9fbe7',
+      
+      // Design & UI (Orange/Pink family)
+      'bootstrap': '#f3e5f5',
+      'material-ui': '#e3f2fd',
+      'responsive design': '#ffebee',
+      'figma': '#fce4ec',
+      'zeplin': '#fff3e0'
+    }
+    
+    const normalizedTag = tag.toLowerCase().trim()
+    return colors[normalizedTag] || '#f5f5f5'
+  }
+
   if (loading) {
     return (
       <MuiThemeProvider>
@@ -247,8 +295,15 @@ export default function PostDetailPage() {
                     <Chip 
                       key={tag} 
                       label={tag} 
-                      variant="outlined" 
                       size="small"
+                      sx={{ 
+                        backgroundColor: getTagColor(tag),
+                        border: 'none',
+                        color: '#555',
+                        '&:hover': {
+                          backgroundColor: getTagColor(tag)
+                        }
+                      }}
                     />
                   ))}
                   {post.featured && (

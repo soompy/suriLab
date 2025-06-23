@@ -33,25 +33,25 @@ export default function AboutPage() {
   const theme = useTheme()
 
   const skillColors = {
-    // Frontend
-    'HTML': '#E34F26',
-    'CSS/SCSS': '#1572B6', 
-    'JavaScript': '#F7DF1E',
-    'TypeScript': '#3178C6',
-    // Frameworks
-    'Vue': '#4FC08D',
-    'Nuxt': '#00DC82',
-    'React': '#61DAFB',
-    'Next.js': '#000000',
-    // Tools
-    'Git': '#F05032',
-    'Jira': '#0052CC',
-    'Figma': '#F24E1E',
-    'Zeplin': '#FF6900',
-    // Design
-    'Bootstrap': '#7952B3',
-    'Material-UI': '#0081CB',
-    'Responsive Design': '#FF6347'
+    // Frontend - 파스텔 톤으로 변경
+    'HTML': '#ffebee',
+    'CSS/SCSS': '#e3f2fd', 
+    'JavaScript': '#fff9c4',
+    'TypeScript': '#e8f5ff',
+    // Frameworks - 파스텔 톤으로 변경
+    'Vue': '#e8f5e8',
+    'Nuxt': '#f1f8e9',
+    'React': '#e0f7fa',
+    'Next.js': '#f3e5f5',
+    // Tools - 파스텔 톤으로 변경
+    'Git': '#ffebee',
+    'Jira': '#e8eaf6',
+    'Figma': '#fce4ec',
+    'Zeplin': '#fff3e0',
+    // Design - 파스텔 톤으로 변경
+    'Bootstrap': '#f3e5f5',
+    'Material-UI': '#e3f2fd',
+    'Responsive Design': '#ffebee'
   }
 
   const skills = [
@@ -316,12 +316,12 @@ export default function AboutPage() {
                         size="small"
                         sx={{ 
                           fontSize: '0.75rem',
-                          backgroundColor: skillColors[skill as keyof typeof skillColors] || theme.palette.primary.main,
-                          color: skill === 'JavaScript' || skill === 'Nuxt' ? '#000' : '#fff',
+                          backgroundColor: skillColors[skill as keyof typeof skillColors] || '#f5f5f5',
+                          color: '#555',
                           fontWeight: 500,
-                          border: 'none',
+                          border: '1px solid #e0e0e0',
                           '&:hover': {
-                            backgroundColor: skillColors[skill as keyof typeof skillColors] || theme.palette.primary.main,
+                            backgroundColor: skillColors[skill as keyof typeof skillColors] || '#f5f5f5',
                             opacity: 0.8,
                             transform: 'translateY(-1px)',
                           },

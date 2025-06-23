@@ -43,6 +43,7 @@ interface BlogPost {
   readTime: number
   views: number
   featured?: boolean
+  slug?: string
 }
 
 export default function Archives() {
@@ -56,23 +57,27 @@ export default function Archives() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch('/api/posts?isPublished=true')
-        const data = await response.json()
-        
-        if (data.success && data.posts) {
-          // API 응답 데이터를 BlogPost 인터페이스에 맞게 변환
-          const transformedPosts: BlogPost[] = data.posts.map((post: BlogPost) => ({
-            id: post.id,
-            title: post.title,
-            excerpt: post.excerpt,
-            tags: post.tags,
-            category: post.category,
-            publishedAt: post.publishedAt,
-            readTime: post.readTime,
-            views: post.views || 0,
-            featured: post.featured || false
-          }))
-          setAllPosts(transformedPosts)
+        const response = await fetch('/api/posts?isPublished=true&limit=100')
+        if (response.ok) {
+          const data = await response.json()
+          const posts = data.posts || []
+          if (posts.length > 0) {
+            // API 응답 데이터를 BlogPost 인터페이스에 맞게 변환
+            const transformedPosts: BlogPost[] = posts.map((post: any) => ({
+              id: post.id,
+              title: post.title,
+              excerpt: post.excerpt || '',
+              tags: Array.isArray(post.tags) ? post.tags.map((tag: any) => typeof tag === 'string' ? tag : tag.name) : [],
+              category: post.category,
+              publishedAt: post.publishedAt,
+              readTime: post.readTime || 5,
+              views: Number(post.views) || 0,
+              featured: post.featured || false,
+              slug: post.slug
+            }))
+            
+            setAllPosts(transformedPosts)
+          }
         }
       } catch (error) {
         console.error('Failed to fetch posts:', error)
@@ -95,6 +100,40 @@ export default function Archives() {
   // 카테고리 목록
   const categories = Array.from(new Set(allPosts.map(post => post.category)))
 
+  // 필터링된 포스트 계산
+  const getFilteredPosts = () => {
+    return Object.entries(postsByYear)
+      .map(([year, posts]) => {
+        const yearPosts = posts.filter(post => {
+          // 카테고리 필터
+          if (selectedCategory && post.category !== selectedCategory) {
+            return false
+          }
+          
+          // 검색어 필터
+          if (searchQuery.trim() === '') {
+            return true
+          }
+          
+          const query = searchQuery.toLowerCase().trim()
+          const title = (post.title || '').toLowerCase()
+          const excerpt = (post.excerpt || '').toLowerCase()
+          const category = (post.category || '').toLowerCase()
+          const tags = post.tags || []
+          
+          return title.includes(query) ||
+                 excerpt.includes(query) ||
+                 category.includes(query) ||
+                 tags.some(tag => (tag || '').toLowerCase().includes(query))
+        })
+        return { year, posts: yearPosts }
+      })
+      .filter(({ posts }) => posts.length > 0)
+      .sort((a, b) => parseInt(b.year) - parseInt(a.year))
+  }
+
+  const filteredPosts = getFilteredPosts()
+
 
   const handleYearToggle = (year: string) => {
     setExpandedYears(prev => 
@@ -105,12 +144,70 @@ export default function Archives() {
   }
 
   const handlePostClick = (post: BlogPost) => {
-    const slug = post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    const slug = post.slug || post.title.toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/(^-|-$)/g, '')
     window.location.href = `/posts/${slug}`
   }
 
-  const totalViews = allPosts.reduce((sum, post) => sum + post.views, 0)
-  const totalTags = new Set(allPosts.flatMap(post => post.tags)).size
+  const getTagColor = (tag: string) => {
+    const colors: { [key: string]: string } = {
+      // Frontend & Core Technologies (Light Blue/Cyan family)
+      'html': '#ffebee',
+      'css': '#e3f2fd', 
+      'javascript': '#fff9c4',
+      'typescript': '#e8f5ff',
+      'react': '#e0f7fa',
+      'nextjs': '#f3e5f5',
+      'vue': '#e8f5e8',
+      'nuxt': '#f1f8e9',
+      'frontend': '#e1f5fe',
+      
+      // Backend & Database (Green/Purple family)
+      'backend': '#f1f8e9',
+      'database': '#fff8e1',
+      'node': '#e8f5e8',
+      'python': '#fff3e0',
+      
+      // Development & Tools (Purple/Pink family)
+      'development': '#f3e5f5',
+      'tools': '#e8eaf6',
+      'git': '#ffebee',
+      'devops': '#e8eaf6',
+      
+      // Content Categories (Warm tones)
+      'tutorial': '#e8f5e8',
+      'review': '#fff3e0',
+      'tech insights': '#e3f2fd',
+      'personal': '#fce4ec',
+      'career': '#fce4ec',
+      'productivity': '#f3e5f5',
+      
+      // AI & Modern Tech (Light Green/Yellow)
+      'ai': '#f9fbe7',
+      
+      // Design & UI (Orange/Pink family)
+      'bootstrap': '#f3e5f5',
+      'material-ui': '#e3f2fd',
+      'responsive design': '#ffebee',
+      'figma': '#fce4ec',
+      'zeplin': '#fff3e0'
+    }
+    
+    const normalizedTag = tag.toLowerCase().trim()
+    return colors[normalizedTag] || '#f5f5f5'
+  }
+
+  const totalViews = allPosts.reduce((sum, post) => sum + (post.views || 0), 0)
+  const totalTags = new Set(allPosts.flatMap(post => post.tags || [])).size
+  
+  // 조회수 계산 디버깅
+  useEffect(() => {
+    if (allPosts.length > 0) {
+      console.log('📊 Archives 통계:')
+      console.log('총 포스트:', allPosts.length)
+      console.log('각 포스트 조회수:', allPosts.map(p => ({ title: p.title, views: p.views })))
+      console.log('총 조회수:', totalViews)
+    }
+  }, [allPosts, totalViews])
 
   if (loading) {
     return (
@@ -182,11 +279,16 @@ export default function Archives() {
               </Box>
               <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" color="primary" fontWeight="bold">
-                  {(totalViews / 1000).toFixed(1)}k
+                  {totalViews >= 1000 ? `${(totalViews / 1000).toFixed(1)}k` : (totalViews || 0).toLocaleString()}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   총 조회수
                 </Typography>
+                {process.env.NODE_ENV === 'development' && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                    (실제값: {totalViews})
+                  </Typography>
+                )}
               </Box>
             </Box>
           </Paper>
@@ -200,7 +302,7 @@ export default function Archives() {
             <Box>
               {/* 검색 및 필터 */}
               <Paper sx={{ p: 3, mb: 4, boxShadow: 'none' }}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
                   <TextField
                     fullWidth
                     placeholder="제목, 내용, 태그로 검색..."
@@ -213,19 +315,35 @@ export default function Archives() {
                         </InputAdornment>
                       ),
                     }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        height: '56px'
+                      }
+                    }}
                   />
                   <Button
-                    variant="outlined"
+                    variant={selectedCategory === null ? "contained" : "outlined"}
                     startIcon={<FilterIcon />}
                     onClick={() => setSelectedCategory(null)}
-                    sx={{ minWidth: 120 }}
+                    sx={{ 
+                      minWidth: 120,
+                      height: '56px',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}
                   >
                     모든 카테고리
                   </Button>
                 </Stack>
                 
                 {/* 카테고리 필터 */}
-                <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                <Box sx={{ 
+                  mt: 2, 
+                  display: 'flex', 
+                  flexWrap: 'wrap', 
+                  gap: 1,
+                  alignItems: 'center'
+                }}>
                   {categories.map((category) => (
                     <Chip
                       key={category}
@@ -233,7 +351,14 @@ export default function Archives() {
                       onClick={() => setSelectedCategory(category === selectedCategory ? null : category)}
                       color={selectedCategory === category ? 'primary' : 'default'}
                       variant={selectedCategory === category ? 'filled' : 'outlined'}
-                      sx={{ cursor: 'pointer' }}
+                      sx={{ 
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        '& .MuiChip-label': {
+                          overflow: 'visible',
+                          textOverflow: 'unset'
+                        }
+                      }}
                     />
                   ))}
                 </Box>
@@ -241,20 +366,48 @@ export default function Archives() {
 
               {/* 연도별 포스트 목록 */}
               <Box>
-                {Object.entries(postsByYear)
-                  .sort(([a], [b]) => parseInt(b) - parseInt(a))
-                  .map(([year, posts]) => {
-                    const yearPosts = posts.filter(post => 
-                      selectedCategory ? post.category === selectedCategory : true
-                    ).filter(post =>
-                      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-                    )
-
-                    if (yearPosts.length === 0) return null
-
-                    return (
+                {allPosts.length === 0 ? (
+                  <Paper sx={{ p: 6, textAlign: 'center', boxShadow: 'none' }}>
+                    <ArchiveIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                      아직 작성된 포스트가 없습니다
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      첫 번째 포스트를 작성해보세요!
+                    </Typography>
+                  </Paper>
+                ) : filteredPosts.length === 0 ? (
+                  <Paper sx={{ p: 6, textAlign: 'center', boxShadow: 'none' }}>
+                    <SearchIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                      {searchQuery.trim() !== '' 
+                        ? `"${searchQuery}"에 대한 검색 결과가 없습니다`
+                        : selectedCategory 
+                          ? `"${selectedCategory}" 카테고리에 포스트가 없습니다`
+                          : '조건에 맞는 포스트가 없습니다'
+                      }
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {searchQuery.trim() !== '' 
+                        ? '다른 검색어를 시도해보세요'
+                        : '다른 카테고리를 선택해보세요'
+                      }
+                    </Typography>
+                    {(searchQuery.trim() !== '' || selectedCategory) && (
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          setSearchQuery('')
+                          setSelectedCategory(null)
+                        }}
+                        sx={{ mt: 2 }}
+                      >
+                        모든 포스트 보기
+                      </Button>
+                    )}
+                  </Paper>
+                ) : (
+                  filteredPosts.map(({ year, posts: yearPosts }) => (
                       <Paper key={year} sx={{ mb: 3, boxShadow: 'none' }}>
                         <ListItemButton onClick={() => handleYearToggle(year)} sx={{ p: 3 }}>
                           <DateIcon sx={{ mr: 2, color: 'primary.main' }} />
@@ -280,37 +433,80 @@ export default function Archives() {
                                   key={post.id}
                                   sx={{
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s',
+                                    transition: 'all 0.3s ease',
                                     boxShadow: 'none',
                                     border: '1px solid',
                                     borderColor: 'divider',
+                                    backgroundColor: 'background.paper',
                                     '&:hover': {
-                                      transform: 'translateY(-2px)',
+                                      transform: 'translateY(-4px)',
                                       borderColor: 'primary.main',
+                                      boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+                                      backgroundColor: 'grey.50'
                                     }
                                   }}
                                   onClick={() => handlePostClick(post)}
                                 >
                                   <CardContent sx={{ p: 3 }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                      <Box sx={{ flexGrow: 1 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                          <Typography variant="h6" component="h3">
-                                            {post.title}
-                                          </Typography>
-                                          {post.featured && (
-                                            <Chip label="Featured" size="small" color="primary" />
+                                    <Box sx={{ mb: 2 }}>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                        <Chip 
+                                          label={post.category} 
+                                          size="small" 
+                                          color="primary" 
+                                          variant="outlined"
+                                          sx={{ fontSize: '0.75rem' }}
+                                        />
+                                        {post.featured && (
+                                          <Chip label="Featured" size="small" color="secondary" />
+                                        )}
+                                      </Box>
+                                      <Typography variant="h6" component="h3" sx={{ mb: 1, fontWeight: 'bold' }}>
+                                        {post.title}
+                                      </Typography>
+                                      <Typography 
+                                        variant="body2" 
+                                        color="text.secondary" 
+                                        sx={{ 
+                                          mb: 2, 
+                                          lineHeight: 1.6,
+                                          display: '-webkit-box',
+                                          WebkitLineClamp: 2,
+                                          WebkitBoxOrient: 'vertical',
+                                          overflow: 'hidden'
+                                        }}
+                                      >
+                                        {post.excerpt}
+                                      </Typography>
+                                      {post.tags.length > 0 && (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                                          {post.tags.slice(0, 3).map((tag) => (
+                                            <Chip 
+                                              key={tag} 
+                                              label={tag} 
+                                              size="small" 
+                                              sx={{ 
+                                                fontSize: '0.7rem', 
+                                                height: '20px',
+                                                backgroundColor: getTagColor(tag),
+                                                border: 'none',
+                                                color: '#555',
+                                                '&:hover': {
+                                                  backgroundColor: getTagColor(tag)
+                                                }
+                                              }}
+                                            />
+                                          ))}
+                                          {post.tags.length > 3 && (
+                                            <Chip 
+                                              label={`+${post.tags.length - 3}`} 
+                                              size="small" 
+                                              variant="outlined"
+                                              sx={{ fontSize: '0.7rem', height: '20px' }}
+                                            />
                                           )}
                                         </Box>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                          {post.excerpt}
-                                        </Typography>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                                          {post.tags.map((tag) => (
-                                            <Chip key={tag} label={tag} size="small" variant="outlined" />
-                                          ))}
-                                        </Box>
-                                      </Box>
+                                      )}
                                     </Box>
                                     
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
@@ -339,8 +535,8 @@ export default function Archives() {
                           </Box>
                         </Collapse>
                       </Paper>
-                    )
-                  })}
+                    ))
+                )}
               </Box>
             </Box>
 
@@ -414,14 +610,34 @@ export default function Archives() {
                             cursor: 'pointer',
                             p: 1,
                             borderRadius: 1,
-                            '&:hover': { bgcolor: 'action.hover' }
+                            '&:hover': { bgcolor: 'action.hover' },
+                            bgcolor: selectedCategory === category ? 'primary.50' : 'transparent',
+                            border: selectedCategory === category ? '1px solid' : 'none',
+                            borderColor: selectedCategory === category ? 'primary.main' : 'transparent'
                           }}
-                          onClick={() => setSelectedCategory(category)}
+                          onClick={() => setSelectedCategory(category === selectedCategory ? null : category)}
                         >
-                          <Typography variant="body2">
+                          <Typography 
+                            variant="body2"
+                            sx={{ 
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              flex: 1,
+                              mr: 1,
+                              fontWeight: selectedCategory === category ? 600 : 400,
+                              color: selectedCategory === category ? 'primary.main' : 'text.primary'
+                            }}
+                          >
                             {category}
                           </Typography>
-                          <Chip label={count} size="small" variant="outlined" />
+                          <Chip 
+                            label={count} 
+                            size="small" 
+                            variant={selectedCategory === category ? "filled" : "outlined"}
+                            color={selectedCategory === category ? "primary" : "default"}
+                            sx={{ flexShrink: 0 }}
+                          />
                         </Box>
                       )
                     })}
