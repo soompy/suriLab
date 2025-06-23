@@ -2,9 +2,11 @@
 
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeHighlight from 'rehype-highlight'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { ContentImage } from './image'
 import { Box, Typography } from '@mui/material'
+import type { Components } from 'react-markdown'
 
 interface OptimizedMarkdownProps {
   content: string
@@ -17,8 +19,8 @@ export default function OptimizedMarkdown({
   className = '', 
   style = {} 
 }: OptimizedMarkdownProps) {
-  const customComponents = {
-    img: ({ src, alt, title }: { src?: string; alt?: string; title?: string }) => {
+  const customComponents: Components = {
+    img: ({ src, alt, title }) => {
       if (!src) return null
       
       return (
@@ -35,7 +37,7 @@ export default function OptimizedMarkdown({
     },
     
     // 커스텀 헤딩 스타일
-    h1: ({ children }: { children: React.ReactNode }) => (
+    h1: ({ children }) => (
       <Typography 
         variant="h3" 
         component="h1" 
@@ -49,7 +51,7 @@ export default function OptimizedMarkdown({
       </Typography>
     ),
     
-    h2: ({ children }: { children: React.ReactNode }) => (
+    h2: ({ children }) => (
       <Typography 
         variant="h4" 
         component="h2" 
@@ -63,7 +65,7 @@ export default function OptimizedMarkdown({
       </Typography>
     ),
     
-    h3: ({ children }: { children: React.ReactNode }) => (
+    h3: ({ children }) => (
       <Typography 
         variant="h5" 
         component="h3" 
@@ -78,7 +80,7 @@ export default function OptimizedMarkdown({
     ),
     
     // 커스텀 문단 스타일
-    p: ({ children }: { children: React.ReactNode }) => (
+    p: ({ children }) => (
       <Typography 
         variant="body1" 
         component="p" 
@@ -93,7 +95,7 @@ export default function OptimizedMarkdown({
     ),
     
     // 커스텀 인용문 스타일
-    blockquote: ({ children }: { children: React.ReactNode }) => (
+    blockquote: ({ children }) => (
       <Box
         component="blockquote"
         sx={{
@@ -116,7 +118,7 @@ export default function OptimizedMarkdown({
     ),
     
     // 커스텀 코드 블록 스타일
-    pre: ({ children }: { children: React.ReactNode }) => (
+    pre: ({ children }) => (
       <Box
         component="pre"
         sx={{
@@ -142,11 +144,26 @@ export default function OptimizedMarkdown({
       </Box>
     ),
     
-    // 커스텀 인라인 코드 스타일
-    code: ({ children, className }: { children: React.ReactNode; className?: string }) => {
-      // 코드 블록인 경우 (className이 있으면)
-      if (className) {
-        return <code className={className}>{children}</code>
+    // 커스텀 코드 스타일
+    code: ({ children, className }) => {
+      const match = /language-(\w+)/.exec(className || '')
+      
+      // 코드 블록인 경우
+      if (match) {
+        return (
+          <SyntaxHighlighter
+            style={vscDarkPlus as any}
+            language={match[1]}
+            PreTag="div"
+            customStyle={{
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              lineHeight: 1.5,
+            }}
+          >
+            {String(children).replace(/\n$/, '')}
+          </SyntaxHighlighter>
+        )
       }
       
       // 인라인 코드인 경우
@@ -174,7 +191,7 @@ export default function OptimizedMarkdown({
     },
     
     // 커스텀 리스트 스타일
-    ul: ({ children }: { children: React.ReactNode }) => (
+    ul: ({ children }) => (
       <Box 
         component="ul" 
         sx={{ 
@@ -189,7 +206,7 @@ export default function OptimizedMarkdown({
       </Box>
     ),
     
-    ol: ({ children }: { children: React.ReactNode }) => (
+    ol: ({ children }) => (
       <Box 
         component="ol" 
         sx={{ 
@@ -204,7 +221,7 @@ export default function OptimizedMarkdown({
       </Box>
     ),
     
-    li: ({ children }: { children: React.ReactNode }) => (
+    li: ({ children }) => (
       <Typography 
         component="li" 
         sx={{ 
@@ -217,7 +234,7 @@ export default function OptimizedMarkdown({
     ),
     
     // 커스텀 링크 스타일
-    a: ({ href, children }: any) => (
+    a: ({ href, children }) => (
       <Box
         component="a"
         href={href}
@@ -238,7 +255,7 @@ export default function OptimizedMarkdown({
     ),
     
     // 커스텀 테이블 스타일
-    table: ({ children }: { children: React.ReactNode }) => (
+    table: ({ children }) => (
       <Box
         sx={{
           overflow: 'auto',
@@ -257,7 +274,7 @@ export default function OptimizedMarkdown({
       </Box>
     ),
     
-    th: ({ children }: { children: React.ReactNode }) => (
+    th: ({ children }) => (
       <Box
         component="th"
         sx={{
@@ -279,7 +296,7 @@ export default function OptimizedMarkdown({
       </Box>
     ),
     
-    td: ({ children }: { children: React.ReactNode }) => (
+    td: ({ children }) => (
       <Box
         component="td"
         sx={{
@@ -300,7 +317,6 @@ export default function OptimizedMarkdown({
     <Box className={className} style={style}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight]}
         components={customComponents}
       >
         {content}
