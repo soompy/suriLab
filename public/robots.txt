@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /write/
+
+# Allow search engines to crawl posts and pages
+Allow: /posts/
+Allow: /about/
+Allow: /projects/
+Allow: /contact/
+Allow: /archives/
