@@ -15,6 +15,7 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force",
     "db:migrate-to-postgresql": "tsx scripts/migrate-to-postgresql.ts",
+    "db:migrate-to-supabase": "tsx scripts/migrate-to-supabase.ts",
     "postinstall": "prisma generate",
     "vercel-build": "prisma generate && next build"
   },

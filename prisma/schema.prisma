@@ -1,42 +1,36 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id       String @id @default(cuid())
-  name     String
-  email    String @unique
-  posts    Post[]
-  
+  id    String @id @default(cuid())
+  name  String
+  email String @unique
+  posts Post[]
+
   @@map("users")
 }
 
 model Category {
-  id          String @id @default(cuid())
-  name        String @unique
+  id          String  @id @default(cuid())
+  name        String  @unique
   description String?
   color       String?
   posts       Post[]
-  
+
   @@map("categories")
 }
 
 model Tag {
   id    String @id @default(cuid())
   name  String @unique
-  posts Post[]
-  
+  posts Post[] @relation("PostToTag")
+
   @@map("tags")
 }
 
@@ -52,16 +46,16 @@ model Post {
   views       Int      @default(0)
   featured    Boolean  @default(false)
   isPublished Boolean  @default(false)
-  
-  // Relations
-  tags       Tag[]
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String
-  author     User     @relation(fields: [authorId], references: [id])
-  authorId   String
-  comments   Comment[]
-  likes      Like[]
-  
+  categoryId  String
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
+  tags        Tag[]    @relation("PostToTag")
+  comments    Comment[]
+  likes       Like[]
+
+  @@index([categoryId])
+  @@index([authorId])
   @@map("posts")
 }
 
@@ -77,6 +71,7 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
   
+  @@index([postId])
   @@map("comments")
 }
 
@@ -92,5 +87,6 @@ model Like {
   ipAddress String
   
   @@unique([postId, ipAddress])
+  @@index([postId])
   @@map("likes")
 }
