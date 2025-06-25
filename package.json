@@ -21,6 +21,8 @@
     "backup:auto": "node scripts/backup-database.js && echo 'Backup completed at $(date)'",
     "backup:test": "node scripts/test-backup.js",
     "restore": "node scripts/restore-database.js",
+    "update:category": "node scripts/update-category.js",
+    "cleanup:categories": "node scripts/cleanup-categories.js",
     "postinstall": "prisma generate",
     "vercel-build": "prisma generate && next build"
   },

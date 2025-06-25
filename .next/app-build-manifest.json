@@ -16,15 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/posts/route.js"
     ],
-    "/write/page": [
+    "/projects/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/write/page.js"
+      "static/chunks/app/projects/page.js"
     ],
-    "/api/auth/login/route": [
+    "/archives/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/auth/login/route.js"
+      "static/chunks/app/archives/page.js"
     ]
   }
 }
