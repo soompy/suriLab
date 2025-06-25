@@ -215,7 +215,7 @@ export default function Archives() {
                 </Typography>
                 {process.env.NODE_ENV === 'development' && (
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                    (실제값: {totalViews})
+                    (실제값: {totalViews} - 샘플 데이터 포함)
                   </Typography>
                 )}
               </Box>
