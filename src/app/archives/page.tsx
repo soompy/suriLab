@@ -234,7 +234,7 @@ export default function Archives() {
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
                   <TextField
                     fullWidth
-                    placeholder="제목, 내용, 태그로 검색..."
+                    placeholder="포스트 제목, 내용, 태그를 검색하세요..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     InputProps={{
@@ -250,19 +250,24 @@ export default function Archives() {
                       }
                     }}
                   />
-                  <Button
-                    variant={selectedCategory === null ? "contained" : "outlined"}
-                    startIcon={<FilterIcon />}
-                    onClick={() => setSelectedCategory(null)}
-                    sx={{ 
-                      minWidth: 120,
-                      height: '56px',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0
-                    }}
-                  >
-                    모든 카테고리
-                  </Button>
+                  {(searchQuery.trim() !== '' || selectedCategory !== null) && (
+                    <Button
+                      variant="outlined"
+                      startIcon={<SearchIcon />}
+                      onClick={() => {
+                        setSearchQuery('')
+                        setSelectedCategory(null)
+                      }}
+                      sx={{ 
+                        minWidth: 120,
+                        height: '56px',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
+                    >
+                      검색 초기화
+                    </Button>
+                  )}
                 </Stack>
                 
                 {/* 카테고리 필터 */}
@@ -331,7 +336,7 @@ export default function Archives() {
                         }}
                         sx={{ mt: 2 }}
                       >
-                        모든 포스트 보기
+                        검색 초기화
                       </Button>
                     )}
                   </Paper>
