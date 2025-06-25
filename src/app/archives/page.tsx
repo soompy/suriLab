@@ -27,30 +27,31 @@ import {
   ExpandLess as ExpandLessIcon,
   Visibility as ViewIcon,
   Schedule as ScheduleIcon,
-  TrendingUp as TrendingIcon
+  TrendingUp as TrendingIcon,
+  CalendarMonth as CalendarIcon
 } from '@mui/icons-material'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-
-interface BlogPost {
-  id: string
-  title: string
-  excerpt: string
-  tags: string[]
-  category: string
-  publishedAt: string
-  readTime: number
-  views: number
-  featured?: boolean
-  slug?: string
-}
+import {
+  BlogPost,
+  ArchiveData,
+  groupPostsByYearAndMonth,
+  getFilteredArchiveData,
+  getYearStats,
+  getMonthStats,
+  getTagColor,
+  formatDate,
+  formatViews
+} from '@/utils/archiveHelpers'
 
 export default function Archives() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [expandedYears, setExpandedYears] = useState<string[]>(['2024'])
+  const [expandedMonths, setExpandedMonths] = useState<{ [key: string]: string[] }>({})
   const [allPosts, setAllPosts] = useState<BlogPost[]>([])
+  const [archiveData, setArchiveData] = useState<ArchiveData>({})
   const [loading, setLoading] = useState(true)
 
   // API에서 포스트 데이터 가져오기
@@ -77,6 +78,9 @@ export default function Archives() {
             }))
             
             setAllPosts(transformedPosts)
+            // 아카이브 데이터 생성
+            const groupedData = groupPostsByYearAndMonth(transformedPosts)
+            setArchiveData(groupedData)
           }
         }
       } catch (error) {
@@ -89,50 +93,12 @@ export default function Archives() {
     fetchPosts()
   }, [])
 
-  // 연도별로 포스트 그룹화
-  const postsByYear = allPosts.reduce((acc, post) => {
-    const year = new Date(post.publishedAt).getFullYear().toString()
-    if (!acc[year]) acc[year] = []
-    acc[year].push(post)
-    return acc
-  }, {} as Record<string, BlogPost[]>)
-
   // 카테고리 목록
   const categories = Array.from(new Set(allPosts.map(post => post.category)))
 
-  // 필터링된 포스트 계산
-  const getFilteredPosts = () => {
-    return Object.entries(postsByYear)
-      .map(([year, posts]) => {
-        const yearPosts = posts.filter(post => {
-          // 카테고리 필터
-          if (selectedCategory && post.category !== selectedCategory) {
-            return false
-          }
-          
-          // 검색어 필터
-          if (searchQuery.trim() === '') {
-            return true
-          }
-          
-          const query = searchQuery.toLowerCase().trim()
-          const title = (post.title || '').toLowerCase()
-          const excerpt = (post.excerpt || '').toLowerCase()
-          const category = (post.category || '').toLowerCase()
-          const tags = post.tags || []
-          
-          return title.includes(query) ||
-                 excerpt.includes(query) ||
-                 category.includes(query) ||
-                 tags.some(tag => (tag || '').toLowerCase().includes(query))
-        })
-        return { year, posts: yearPosts }
-      })
-      .filter(({ posts }) => posts.length > 0)
-      .sort((a, b) => parseInt(b.year) - parseInt(a.year))
-  }
-
-  const filteredPosts = getFilteredPosts()
+  // 필터링된 아카이브 데이터 계산
+  const filteredArchiveData = getFilteredArchiveData(archiveData, searchQuery, selectedCategory)
+  const sortedYears = Object.keys(filteredArchiveData).sort((a, b) => parseInt(b) - parseInt(a))
 
 
   const handleYearToggle = (year: string) => {
@@ -143,58 +109,21 @@ export default function Archives() {
     )
   }
 
+  const handleMonthToggle = (year: string, month: number) => {
+    const monthKey = `${year}-${month}`
+    setExpandedMonths(prev => ({
+      ...prev,
+      [year]: prev[year]?.includes(monthKey)
+        ? prev[year].filter(m => m !== monthKey)
+        : [...(prev[year] || []), monthKey]
+    }))
+  }
+
   const handlePostClick = (post: BlogPost) => {
     const slug = post.slug || post.title.toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/(^-|-$)/g, '')
     window.location.href = `/posts/${slug}`
   }
 
-  const getTagColor = (tag: string) => {
-    const colors: { [key: string]: string } = {
-      // Frontend & Core Technologies (Light Blue/Cyan family)
-      'html': '#ffebee',
-      'css': '#e3f2fd', 
-      'javascript': '#fff9c4',
-      'typescript': '#e8f5ff',
-      'react': '#e0f7fa',
-      'nextjs': '#f3e5f5',
-      'vue': '#e8f5e8',
-      'nuxt': '#f1f8e9',
-      'frontend': '#e1f5fe',
-      
-      // Backend & Database (Green/Purple family)
-      'backend': '#f1f8e9',
-      'database': '#fff8e1',
-      'node': '#e8f5e8',
-      'python': '#fff3e0',
-      
-      // Development & Tools (Purple/Pink family)
-      'development': '#f3e5f5',
-      'tools': '#e8eaf6',
-      'git': '#ffebee',
-      'devops': '#e8eaf6',
-      
-      // Content Categories (Warm tones)
-      'tutorial': '#e8f5e8',
-      'review': '#fff3e0',
-      'tech insights': '#e3f2fd',
-      'personal': '#fce4ec',
-      'career': '#fce4ec',
-      'productivity': '#f3e5f5',
-      
-      // AI & Modern Tech (Light Green/Yellow)
-      'ai': '#f9fbe7',
-      
-      // Design & UI (Orange/Pink family)
-      'bootstrap': '#f3e5f5',
-      'material-ui': '#e3f2fd',
-      'responsive design': '#ffebee',
-      'figma': '#fce4ec',
-      'zeplin': '#fff3e0'
-    }
-    
-    const normalizedTag = tag.toLowerCase().trim()
-    return colors[normalizedTag] || '#f5f5f5'
-  }
 
   const totalViews = allPosts.reduce((sum, post) => sum + (post.views || 0), 0)
   const totalTags = new Set(allPosts.flatMap(post => post.tags || [])).size
@@ -364,7 +293,7 @@ export default function Archives() {
                 </Box>
               </Paper>
 
-              {/* 연도별 포스트 목록 */}
+              {/* 연도별/월별 포스트 목록 */}
               <Box>
                 {allPosts.length === 0 ? (
                   <Paper sx={{ p: 6, textAlign: 'center', boxShadow: 'none' }}>
@@ -376,7 +305,7 @@ export default function Archives() {
                       첫 번째 포스트를 작성해보세요!
                     </Typography>
                   </Paper>
-                ) : filteredPosts.length === 0 ? (
+                ) : sortedYears.length === 0 ? (
                   <Paper sx={{ p: 6, textAlign: 'center', boxShadow: 'none' }}>
                     <SearchIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
                     <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -407,135 +336,244 @@ export default function Archives() {
                     )}
                   </Paper>
                 ) : (
-                  filteredPosts.map(({ year, posts: yearPosts }) => (
-                      <Paper key={year} sx={{ mb: 3, boxShadow: 'none' }}>
+                  sortedYears.map((year) => {
+                    const yearData = filteredArchiveData[year]
+                    const yearStats = getYearStats(yearData)
+                    
+                    return (
+                      <Paper key={year} sx={{ mb: 3, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+                        {/* 연도 헤더 */}
                         <ListItemButton onClick={() => handleYearToggle(year)} sx={{ p: 3 }}>
                           <DateIcon sx={{ mr: 2, color: 'primary.main' }} />
                           <ListItemText
                             primary={
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                                 <Typography variant="h5" fontWeight="bold">
-                                  {year}
+                                  {year}년
                                 </Typography>
-                                <Badge badgeContent={yearPosts.length} color="primary" />
+                                <Badge badgeContent={yearData.count} color="primary" />
+                                <Chip 
+                                  label={`${formatViews(yearData.totalViews)} views`} 
+                                  size="small" 
+                                  variant="outlined"
+                                  icon={<ViewIcon />}
+                                />
                               </Box>
                             }
-                            secondary={`${yearPosts.length}개의 포스트`}
+                            secondary={
+                              <Box sx={{ mt: 1 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  {yearData.count}개의 포스트 • {yearStats.categoriesCount}개 카테고리 • {yearStats.tagsCount}개 태그
+                                </Typography>
+                              </Box>
+                            }
                           />
                           {expandedYears.includes(year) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                         </ListItemButton>
                         
                         <Collapse in={expandedYears.includes(year)}>
                           <Box sx={{ px: 3, pb: 3 }}>
+                            {/* 연도 통계 */}
+                            <Paper sx={{ p: 2, mb: 3, bgcolor: 'grey.50', boxShadow: 'none' }}>
+                              <Box sx={{ 
+                                display: 'grid',
+                                gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+                                gap: 2
+                              }}>
+                                <Box sx={{ textAlign: 'center' }}>
+                                  <Typography variant="h6" color="primary" fontWeight="bold">
+                                    {yearData.count}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    포스트
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ textAlign: 'center' }}>
+                                  <Typography variant="h6" color="primary" fontWeight="bold">
+                                    {formatViews(yearData.totalViews)}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    총 조회수
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ textAlign: 'center' }}>
+                                  <Typography variant="h6" color="primary" fontWeight="bold">
+                                    {yearStats.categoriesCount}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    카테고리
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ textAlign: 'center' }}>
+                                  <Typography variant="h6" color="primary" fontWeight="bold">
+                                    {formatViews(yearStats.averageViews)}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    평균 조회수
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Paper>
+
+                            {/* 월별 섹션 */}
                             <Stack spacing={2}>
-                              {yearPosts.map((post) => (
-                                <Card
-                                  key={post.id}
-                                  sx={{
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    boxShadow: 'none',
-                                    border: '1px solid',
-                                    borderColor: 'divider',
-                                    backgroundColor: 'background.paper',
-                                    '&:hover': {
-                                      transform: 'translateY(-4px)',
-                                      borderColor: 'primary.main',
-                                      boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-                                      backgroundColor: 'grey.50'
-                                    }
-                                  }}
-                                  onClick={() => handlePostClick(post)}
-                                >
-                                  <CardContent sx={{ p: 3 }}>
-                                    <Box sx={{ mb: 2 }}>
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                        <Chip 
-                                          label={post.category} 
-                                          size="small" 
-                                          color="primary" 
-                                          variant="outlined"
-                                          sx={{ fontSize: '0.75rem' }}
-                                        />
-                                        {post.featured && (
-                                          <Chip label="Featured" size="small" color="secondary" />
-                                        )}
-                                      </Box>
-                                      <Typography variant="h6" component="h3" sx={{ mb: 1, fontWeight: 'bold' }}>
-                                        {post.title}
-                                      </Typography>
-                                      <Typography 
-                                        variant="body2" 
-                                        color="text.secondary" 
-                                        sx={{ 
-                                          mb: 2, 
-                                          lineHeight: 1.6,
-                                          display: '-webkit-box',
-                                          WebkitLineClamp: 2,
-                                          WebkitBoxOrient: 'vertical',
-                                          overflow: 'hidden'
-                                        }}
-                                      >
-                                        {post.excerpt}
-                                      </Typography>
-                                      {post.tags.length > 0 && (
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                                          {post.tags.slice(0, 3).map((tag) => (
+                              {yearData.months.map((monthData) => {
+                                const monthKey = `${year}-${monthData.month}`
+                                const isMonthExpanded = expandedMonths[year]?.includes(monthKey)
+                                const monthStats = getMonthStats(monthData)
+                                
+                                return (
+                                  <Paper key={monthKey} sx={{ border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                                    {/* 월 헤더 */}
+                                    <ListItemButton 
+                                      onClick={() => handleMonthToggle(year, monthData.month)}
+                                      sx={{ p: 2, bgcolor: 'grey.25' }}
+                                    >
+                                      <CalendarIcon sx={{ mr: 2, color: 'secondary.main', fontSize: 20 }} />
+                                      <ListItemText
+                                        primary={
+                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            <Typography variant="h6" fontWeight="medium">
+                                              {monthData.monthName}
+                                            </Typography>
+                                            <Badge badgeContent={monthData.count} color="secondary" />
                                             <Chip 
-                                              key={tag} 
-                                              label={tag} 
-                                              size="small" 
-                                              sx={{ 
-                                                fontSize: '0.7rem', 
-                                                height: '20px',
-                                                backgroundColor: getTagColor(tag),
-                                                border: 'none',
-                                                color: '#555',
-                                                '&:hover': {
-                                                  backgroundColor: getTagColor(tag)
-                                                }
-                                              }}
-                                            />
-                                          ))}
-                                          {post.tags.length > 3 && (
-                                            <Chip 
-                                              label={`+${post.tags.length - 3}`} 
+                                              label={`${formatViews(monthStats.totalViews)} views`} 
                                               size="small" 
                                               variant="outlined"
-                                              sx={{ fontSize: '0.7rem', height: '20px' }}
+                                              sx={{ fontSize: '0.7rem' }}
                                             />
-                                          )}
-                                        </Box>
-                                      )}
-                                    </Box>
+                                          </Box>
+                                        }
+                                        secondary={`${monthData.count}개의 포스트`}
+                                      />
+                                      {isMonthExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                    </ListItemButton>
                                     
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                          <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                          <Typography variant="body2" color="text.secondary">
-                                            {post.readTime}분
-                                          </Typography>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                          <ViewIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                          <Typography variant="body2" color="text.secondary">
-                                            {post.views.toLocaleString()}
-                                          </Typography>
-                                        </Box>
+                                    <Collapse in={isMonthExpanded}>
+                                      <Box sx={{ p: 2 }}>
+                                        <Stack spacing={2}>
+                                          {monthData.posts.map((post) => (
+                                            <Card
+                                              key={post.id}
+                                              sx={{
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                                boxShadow: 'none',
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                backgroundColor: 'background.paper',
+                                                '&:hover': {
+                                                  transform: 'translateY(-2px)',
+                                                  borderColor: 'primary.main',
+                                                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                                  backgroundColor: 'grey.50'
+                                                }
+                                              }}
+                                              onClick={() => handlePostClick(post)}
+                                            >
+                                              <CardContent sx={{ p: 2 }}>
+                                                <Box sx={{ mb: 1 }}>
+                                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                    <Chip 
+                                                      label={post.category} 
+                                                      size="small" 
+                                                      color="primary" 
+                                                      variant="outlined"
+                                                      sx={{ fontSize: '0.7rem' }}
+                                                    />
+                                                    {post.featured && (
+                                                      <Chip label="Featured" size="small" color="secondary" />
+                                                    )}
+                                                    <Typography variant="caption" color="text.secondary">
+                                                      {formatDate(post.publishedAt)}
+                                                    </Typography>
+                                                  </Box>
+                                                  <Typography variant="body1" component="h4" sx={{ mb: 1, fontWeight: 'medium' }}>
+                                                    {post.title}
+                                                  </Typography>
+                                                  <Typography 
+                                                    variant="body2" 
+                                                    color="text.secondary" 
+                                                    sx={{ 
+                                                      mb: 1.5, 
+                                                      lineHeight: 1.6,
+                                                      display: '-webkit-box',
+                                                      WebkitLineClamp: 2,
+                                                      WebkitBoxOrient: 'vertical',
+                                                      overflow: 'hidden'
+                                                    }}
+                                                  >
+                                                    {post.excerpt}
+                                                  </Typography>
+                                                  {post.tags.length > 0 && (
+                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1.5 }}>
+                                                      {post.tags.slice(0, 4).map((tag) => (
+                                                        <Chip 
+                                                          key={tag} 
+                                                          label={tag} 
+                                                          size="small" 
+                                                          sx={{ 
+                                                            fontSize: '0.65rem', 
+                                                            height: '18px',
+                                                            backgroundColor: getTagColor(tag),
+                                                            border: 'none',
+                                                            color: '#555',
+                                                            '&:hover': {
+                                                              backgroundColor: getTagColor(tag)
+                                                            }
+                                                          }}
+                                                        />
+                                                      ))}
+                                                      {post.tags.length > 4 && (
+                                                        <Chip 
+                                                          label={`+${post.tags.length - 4}`} 
+                                                          size="small" 
+                                                          variant="outlined"
+                                                          sx={{ fontSize: '0.65rem', height: '18px' }}
+                                                        />
+                                                      )}
+                                                    </Box>
+                                                  )}
+                                                </Box>
+                                                
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                      <ScheduleIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                                                      <Typography variant="caption" color="text.secondary">
+                                                        {post.readTime}분
+                                                      </Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                      <ViewIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                                                      <Typography variant="caption" color="text.secondary">
+                                                        {formatViews(post.views)}
+                                                      </Typography>
+                                                    </Box>
+                                                  </Box>
+                                                  <Typography variant="caption" color="text.secondary">
+                                                    {new Date(post.publishedAt).toLocaleDateString('ko-KR', { 
+                                                      month: 'short', 
+                                                      day: 'numeric' 
+                                                    })}
+                                                  </Typography>
+                                                </Box>
+                                              </CardContent>
+                                            </Card>
+                                          ))}
+                                        </Stack>
                                       </Box>
-                                      <Typography variant="body2" color="text.secondary">
-                                        {new Date(post.publishedAt).toLocaleDateString('ko-KR')}
-                                      </Typography>
-                                    </Box>
-                                  </CardContent>
-                                </Card>
-                              ))}
+                                    </Collapse>
+                                  </Paper>
+                                )
+                              })}
                             </Stack>
                           </Box>
                         </Collapse>
                       </Paper>
-                    ))
+                    )
+                  })
                 )}
               </Box>
             </Box>
