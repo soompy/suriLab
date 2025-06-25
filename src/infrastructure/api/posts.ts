@@ -7,6 +7,7 @@ import { UpdatePostUseCaseImpl } from '../../usecases/UpdatePost'
 import { DeletePostUseCaseImpl } from '../../usecases/DeletePost'
 import { prisma } from '../../lib/prisma'
 import { initializeDatabase } from '../../lib/database-init'
+import { verifyAdminPassword, createAuthResponse } from '../../lib/auth-server'
 
 const postRepository = new PrismaPostRepository(prisma)
 const getPostsUseCase = new GetPostsUseCaseImpl(postRepository)
@@ -136,6 +137,11 @@ export class PostsAPIHandler {
 
   static async POST(request: NextRequest) {
     try {
+      // 관리자 권한 확인
+      if (!verifyAdminPassword(request)) {
+        return createAuthResponse('포스트 작성 권한이 없습니다.')
+      }
+
       const body = await request.json()
       console.log('Creating post with data:', body)
       
@@ -180,6 +186,11 @@ export class PostAPIHandler {
 
   static async PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+      // 관리자 권한 확인
+      if (!verifyAdminPassword(request)) {
+        return createAuthResponse('포스트 수정 권한이 없습니다.')
+      }
+
       const body = await request.json()
       const updateInput: UpdatePostInput = {
         id: params.id,
@@ -197,6 +208,11 @@ export class PostAPIHandler {
 
   static async DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+      // 관리자 권한 확인
+      if (!verifyAdminPassword(request)) {
+        return createAuthResponse('포스트 삭제 권한이 없습니다.')
+      }
+
       await deletePost(params.id)
       return NextResponse.json({ success: true })
     } catch {

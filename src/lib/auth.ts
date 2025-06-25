@@ -42,7 +42,8 @@ export class AuthService {
       if (data.success) {
         const authData = {
           timestamp: Date.now(),
-          user: data.user
+          user: data.user,
+          token: data.token // 안전한 토큰만 저장, 비밀번호는 저장하지 않음
         }
         localStorage.setItem(AUTH_KEY, JSON.stringify(authData))
         return true
@@ -81,5 +82,42 @@ export class AuthService {
     } catch {
       return null
     }
+  }
+
+  // 인증 헤더를 포함한 API 요청 옵션 생성
+  static getAuthHeaders(): HeadersInit {
+    if (typeof window === 'undefined') return {}
+    
+    const authData = localStorage.getItem(AUTH_KEY)
+    if (!authData) return {}
+    
+    try {
+      const { token } = JSON.parse(authData)
+      if (!token) return {}
+      
+      return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    } catch {
+      return {}
+    }
+  }
+
+  // 인증이 필요한 fetch 요청을 위한 헬퍼
+  static async authenticatedFetch(url: string, options: RequestInit = {}) {
+    if (!this.isAuthenticated()) {
+      throw new Error('Authentication required')
+    }
+
+    const headers = {
+      ...this.getAuthHeaders(),
+      ...options.headers
+    }
+
+    return fetch(url, {
+      ...options,
+      headers
+    })
   }
 }

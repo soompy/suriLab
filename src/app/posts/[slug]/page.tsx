@@ -35,6 +35,7 @@ import { AvatarImage } from '@/components/image'
 import OptimizedMarkdown from '@/components/OptimizedMarkdown'
 import CommentSection from '@/components/CommentSection'
 import LikeButton from '@/components/LikeButton'
+import { AuthService } from '@/lib/auth'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -46,6 +47,7 @@ export default function PostDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [viewCounted, setViewCounted] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -76,6 +78,11 @@ export default function PostDetailPage() {
       fetchPost()
     }
   }, [slug, viewCounted])
+
+  // 관리자 인증 확인
+  useEffect(() => {
+    setIsAdmin(AuthService.isAuthenticated())
+  }, [])
 
   const incrementViews = async (postId: string) => {
     try {
@@ -129,18 +136,19 @@ export default function PostDetailPage() {
     
     try {
       setIsDeleting(true)
-      const response = await fetch(`/api/posts/${post.id}`, {
+      const response = await AuthService.authenticatedFetch(`/api/posts/${post.id}`, {
         method: 'DELETE'
       })
       
       if (!response.ok) {
-        throw new Error('Failed to delete post')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete post')
       }
       
       router.push('/')
     } catch (error) {
       console.error('Error deleting post:', error)
-      alert('글 삭제에 실패했습니다.')
+      alert(error instanceof Error ? error.message : '글 삭제에 실패했습니다.')
     } finally {
       setIsDeleting(false)
     }
@@ -325,21 +333,26 @@ export default function PostDetailPage() {
                   <IconButton title="북마크">
                     <BookmarkIcon />
                   </IconButton>
-                  <IconButton 
-                    onClick={handleEdit} 
-                    title="수정하기"
-                    color="primary"
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton 
-                    onClick={handleDelete} 
-                    title="삭제하기"
-                    color="error"
-                    disabled={isDeleting}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  {isAdmin && (
+                    <>
+                      <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                      <IconButton 
+                        onClick={handleEdit} 
+                        title="수정하기"
+                        color="primary"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton 
+                        onClick={handleDelete} 
+                        title="삭제하기"
+                        color="error"
+                        disabled={isDeleting}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+                  )}
                 </Stack>
 
                 <Divider />

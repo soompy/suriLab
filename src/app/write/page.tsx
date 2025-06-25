@@ -143,12 +143,14 @@ function WriteContent() {
       if (authenticated) {
         setCurrentUser(AuthService.getUser())
       } else {
-        setShowLoginDialog(true)
+        // 인증되지 않은 사용자는 메인 페이지로 리다이렉트
+        router.push('/')
+        return
       }
     }
 
     checkAuth()
-  }, [])
+  }, [router])
 
   // Cleanup debounce on unmount
   useEffect(() => {
@@ -430,11 +432,8 @@ function WriteContent() {
       const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
       const method = isEditing ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
+      const response = await AuthService.authenticatedFetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(postData),
       })
 
@@ -487,11 +486,8 @@ function WriteContent() {
       const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
       const method = isEditing ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
+      const response = await AuthService.authenticatedFetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(postData),
       })
 

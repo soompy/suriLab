@@ -144,9 +144,227 @@ export default function Archives() {
       <MuiThemeProvider>
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
           <Header />
+          
           <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, py: 6 }}>
-            <Loading variant="posts" message="아카이브를 불러오는 중..." />
+            {/* 헤더 스켈레톤 */}
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Box sx={{
+                width: 200,
+                height: 48,
+                backgroundColor: 'grey.300',
+                borderRadius: 1,
+                mx: 'auto',
+                mb: 2,
+                animation: 'pulse 1.5s ease-in-out infinite'
+              }} />
+              <Box sx={{
+                width: 400,
+                height: 24,
+                backgroundColor: 'grey.200',
+                borderRadius: 1,
+                mx: 'auto'
+              }} />
+            </Box>
+
+            {/* 통계 섹션 스켈레톤 */}
+            <Paper sx={{ p: 4, mb: 6, textAlign: 'center', boxShadow: 'none' }}>
+              <Box sx={{
+                width: 120,
+                height: 24,
+                backgroundColor: 'grey.300',
+                borderRadius: 1,
+                mx: 'auto',
+                mb: 2
+              }} />
+              <Box sx={{ 
+                mt: 2,
+                display: 'grid',
+                gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+                gap: 4,
+                justifyItems: 'center'
+              }}>
+                {[1, 2, 3, 4].map((index) => (
+                  <Box key={index} sx={{ textAlign: 'center' }}>
+                    <Box sx={{
+                      width: 60,
+                      height: 40,
+                      backgroundColor: 'grey.300',
+                      borderRadius: 1,
+                      mb: 1,
+                      animation: `pulse 1.5s ease-in-out infinite`,
+                      animationDelay: `${index * 0.1}s`
+                    }} />
+                    <Box sx={{
+                      width: 80,
+                      height: 16,
+                      backgroundColor: 'grey.200',
+                      borderRadius: 1
+                    }} />
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+
+            <Box sx={{ 
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' },
+              gap: 4
+            }}>
+              {/* 메인 콘텐츠 스켈레톤 */}
+              <Box>
+                {/* 검색 및 필터 스켈레톤 */}
+                <Paper sx={{ p: 3, mb: 4, boxShadow: 'none' }}>
+                  <Box sx={{
+                    width: '100%',
+                    height: 56,
+                    backgroundColor: 'grey.200',
+                    borderRadius: 1,
+                    mb: 2
+                  }} />
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {[1, 2, 3].map((index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          width: 80 + (index * 20),
+                          height: 32,
+                          backgroundColor: 'grey.200',
+                          borderRadius: 2
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Paper>
+
+                {/* 년도별 섹션 스켈레톤 */}
+                {[1, 2, 3].map((yearIndex) => (
+                  <Paper key={yearIndex} sx={{ mb: 3, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+                    {/* 년도 헤더 스켈레톤 */}
+                    <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Box sx={{
+                        width: 24,
+                        height: 24,
+                        backgroundColor: 'grey.300',
+                        borderRadius: '50%'
+                      }} />
+                      <Box sx={{
+                        width: 100,
+                        height: 32,
+                        backgroundColor: 'grey.300',
+                        borderRadius: 1
+                      }} />
+                      <Box sx={{
+                        width: 24,
+                        height: 24,
+                        backgroundColor: 'grey.200',
+                        borderRadius: '50%'
+                      }} />
+                      <Box sx={{
+                        width: 80,
+                        height: 24,
+                        backgroundColor: 'grey.200',
+                        borderRadius: 1
+                      }} />
+                    </Box>
+                  </Paper>
+                ))}
+              </Box>
+
+              {/* 사이드바 스켈레톤 */}
+              <Box>
+                <Box sx={{ position: 'sticky', top: 24 }}>
+                  {/* 인기 포스트 스켈레톤 */}
+                  <Paper sx={{ p: 3, mb: 3, boxShadow: 'none' }}>
+                    <Box sx={{
+                      width: 120,
+                      height: 24,
+                      backgroundColor: 'grey.300',
+                      borderRadius: 1,
+                      mb: 2
+                    }} />
+                    {[1, 2, 3, 4, 5].map((index) => (
+                      <Box key={index} sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                        <Box sx={{
+                          width: 24,
+                          height: 24,
+                          backgroundColor: 'grey.300',
+                          borderRadius: 1
+                        }} />
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{
+                            width: '90%',
+                            height: 16,
+                            backgroundColor: 'grey.200',
+                            borderRadius: 1,
+                            mb: 1
+                          }} />
+                          <Box sx={{
+                            width: 60,
+                            height: 12,
+                            backgroundColor: 'grey.200',
+                            borderRadius: 1
+                          }} />
+                        </Box>
+                      </Box>
+                    ))}
+                  </Paper>
+
+                  {/* 카테고리별 포스트 스켈레톤 */}
+                  <Paper sx={{ p: 3, boxShadow: 'none' }}>
+                    <Box sx={{
+                      width: 150,
+                      height: 24,
+                      backgroundColor: 'grey.300',
+                      borderRadius: 1,
+                      mb: 2
+                    }} />
+                    {[1, 2, 3].map((index) => (
+                      <Box key={index} sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        mb: 1,
+                        p: 1
+                      }}>
+                        <Box sx={{
+                          width: 100,
+                          height: 16,
+                          backgroundColor: 'grey.200',
+                          borderRadius: 1
+                        }} />
+                        <Box sx={{
+                          width: 24,
+                          height: 20,
+                          backgroundColor: 'grey.200',
+                          borderRadius: 1
+                        }} />
+                      </Box>
+                    ))}
+                  </Paper>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* 로딩 메시지 */}
+            <Box sx={{ 
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              backgroundColor: 'white',
+              p: 2,
+              borderRadius: 2,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}>
+              <CircularProgress size={20} />
+              <Typography variant="body2" color="text.secondary">
+                아카이브를 불러오는 중...
+              </Typography>
+            </Box>
           </Container>
+          
           <Footer />
         </Box>
       </MuiThemeProvider>
