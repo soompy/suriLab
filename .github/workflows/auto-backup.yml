@@ -1,0 +1,48 @@
+name: Auto Database Backup
+
+on:
+  schedule:
+    # 매일 오전 2시(KST 11시)에 백업 실행
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # 수동 실행 가능
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Generate Prisma client
+      run: npx prisma generate
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    
+    - name: Create backup
+      run: npm run backup
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    
+    - name: Upload backup to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: database-backup-${{ github.run_number }}
+        path: backups/
+        retention-days: 30
+    
+    - name: Notify backup status
+      if: failure()
+      run: |
+        echo "❌ Database backup failed!"
+        echo "Please check the workflow logs for details."
