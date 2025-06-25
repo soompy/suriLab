@@ -8,20 +8,29 @@
  * 2. npm run db:migrate-to-neon
  */
 
-import { PrismaClient as SqliteClient } from '@prisma/client'
-import { PrismaClient as PostgresClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+import * as fs from 'fs'
+import * as path from 'path'
+
+// SQLite 데이터베이스 존재 확인
+const sqliteDbPath = path.join(process.cwd(), 'prisma', 'dev.db')
+const hasExistingData = fs.existsSync(sqliteDbPath)
+
+if (!hasExistingData) {
+  console.log('📝 No existing SQLite database found. Starting with fresh PostgreSQL database.')
+  process.exit(0)
+}
+
+// 임시로 환경변수를 백업하고 SQLite용으로 변경
+const originalUrl = process.env.DATABASE_URL
+process.env.DATABASE_URL = `file:${sqliteDbPath}`
 
 // SQLite 클라이언트 (기존 데이터)
-const sqliteClient = new SqliteClient({
-  datasources: {
-    db: {
-      url: 'file:./prisma/dev.db'
-    }
-  }
-})
+const sqliteClient = new PrismaClient()
 
-// PostgreSQL 클라이언트 (새 데이터베이스)
-const postgresClient = new PostgresClient()
+// PostgreSQL 클라이언트를 위해 원래 URL 복원
+process.env.DATABASE_URL = originalUrl
+const postgresClient = new PrismaClient()
 
 async function migrateData() {
   try {

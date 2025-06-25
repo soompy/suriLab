@@ -10,11 +10,10 @@ export async function initializeDatabase() {
     const dbUrl = process.env.DATABASE_URL || ''
     console.log(`Database URL: ${dbUrl.substring(0, 30)}...`)
 
-    // Vercel 환경에서 메모리 데이터베이스 사용
+    // Vercel 환경에서 Neon PostgreSQL 사용
     if (process.env.VERCEL) {
-      console.log('Vercel environment detected, initializing in-memory database...')
-      // 메모리 데이터베이스의 경우 항상 초기화가 필요
-      console.log('Initializing tables and data...')  
+      console.log('Vercel environment detected, using Neon PostgreSQL...')
+      console.log('Checking database connection and initialization...')  
     }
 
     // 기본 데이터 생성 (영구 저장 또는 메모리)
@@ -77,8 +76,10 @@ async function createDefaultData() {
     ])
     console.log('Default tags ready')
 
-    // 샘플 포스트 생성 (메모리 DB에서 필요)
-    if (process.env.VERCEL) {
+    // 샘플 포스트 생성 (필요시에만)
+    const postCount = await prisma.post.count()
+    if (postCount === 0) {
+      console.log('No posts found, creating sample posts...')
       await createSamplePosts(user.id)
     }
   } catch (error) {
@@ -302,7 +303,9 @@ Flexbox를 활용한 레이아웃 예시입니다.
           slug: postData.slug,
           authorId: userId,
           categoryId: postData.categoryId,
-          tags: postData.tags,
+          tags: {
+            connect: postData.tags.map(tagName => ({ name: tagName }))
+          },
           featured: postData.featured,
           views: postData.views,
           readTime: 1,
