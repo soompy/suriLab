@@ -7,15 +7,12 @@ import { keyframes } from '@mui/system'
 const pulse = keyframes`
   0% {
     opacity: 0.4;
-    transform: scale(0.95);
   }
   50% {
     opacity: 1;
-    transform: scale(1.05);
   }
   100% {
     opacity: 0.4;
-    transform: scale(0.95);
   }
 `
 
