@@ -26,6 +26,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import HeroSection from '@/components/HeroSection'
 import { BLOG_CATEGORIES, CATEGORY_DESCRIPTIONS, CATEGORY_COLORS } from '@/shared/constants/categories'
+import { getTagColor } from '@/utils/archiveHelpers'
 
 type BlogCategory = typeof BLOG_CATEGORIES[number]
 
@@ -322,6 +323,38 @@ export default function HomePage() {
                             >
                               {post.excerpt}
                             </Typography>
+
+                            {/* Tags */}
+                            {post.tags && post.tags.length > 0 && (
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                                {post.tags.slice(0, 3).map((tag) => (
+                                  <Chip 
+                                    key={tag} 
+                                    label={tag} 
+                                    size="small" 
+                                    sx={{ 
+                                      fontSize: '0.65rem', 
+                                      height: '18px',
+                                      backgroundColor: getTagColor(tag),
+                                      border: `1px solid ${getTagColor(tag)}`,
+                                      color: '#555',
+                                      '&:hover': {
+                                        backgroundColor: getTagColor(tag),
+                                        borderColor: getTagColor(tag)
+                                      }
+                                    }}
+                                  />
+                                ))}
+                                {post.tags.length > 3 && (
+                                  <Chip 
+                                    label={`+${post.tags.length - 3}`} 
+                                    size="small" 
+                                    variant="outlined"
+                                    sx={{ fontSize: '0.65rem', height: '18px', color: '#666' }}
+                                  />
+                                )}
+                              </Box>
+                            )}
                             
                             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

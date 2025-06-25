@@ -517,10 +517,11 @@ export default function Archives() {
                                                             fontSize: '0.65rem', 
                                                             height: '18px',
                                                             backgroundColor: getTagColor(tag),
-                                                            border: 'none',
+                                                            border: `1px solid ${getTagColor(tag)}`,
                                                             color: '#555',
                                                             '&:hover': {
-                                                              backgroundColor: getTagColor(tag)
+                                                              backgroundColor: getTagColor(tag),
+                                                              borderColor: getTagColor(tag)
                                                             }
                                                           }}
                                                         />
@@ -530,7 +531,7 @@ export default function Archives() {
                                                           label={`+${post.tags.length - 4}`} 
                                                           size="small" 
                                                           variant="outlined"
-                                                          sx={{ fontSize: '0.65rem', height: '18px' }}
+                                                          sx={{ fontSize: '0.65rem', height: '18px', color: '#666' }}
                                                         />
                                                       )}
                                                     </Box>
