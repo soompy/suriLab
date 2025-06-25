@@ -33,6 +33,7 @@ import {
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Loading from '@/components/Loading'
 import {
   BlogPost,
   ArchiveData,
@@ -144,9 +145,7 @@ export default function Archives() {
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, py: 6 }}>
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <Typography variant="h6">Loading...</Typography>
-            </Box>
+            <Loading variant="posts" message="아카이브를 불러오는 중..." />
           </Container>
           <Footer />
         </Box>

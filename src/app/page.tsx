@@ -25,6 +25,7 @@ import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import HeroSection from '@/components/HeroSection'
+import Loading from '@/components/Loading'
 import { BLOG_CATEGORIES, CATEGORY_DESCRIPTIONS, CATEGORY_COLORS } from '@/shared/constants/categories'
 import { getTagColor } from '@/utils/archiveHelpers'
 
@@ -240,9 +241,7 @@ export default function HomePage() {
               {/* Right Content - Posts Grid */}
               <Box sx={{ flex: 1 }}>
                 {loading ? (
-                  <Box sx={{ textAlign: 'center', py: 8 }}>
-                    <Typography>Loading posts...</Typography>
-                  </Box>
+                  <Loading variant="posts" message="최신 포스트를 불러오는 중..." />
                 ) : (
                   <Box sx={{ 
                     display: 'grid', 

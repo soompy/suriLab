@@ -16,6 +16,7 @@ import {
   DialogActions,
   Alert
 } from '@mui/material'
+import Loading from './Loading'
 import {
   Send as SendIcon,
   Edit as EditIcon,
@@ -150,7 +151,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   if (loading) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography>댓글을 불러오는 중...</Typography>
+        <Loading variant="minimal" message="댓글을 불러오는 중..." />
       </Box>
     )
   }

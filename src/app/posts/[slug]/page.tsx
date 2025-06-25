@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Loading from '@/components/Loading'
 import { PostEntity } from '@/entities/Post'
 import { BLOG_CONFIG } from '@/config/blog'
 import { AvatarImage } from '@/components/image'
@@ -199,11 +200,7 @@ export default function PostDetailPage() {
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth="md" sx={{ py: 4 }}>
-            <Stack spacing={3}>
-              <Skeleton variant="text" width="60%" height={60} />
-              <Skeleton variant="text" width="100%" height={24} />
-              <Skeleton variant="rectangular" width="100%" height={400} />
-            </Stack>
+            <Loading variant="default" message="포스트를 불러오는 중..." />
           </Container>
           <Footer />
         </Box>
