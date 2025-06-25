@@ -16,13 +16,13 @@ import {
   Collapse,
   ListItemButton,
   ListItemText,
-  Badge
+  Badge,
+  CircularProgress
 } from '@mui/material'
 import {
   Archive as ArchiveIcon,
   DateRange as DateIcon,
   Search as SearchIcon,
-  FilterList as FilterIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Visibility as ViewIcon,
@@ -33,7 +33,6 @@ import {
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import Loading from '@/components/Loading'
 import {
   BlogPost,
   ArchiveData,
@@ -65,11 +64,22 @@ export default function Archives() {
           const posts = data.posts || []
           if (posts.length > 0) {
             // API 응답 데이터를 BlogPost 인터페이스에 맞게 변환
-            const transformedPosts: BlogPost[] = posts.map((post: any) => ({
+            const transformedPosts: BlogPost[] = posts.map((post: {
+              id: string;
+              title: string;
+              excerpt?: string;
+              tags?: (string | { name: string })[];
+              category: string;
+              publishedAt: string;
+              readTime?: number;
+              views?: number;
+              featured?: boolean;
+              slug: string;
+            }) => ({
               id: post.id,
               title: post.title,
               excerpt: post.excerpt || '',
-              tags: Array.isArray(post.tags) ? post.tags.map((tag: any) => typeof tag === 'string' ? tag : tag.name) : [],
+              tags: Array.isArray(post.tags) ? post.tags.map((tag: string | { name: string }) => typeof tag === 'string' ? tag : tag.name) : [],
               category: post.category,
               publishedAt: post.publishedAt,
               readTime: post.readTime || 5,
