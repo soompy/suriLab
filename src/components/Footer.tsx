@@ -1,5 +1,6 @@
 'use client'
 
+import { forwardRef } from 'react'
 import { 
   Box, 
   Container, 
@@ -18,7 +19,7 @@ import {
 import { useTheme } from '@mui/material/styles'
 import Logo from './Logo'
 
-export default function Footer() {
+const Footer = forwardRef<HTMLElement>((_, ref) => {
   const theme = useTheme()
   
   const currentYear = new Date().getFullYear()
@@ -65,7 +66,8 @@ export default function Footer() {
 
   return (
     <Box 
-      component="footer" 
+      component="footer"
+      ref={ref}
       sx={{ 
         backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
         borderTop: '1px solid rgba(0, 29, 58, 0.08)',
@@ -250,4 +252,8 @@ export default function Footer() {
       </Container>
     </Box>
   )
-}
+})
+
+Footer.displayName = 'Footer'
+
+export default Footer

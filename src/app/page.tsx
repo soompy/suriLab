@@ -39,7 +39,9 @@ export default function HomePage() {
   const [isSticky, setIsSticky] = useState(false)
   const [newPostAdded, setNewPostAdded] = useState(false)
   const [previousPostCount, setPreviousPostCount] = useState(0)
+  const [isNearFooter, setIsNearFooter] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
+  const footerRef = useRef<HTMLElement>(null)
 
   const fetchPosts = async (showNotification = false) => {
     try {
@@ -98,6 +100,27 @@ export default function HomePage() {
     }
 
     return () => observer.disconnect()
+  }, [])
+
+  // Footer와의 겹침을 방지하는 스크롤 이벤트 리스너
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!footerRef.current) return
+
+      const footerRect = footerRef.current.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      
+      // Footer가 화면에 들어오기 시작하면 (sticky 탭의 높이만큼 여유를 둠)
+      const footerThreshold = 400 // sticky 탭 컨테이너의 대략적인 높이
+      const isFooterNear = footerRect.top < windowHeight - footerThreshold
+      
+      setIsNearFooter(isFooterNear)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    handleScroll() // 초기 실행
+
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const handleCategoryChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -162,56 +185,139 @@ export default function HomePage() {
               최신 포스트
             </Typography>
             
-            <Box sx={{ display: 'flex', gap: 4 }}>
+            <Box sx={{ 
+              display: { xs: 'block', md: 'flex' }, 
+              gap: { xs: 0, md: 4 },
+              flexDirection: { xs: 'column', md: 'row' }
+            }}>
               {/* Left Sidebar - Category Tabs */}
-              <Box sx={{ width: 280, flexShrink: 0 }}>
+              <Box sx={{ 
+                width: { xs: '100%', md: 280 }, 
+                flexShrink: 0,
+                mb: { xs: 4, md: 0 }
+              }}>
                 <Box sx={{ 
-                  position: isSticky ? 'fixed' : 'sticky', 
-                  top: isSticky ? 80 : 32,
-                  zIndex: 10,
-                  width: 280,
-                  maxHeight: isSticky ? 'calc(100vh - 100px)' : 'none',
-                  overflowY: isSticky ? 'auto' : 'visible'
+                  position: { 
+                    xs: 'static', // 모바일에서는 static
+                    md: isNearFooter ? 'absolute' : (isSticky ? 'fixed' : 'sticky')
+                  }, 
+                  top: { 
+                    xs: 'auto',
+                    md: isSticky && !isNearFooter ? 80 : 32
+                  },
+                  zIndex: { xs: 1, md: 10 },
+                  width: { xs: '100%', md: 280 },
+                  maxHeight: { 
+                    xs: 'none',
+                    md: isSticky && !isNearFooter ? 'calc(100vh - 100px)' : 'none'
+                  },
+                  overflowY: { 
+                    xs: 'visible',
+                    md: isSticky && !isNearFooter ? 'auto' : 'visible'
+                  },
+                  backgroundColor: { xs: 'transparent', md: 'background.default' },
+                  borderRadius: { xs: 0, md: isSticky ? 2 : 0 },
+                  boxShadow: { 
+                    xs: 'none', 
+                    md: isSticky && !isNearFooter ? '0 4px 20px rgba(0,0,0,0.1)' : 'none'
+                  },
+                  p: { xs: 0, md: isSticky && !isNearFooter ? 2 : 0 },
+                  transition: 'all 0.3s ease-in-out'
                 }}>
-                  <Tabs
-                    value={selectedCategory}
-                    onChange={handleCategoryChange}
-                    orientation="vertical"
-                    textColor="primary"
-                    sx={{
-                      borderRight: 'none',
-                      '& .MuiTabs-indicator': {
-                        display: 'none'
-                      },
-                      '& .MuiTab-root': {
-                        borderRadius: '12px',
-                        margin: '4px 0',
-                        textTransform: 'none',
-                        fontWeight: 500,
-                        transition: 'all 0.2s ease',
-                        alignItems: 'flex-start',
-                        textAlign: 'left',
-                        minHeight: 48,
-                        '&.Mui-selected': {
-                          backgroundColor: 'primary.main',
-                          color: 'white',
-                          fontWeight: 600
+                  {/* Mobile Tabs */}
+                  <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                    <Tabs
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                      orientation="horizontal"
+                      variant="scrollable"
+                      scrollButtons="auto"
+                      textColor="primary"
+                      sx={{
+                        borderBottom: '1px solid',
+                        borderBottomColor: 'divider',
+                        mb: 2,
+                        '& .MuiTabs-indicator': {
+                          display: 'none'
                         },
-                        '&:hover': {
-                          backgroundColor: 'primary.50'
+                        '& .MuiTab-root': {
+                          borderRadius: '12px',
+                          margin: '0 4px',
+                          textTransform: 'none',
+                          fontWeight: 500,
+                          fontSize: '0.875rem',
+                          minWidth: 'auto',
+                          transition: 'all 0.2s ease',
+                          alignItems: 'center',
+                          textAlign: 'center',
+                          minHeight: 40,
+                          '&.Mui-selected': {
+                            backgroundColor: 'primary.main',
+                            color: 'white',
+                            fontWeight: 600
+                          },
+                          '&:hover': {
+                            backgroundColor: 'primary.50'
+                          }
                         }
-                      }
-                    }}
-                  >
-                    <Tab label="All Posts" value="all" />
-                    {BLOG_CATEGORIES.map((category) => (
-                      <Tab key={category} label={category} value={category} />
-                    ))}
-                  </Tabs>
+                      }}
+                    >
+                      <Tab label="All Posts" value="all" />
+                      {BLOG_CATEGORIES.map((category) => (
+                        <Tab key={category} label={category} value={category} />
+                      ))}
+                    </Tabs>
+                  </Box>
 
-                  {/* Category Description */}
+                  {/* Desktop Tabs */}
+                  <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                    <Tabs
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                      orientation="vertical"
+                      variant="standard"
+                      textColor="primary"
+                      sx={{
+                        '& .MuiTabs-indicator': {
+                          display: 'none'
+                        },
+                        '& .MuiTab-root': {
+                          borderRadius: '12px',
+                          margin: '4px 0',
+                          textTransform: 'none',
+                          fontWeight: 500,
+                          fontSize: '1rem',
+                          transition: 'all 0.2s ease',
+                          alignItems: 'flex-start',
+                          textAlign: 'left',
+                          minHeight: 48,
+                          '&.Mui-selected': {
+                            backgroundColor: 'primary.main',
+                            color: 'white',
+                            fontWeight: 600
+                          },
+                          '&:hover': {
+                            backgroundColor: 'primary.50'
+                          }
+                        }
+                      }}
+                    >
+                      <Tab label="All Posts" value="all" />
+                      {BLOG_CATEGORIES.map((category) => (
+                        <Tab key={category} label={category} value={category} />
+                      ))}
+                    </Tabs>
+                  </Box>
+
+                  {/* Category Description - Desktop only */}
                   {selectedCategory !== 'all' && (
-                    <Box sx={{ mt: 4, p: 3, backgroundColor: 'grey.50', borderRadius: 2 }}>
+                    <Box sx={{ 
+                      mt: { xs: 0, md: 4 }, 
+                      p: 3, 
+                      backgroundColor: 'grey.50', 
+                      borderRadius: 2,
+                      display: { xs: 'none', md: 'block' }
+                    }}>
                       <Chip
                         icon={<CategoryIcon />}
                         label={selectedCategory}
@@ -384,7 +490,7 @@ export default function HomePage() {
           </Container>
         </main>
         
-        <Footer />
+        <Footer ref={footerRef} />
 
         {/* 새 포스트 알림 */}
         <Snackbar
