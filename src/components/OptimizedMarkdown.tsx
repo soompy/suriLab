@@ -2,6 +2,7 @@
 
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { ContentImage } from './image'
@@ -85,13 +86,23 @@ export default function OptimizedMarkdown({
         variant="body1" 
         component="p" 
         sx={{ 
-          mb: 2, 
-          lineHeight: 1.7,
+          mb: 2.5, 
+          lineHeight: 1.8,
           color: 'text.primary',
+          whiteSpace: 'pre-wrap', // 줄바꿈 보존
         }}
       >
         {children}
       </Typography>
+    ),
+
+    // 줄바꿈 처리
+    br: () => (
+      <Box component="br" sx={{ 
+        display: 'block',
+        content: '""',
+        marginBottom: '1em'
+      }} />
     ),
     
     // 커스텀 인용문 스타일
@@ -316,7 +327,7 @@ export default function OptimizedMarkdown({
   return (
     <Box className={className} style={style}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkBreaks]}
         components={customComponents}
       >
         {content}

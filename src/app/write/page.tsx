@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
 import rehypeHighlight from 'rehype-highlight'
 import { BLOG_CATEGORIES } from '@/shared/constants/categories'
 import { AuthService } from '@/lib/auth'
@@ -1204,7 +1205,7 @@ function WriteContent() {
                     >
                       {formData.content ? (
                         <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
+                          remarkPlugins={[remarkGfm, remarkBreaks]}
                           rehypePlugins={[rehypeHighlight]}
                           components={{
                             // 커스텀 컴포넌트로 체크박스 지원
@@ -1214,6 +1215,25 @@ function WriteContent() {
                               }
                               return <input type={type} {...props} />
                             },
+                            // 문단 스타일 개선 (줄바꿈 처리)
+                            p: ({ children, ...props }: any) => {
+                              return (
+                                <p style={{ 
+                                  marginBottom: '1.5em', 
+                                  lineHeight: '1.8',
+                                  whiteSpace: 'pre-wrap'
+                                }} {...props}>
+                                  {children}
+                                </p>
+                              )
+                            },
+                            // 줄바꿈 처리
+                            br: () => (
+                              <br style={{ 
+                                display: 'block',
+                                marginBottom: '1em'
+                              }} />
+                            ),
                             // 코드 블록 개선
                             code: ({ className, children, ...props }: any) => {
                               return (
