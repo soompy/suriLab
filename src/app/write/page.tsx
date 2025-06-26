@@ -432,13 +432,29 @@ function WriteContent() {
       const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
       const method = isEditing ? 'PUT' : 'POST'
 
+      console.log(`[WRITE] Sending ${method} request to ${url}`)
+      console.log('[WRITE] Post data:', {
+        title: postData.title,
+        category: postData.category,
+        isPublished: postData.isPublished,
+        tagsCount: postData.tags?.length || 0
+      })
+      
       const response = await AuthService.authenticatedFetch(url, {
         method,
         body: JSON.stringify(postData),
       })
 
+      console.log(`[WRITE] Response status: ${response.status}`)
+      
       if (!response.ok) {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'save'} post`)
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[WRITE] Request failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        })
+        throw new Error(`Failed to ${isEditing ? 'update' : 'save'} post: ${errorData.error || response.statusText}`)
       }
 
       const savedPost = await response.json()
@@ -486,13 +502,29 @@ function WriteContent() {
       const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
       const method = isEditing ? 'PUT' : 'POST'
 
+      console.log(`[WRITE] Publishing: Sending ${method} request to ${url}`)
+      console.log('[WRITE] Publish data:', {
+        title: postData.title,
+        category: postData.category,
+        isPublished: postData.isPublished,
+        tagsCount: postData.tags?.length || 0
+      })
+      
       const response = await AuthService.authenticatedFetch(url, {
         method,
         body: JSON.stringify(postData),
       })
 
+      console.log(`[WRITE] Publish response status: ${response.status}`)
+      
       if (!response.ok) {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'publish'} post`)
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[WRITE] Publish failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        })
+        throw new Error(`Failed to ${isEditing ? 'update' : 'publish'} post: ${errorData.error || response.statusText}`)
       }
 
       const publishedPost = await response.json()

@@ -137,26 +137,42 @@ export class PostsAPIHandler {
 
   static async POST(request: NextRequest) {
     try {
+      console.log('[POSTS] POST request received')
+      
       // 관리자 권한 확인
-      if (!verifyAdminPassword(request)) {
+      const isAuthorized = verifyAdminPassword(request)
+      console.log(`[POSTS] Authorization check result: ${isAuthorized}`)
+      
+      if (!isAuthorized) {
+        console.log('[POSTS] Authorization failed, returning 401')
         return createAuthResponse('포스트 작성 권한이 없습니다.')
       }
 
       const body = await request.json()
-      console.log('Creating post with data:', body)
+      console.log('[POSTS] Creating post with data:', {
+        title: body.title,
+        category: body.category,
+        isPublished: body.isPublished,
+        // 민감한 정보는 로그에서 제외
+      })
       
       // 데이터베이스 초기화 시도 (실패해도 계속 진행)
       try {
         await initializeDatabase()
+        console.log('[POSTS] Database initialized successfully')
       } catch (initError) {
-        console.warn('Database initialization failed, continuing...', initError)
+        console.warn('[POSTS] Database initialization failed, continuing...', initError)
       }
       
       const post = await createPost(body)
-      console.log('Post created successfully:', post)
+      console.log('[POSTS] Post created successfully:', {
+        id: post.id,
+        title: post.title,
+        isPublished: post.isPublished
+      })
       return NextResponse.json(post, { status: 201 })
     } catch (error) {
-      console.error('Error creating post:', error)
+      console.error('[POSTS] Error creating post:', error)
       return NextResponse.json(
         { error: 'Failed to create post', details: error instanceof Error ? error.message : 'Unknown error' },
         { status: 500 }
@@ -186,21 +202,42 @@ export class PostAPIHandler {
 
   static async PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+      console.log(`[POSTS] PUT request received for post ID: ${params.id}`)
+      
       // 관리자 권한 확인
-      if (!verifyAdminPassword(request)) {
+      const isAuthorized = verifyAdminPassword(request)
+      console.log(`[POSTS] Authorization check result: ${isAuthorized}`)
+      
+      if (!isAuthorized) {
+        console.log('[POSTS] Authorization failed for PUT request, returning 401')
         return createAuthResponse('포스트 수정 권한이 없습니다.')
       }
 
       const body = await request.json()
+      console.log('[POSTS] Updating post with data:', {
+        id: params.id,
+        title: body.title,
+        isPublished: body.isPublished,
+        // 민감한 정보는 로그에서 제외
+      })
+      
       const updateInput: UpdatePostInput = {
         id: params.id,
         ...body
       }
       const post = await updatePost(updateInput)
+      
+      console.log('[POSTS] Post updated successfully:', {
+        id: post.id,
+        title: post.title,
+        isPublished: post.isPublished
+      })
+      
       return NextResponse.json(post)
-    } catch {
+    } catch (error) {
+      console.error('[POSTS] Error updating post:', error)
       return NextResponse.json(
-        { error: 'Failed to update post' },
+        { error: 'Failed to update post', details: error instanceof Error ? error.message : 'Unknown error' },
         { status: 400 }
       )
     }

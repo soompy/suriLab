@@ -106,15 +106,24 @@ export class AuthService {
 
   // 인증이 필요한 fetch 요청을 위한 헬퍼
   static async authenticatedFetch(url: string, options: RequestInit = {}) {
+    console.log(`[AUTH] Making authenticated request to: ${url}`)
+    
     if (!this.isAuthenticated()) {
+      console.error('[AUTH] User not authenticated')
       throw new Error('Authentication required')
     }
 
+    const authHeaders = this.getAuthHeaders()
+    const authToken = typeof authHeaders === 'object' && 'Authorization' in authHeaders ? authHeaders.Authorization : null
+    console.log(`[AUTH] Authorization header: ${authToken ? `Bearer ${authToken.toString().substring(7, 15)}...` : 'None'}`)
+    
     const headers = {
-      ...this.getAuthHeaders(),
+      ...authHeaders,
       ...options.headers
     }
 
+    console.log(`[AUTH] Request method: ${options.method || 'GET'}`)
+    
     return fetch(url, {
       ...options,
       headers
