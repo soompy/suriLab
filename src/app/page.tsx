@@ -40,15 +40,19 @@ export default function HomePage() {
   const [newPostAdded, setNewPostAdded] = useState(false)
   const [previousPostCount, setPreviousPostCount] = useState(0)
   const [isNearFooter, setIsNearFooter] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMorePosts, setHasMorePosts] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
   const footerRef = useRef<HTMLElement>(null)
 
-  const fetchPosts = async (showNotification = false) => {
+  const fetchPosts = async (showNotification = false, page = 1, reset = false) => {
     try {
-      if (showNotification) setLoading(false) // 알림용 새로고침일 때는 로딩 표시하지 않음
-      else setLoading(true)
+      if (showNotification) setLoading(false)
+      else if (page === 1) setLoading(true)
+      else setLoadingMore(true)
       
-      const response = await fetch('/api/posts?sortField=publishedAt&sortOrder=desc&limit=50')
+      const response = await fetch(`/api/posts?sortField=publishedAt&sortOrder=desc&limit=12&page=${page}`)
       if (response.ok) {
         const data = await response.json()
         const newPosts = data.posts || []
@@ -58,13 +62,23 @@ export default function HomePage() {
           setNewPostAdded(true)
         }
         
-        setPosts(newPosts)
-        setPreviousPostCount(newPosts.length)
+        if (reset || page === 1) {
+          setPosts(newPosts)
+        } else {
+          setPosts(prevPosts => [...prevPosts, ...newPosts])
+        }
+        
+        // 더 불러올 포스트가 있는지 확인
+        setHasMorePosts(newPosts.length === 12)
+        setPreviousPostCount(page === 1 ? newPosts.length : posts.length + newPosts.length)
       }
     } catch (error) {
       console.error('Failed to fetch posts:', error)
     } finally {
-      if (!showNotification) setLoading(false)
+      if (!showNotification) {
+        setLoading(false)
+      }
+      setLoadingMore(false)
     }
   }
 
@@ -73,7 +87,8 @@ export default function HomePage() {
 
     // 페이지가 포커스를 받을 때 포스트 목록 새로고침
     const handleFocus = () => {
-      fetchPosts(true)
+      setCurrentPage(1)
+      fetchPosts(true, 1, true)
     }
 
     window.addEventListener('focus', handleFocus)
@@ -82,6 +97,13 @@ export default function HomePage() {
       window.removeEventListener('focus', handleFocus)
     }
   }, [])
+
+  // 카테고리 변경 시 포스트 목록 리셋
+  useEffect(() => {
+    setCurrentPage(1)
+    setHasMorePosts(true)
+    fetchPosts(false, 1, true)
+  }, [selectedCategory])
 
 
   useEffect(() => {
@@ -102,7 +124,7 @@ export default function HomePage() {
     return () => observer.disconnect()
   }, [])
 
-  // Footer와의 겹침을 방지하는 스크롤 이벤트 리스너
+  // Footer와의 겹침을 방지하고 무한스크롤을 위한 스크롤 이벤트 리스너
   useEffect(() => {
     const handleScroll = () => {
       if (!footerRef.current) return
@@ -115,13 +137,27 @@ export default function HomePage() {
       const isFooterNear = footerRect.top < windowHeight - footerThreshold
       
       setIsNearFooter(isFooterNear)
+
+      // 무한스크롤: 페이지 하단에 가까워지면 다음 페이지 로드
+      const scrollThreshold = 800 // 하단에서 800px 전에 로드
+      const shouldLoadMore = 
+        footerRect.top < windowHeight + scrollThreshold &&
+        hasMorePosts &&
+        !loadingMore &&
+        !loading
+
+      if (shouldLoadMore) {
+        const nextPage = currentPage + 1
+        setCurrentPage(nextPage)
+        fetchPosts(false, nextPage, false)
+      }
     }
 
     window.addEventListener('scroll', handleScroll)
     handleScroll() // 초기 실행
 
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [currentPage, hasMorePosts, loadingMore, loading])
 
   const handleCategoryChange = (_: React.SyntheticEvent, newValue: string) => {
     setSelectedCategory(newValue)
@@ -349,141 +385,170 @@ export default function HomePage() {
                 {loading ? (
                   <Loading variant="posts" message="최신 포스트를 불러오는 중..." />
                 ) : (
-                  <Box sx={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-                    gap: 3 
-                  }}>
-                    {filteredPosts.map((post) => (
-                      <Box key={post.id}>
-                        <Card 
-                          sx={{ 
-                            height: '100%', 
-                            display: 'flex', 
-                            flexDirection: 'column',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            border: 'none',
-                            boxShadow: 'none',
-                            '&:hover': {
-                              transform: 'translateY(-4px)',
-                              backgroundColor: 'grey.50'
-                            }
-                          }}
-                          onClick={() => handlePostClick(post)}
-                        >
-                          <CardContent sx={{ flexGrow: 1 }}>
-                            <Box sx={{ mb: 2 }}>
-                              <Chip
-                                label={post.category}
-                                size="small"
-                                sx={{
-                                  background: getCategoryInfo(post.category as BlogCategory).color,
-                                  color: 'black',
-                                  fontWeight: 'bold',
-                                  mb: 1
-                                }}
-                              />
-                              {post.featured && (
+                  <>
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+                      gap: 3 
+                    }}>
+                      {filteredPosts.map((post) => (
+                        <Box key={post.id}>
+                          <Card 
+                            sx={{ 
+                              height: '100%', 
+                              display: 'flex', 
+                              flexDirection: 'column',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              border: 'none',
+                              boxShadow: 'none',
+                              '&:hover': {
+                                transform: 'translateY(-4px)',
+                                backgroundColor: 'grey.50'
+                              }
+                            }}
+                            onClick={() => handlePostClick(post)}
+                          >
+                            <CardContent sx={{ flexGrow: 1 }}>
+                              <Box sx={{ mb: 2 }}>
                                 <Chip
-                                  label="Featured"
+                                  label={post.category}
                                   size="small"
-                                  color="secondary"
-                                  sx={{ ml: 1 }}
-                                />
-                              )}
-                              {isNewPost(post.publishedAt) && (
-                                <Chip
-                                  label="NEW"
-                                  size="small"
-                                  sx={{ 
-                                    ml: 1,
-                                    backgroundColor: '#ff4444',
-                                    color: 'white',
+                                  sx={{
+                                    background: getCategoryInfo(post.category as BlogCategory).color,
+                                    color: 'black',
                                     fontWeight: 'bold',
-                                    animation: 'pulse 2s infinite',
-                                    '@keyframes pulse': {
-                                      '0%': { opacity: 1 },
-                                      '50%': { opacity: 0.7 },
-                                      '100%': { opacity: 1 },
-                                    }
+                                    mb: 1
                                   }}
                                 />
-                              )}
-                            </Box>
-                            
-                            <Typography variant="h6" component="h3" sx={{ mb: 1, fontWeight: 'bold' }}>
-                              {post.title}
-                            </Typography>
-                            
-                            <Typography 
-                              variant="body1" 
-                              color="text.primary"
-                              sx={{ 
-                                mb: 2,
-                                fontSize: '0.9rem',
-                                lineHeight: 1.6,
-                                opacity: 0.8
-                              }}
-                            >
-                              {post.excerpt}
-                            </Typography>
-
-                            {/* Tags */}
-                            {post.tags && post.tags.length > 0 && (
-                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                                {post.tags.slice(0, 3).map((tag) => (
-                                  <Chip 
-                                    key={tag} 
-                                    label={tag} 
-                                    size="small" 
+                                {post.featured && (
+                                  <Chip
+                                    label="Featured"
+                                    size="small"
+                                    color="secondary"
+                                    sx={{ ml: 1 }}
+                                  />
+                                )}
+                                {isNewPost(post.publishedAt) && (
+                                  <Chip
+                                    label="NEW"
+                                    size="small"
                                     sx={{ 
-                                      fontSize: '0.65rem', 
-                                      height: '18px',
-                                      backgroundColor: getTagColor(tag),
-                                      border: `1px solid ${getTagColor(tag)}`,
-                                      color: '#555',
-                                      '&:hover': {
-                                        backgroundColor: getTagColor(tag),
-                                        borderColor: getTagColor(tag)
+                                      ml: 1,
+                                      backgroundColor: '#ff4444',
+                                      color: 'white',
+                                      fontWeight: 'bold',
+                                      animation: 'pulse 2s infinite',
+                                      '@keyframes pulse': {
+                                        '0%': { opacity: 1 },
+                                        '50%': { opacity: 0.7 },
+                                        '100%': { opacity: 1 },
                                       }
                                     }}
                                   />
-                                ))}
-                                {post.tags.length > 3 && (
-                                  <Chip 
-                                    label={`+${post.tags.length - 3}`} 
-                                    size="small" 
-                                    variant="outlined"
-                                    sx={{ fontSize: '0.65rem', height: '18px', color: '#666' }}
-                                  />
                                 )}
                               </Box>
-                            )}
-                            
-                            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                <Typography variant="caption" color="text.secondary">
-                                  {post.readTime}분 읽기
-                                </Typography>
-                              </Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <ViewIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                <Typography variant="caption" color="text.secondary">
-                                  {post.views?.toLocaleString()}
-                                </Typography>
-                              </Box>
-                            </Stack>
-                            
-                            <Typography variant="caption" color="text.secondary">
-                              {getRelativeTime(post.publishedAt)}
-                            </Typography>
-                          </CardContent>
-                        </Card>
+                              
+                              <Typography variant="h6" component="h3" sx={{ mb: 1, fontWeight: 'bold' }}>
+                                {post.title}
+                              </Typography>
+                              
+                              <Typography 
+                                variant="body1" 
+                                color="text.primary"
+                                sx={{ 
+                                  mb: 2,
+                                  fontSize: '0.9rem',
+                                  lineHeight: 1.6,
+                                  opacity: 0.8
+                                }}
+                              >
+                                {post.excerpt}
+                              </Typography>
+
+                              {/* Tags */}
+                              {post.tags && post.tags.length > 0 && (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                                  {post.tags.slice(0, 3).map((tag) => (
+                                    <Chip 
+                                      key={tag} 
+                                      label={tag} 
+                                      size="small" 
+                                      sx={{ 
+                                        fontSize: '0.65rem', 
+                                        height: '18px',
+                                        backgroundColor: getTagColor(tag),
+                                        border: `1px solid ${getTagColor(tag)}`,
+                                        color: '#555',
+                                        '&:hover': {
+                                          backgroundColor: getTagColor(tag),
+                                          borderColor: getTagColor(tag)
+                                        }
+                                      }}
+                                    />
+                                  ))}
+                                  {post.tags.length > 3 && (
+                                    <Chip 
+                                      label={`+${post.tags.length - 3}`} 
+                                      size="small" 
+                                      variant="outlined"
+                                      sx={{ fontSize: '0.65rem', height: '18px', color: '#666' }}
+                                    />
+                                  )}
+                                </Box>
+                              )}
+                              
+                              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                  <Typography variant="caption" color="text.secondary">
+                                    {post.readTime}분 읽기
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <ViewIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                  <Typography variant="caption" color="text.secondary">
+                                    {post.views?.toLocaleString()}
+                                  </Typography>
+                                </Box>
+                              </Stack>
+                              
+                              <Typography variant="caption" color="text.secondary">
+                                {getRelativeTime(post.publishedAt)}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        </Box>
+                      ))}
+                    </Box>
+
+                    {/* 더 불러오기 로딩 표시 */}
+                    {loadingMore && (
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                        py: 4 
+                      }}>
+                        <Loading variant="posts" message="추가 포스트를 불러오는 중..." />
                       </Box>
-                    ))}
-                  </Box>
+                    )}
+
+                    {/* 더 이상 불러올 포스트가 없을 때 */}
+                    {!hasMorePosts && filteredPosts.length > 0 && (
+                      <Box sx={{ 
+                        textAlign: 'center', 
+                        py: 4,
+                        borderTop: '1px solid',
+                        borderTopColor: 'divider',
+                        mt: 4
+                      }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                          모든 포스트를 확인했습니다 ✨
+                        </Typography>
+                      </Box>
+                    )}
+                  </>
                 )}
               </Box>
             </Box>
