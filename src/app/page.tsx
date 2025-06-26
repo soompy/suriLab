@@ -417,8 +417,7 @@ export default function HomePage() {
                                   sx={{
                                     background: getCategoryInfo(post.category as BlogCategory).color,
                                     color: 'black',
-                                    fontWeight: 'bold',
-                                    mb: 1
+                                    fontWeight: 'bold'
                                   }}
                                 />
                                 {post.featured && (

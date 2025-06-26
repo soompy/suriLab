@@ -46,9 +46,9 @@ async function createDefaultData() {
     // 기본 카테고리 생성 (upsert)
     await Promise.all([
       prisma.category.upsert({
-        where: { name: 'Developer Tips' },
+        where: { name: 'Study Journal' },
         update: {},
-        create: { id: 'developer-tips', name: 'Developer Tips', description: '개발 생산성을 높이는 팁과 노하우를 제공합니다.', color: '#3b82f6' }
+        create: { id: 'study-journal', name: 'Study Journal', description: '학습 과정과 기록을 공유하는 일지입니다.', color: '#3b82f6' }
       }),
       prisma.category.upsert({
         where: { name: 'Tech Insights' },

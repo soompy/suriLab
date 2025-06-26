@@ -146,7 +146,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
             </Box>
           </Box>
 
-          {/* Developer Tips Section */}
+          {/* Study Journal Section */}
           <Box>
             <Box sx={{ mb: 3 }}>
               <Typography
@@ -169,10 +169,10 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
                     borderRadius: '50%',
                   }}
                 />
-                Developer Tips
+                Study Journal
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                개발 생산성과 협업을 위한 실용적인 팁
+                학습 과정과 기록을 공유하는 일지
               </Typography>
             </Box>
             <Box sx={{ 
@@ -181,7 +181,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
               gap: 3 
             }}>
               {posts
-                .filter(post => post.category === 'Developer Tips')
+                .filter(post => post.category === 'Study Journal')
                 .slice(0, 3)
                 .map((post) => (
                   <PostCard
