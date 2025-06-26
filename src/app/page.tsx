@@ -533,6 +533,32 @@ export default function HomePage() {
                       </Box>
                     )}
 
+                    {/* 포스트가 없는 경우 */}
+                    {!loading && !loadingMore && filteredPosts.length === 0 && (
+                      <Box sx={{ 
+                        textAlign: 'center', 
+                        py: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 2
+                      }}>
+                        <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+                          {selectedCategory === 'all' ? '아직 작성된 포스트가 없습니다' : `${selectedCategory} 카테고리에 포스트가 없습니다`}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                          {selectedCategory === 'Study Journal' 
+                            ? '새로운 학습 여정을 기록해보세요 📝' 
+                            : selectedCategory === 'Tech Insights'
+                            ? '기술 인사이트를 공유해보세요 💡'
+                            : selectedCategory === 'Code Solutions'
+                            ? '코드 솔루션을 공유해보세요 🔧'
+                            : '첫 번째 포스트를 작성해보세요 ✨'
+                          }
+                        </Typography>
+                      </Box>
+                    )}
+
                     {/* 더 이상 불러올 포스트가 없을 때 */}
                     {!hasMorePosts && filteredPosts.length > 0 && (
                       <Box sx={{ 

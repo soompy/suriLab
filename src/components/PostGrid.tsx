@@ -86,16 +86,29 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
               gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
               gap: 3 
             }}>
-              {posts
-                .filter(post => post.category === 'Tech Insights')
-                .slice(0, 3)
-                .map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => onPostClick?.(post)}
-                  />
-                ))}
+              {posts.filter(post => post.category === 'Tech Insights').length === 0 ? (
+                <Box sx={{ 
+                  gridColumn: { xs: '1', sm: '1 / -1', md: '1 / -1' },
+                  textAlign: 'center', 
+                  py: 4,
+                  color: 'text.secondary'
+                }}>
+                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                    기술 인사이트 포스트가 없습니다 💡
+                  </Typography>
+                </Box>
+              ) : (
+                posts
+                  .filter(post => post.category === 'Tech Insights')
+                  .slice(0, 3)
+                  .map((post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onClick={() => onPostClick?.(post)}
+                    />
+                  ))
+              )}
             </Box>
           </Box>
 
@@ -133,16 +146,29 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
               gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
               gap: 3 
             }}>
-              {posts
-                .filter(post => post.category === 'Code Solutions')
-                .slice(0, 3)
-                .map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => onPostClick?.(post)}
-                  />
-                ))}
+              {posts.filter(post => post.category === 'Code Solutions').length === 0 ? (
+                <Box sx={{ 
+                  gridColumn: { xs: '1', sm: '1 / -1', md: '1 / -1' },
+                  textAlign: 'center', 
+                  py: 4,
+                  color: 'text.secondary'
+                }}>
+                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                    코드 솔루션 포스트가 없습니다 🔧
+                  </Typography>
+                </Box>
+              ) : (
+                posts
+                  .filter(post => post.category === 'Code Solutions')
+                  .slice(0, 3)
+                  .map((post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onClick={() => onPostClick?.(post)}
+                    />
+                  ))
+              )}
             </Box>
           </Box>
 
@@ -180,16 +206,29 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
               gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
               gap: 3 
             }}>
-              {posts
-                .filter(post => post.category === 'Study Journal')
-                .slice(0, 3)
-                .map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => onPostClick?.(post)}
-                  />
-                ))}
+              {posts.filter(post => post.category === 'Study Journal').length === 0 ? (
+                <Box sx={{ 
+                  gridColumn: { xs: '1', sm: '1 / -1', md: '1 / -1' },
+                  textAlign: 'center', 
+                  py: 4,
+                  color: 'text.secondary'
+                }}>
+                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                    학습 여정 포스트가 없습니다 📝
+                  </Typography>
+                </Box>
+              ) : (
+                posts
+                  .filter(post => post.category === 'Study Journal')
+                  .slice(0, 3)
+                  .map((post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onClick={() => onPostClick?.(post)}
+                    />
+                  ))
+              )}
             </Box>
           </Box>
         </Box>

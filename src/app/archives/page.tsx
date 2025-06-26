@@ -545,13 +545,19 @@ export default function Archives() {
                         ? `"${searchQuery}"에 대한 검색 결과가 없습니다`
                         : selectedCategory 
                           ? `"${selectedCategory}" 카테고리에 포스트가 없습니다`
-                          : '조건에 맞는 포스트가 없습니다'
+                          : allPosts.length === 0
+                            ? '아직 작성된 포스트가 없습니다'
+                            : '조건에 맞는 포스트가 없습니다'
                       }
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {searchQuery.trim() !== '' 
                         ? '다른 검색어를 시도해보세요'
-                        : '다른 카테고리를 선택해보세요'
+                        : selectedCategory
+                          ? '다른 카테고리를 선택해보세요'
+                          : allPosts.length === 0
+                            ? '첫 번째 포스트를 작성해보세요 ✨'
+                            : '다른 조건을 시도해보세요'
                       }
                     </Typography>
                     {(searchQuery.trim() !== '' || selectedCategory) && (
