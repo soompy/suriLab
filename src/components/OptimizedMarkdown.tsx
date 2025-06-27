@@ -3,6 +3,7 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
+import rehypeRaw from 'rehype-raw'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { ContentImage } from './image'
@@ -322,12 +323,65 @@ export default function OptimizedMarkdown({
         {children}
       </Box>
     ),
+
+    // CodePen iframe 스타일
+    iframe: ({ src, title, height, ...props }) => {
+      if (src?.includes('codepen.io')) {
+        return (
+          <Box
+            sx={{
+              my: 3,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              border: '1px solid',
+              borderColor: (theme) => 
+                theme.palette.mode === 'dark' 
+                  ? 'rgba(255, 255, 255, 0.1)' 
+                  : 'rgba(0, 0, 0, 0.1)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }}
+          >
+            <Box
+              component="iframe"
+              src={src}
+              title={title || 'CodePen Embed'}
+              height={height || 300}
+              loading="lazy"
+              sx={{
+                width: '100%',
+                border: 'none',
+                display: 'block',
+              }}
+              {...props}
+            />
+          </Box>
+        )
+      }
+      
+      // 다른 iframe들은 기본 스타일 적용
+      return (
+        <Box
+          component="iframe"
+          src={src}
+          title={title}
+          height={height}
+          sx={{
+            width: '100%',
+            border: 'none',
+            borderRadius: '8px',
+            my: 2,
+          }}
+          {...props}
+        />
+      )
+    },
   }
 
   return (
     <Box className={className} style={style}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks]}
+        rehypePlugins={[rehypeRaw]}
         components={customComponents}
       >
         {content}

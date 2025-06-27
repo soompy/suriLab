@@ -86,27 +86,29 @@ const ProjectImage = forwardRef<HTMLDivElement, ProjectImageProps>(({
       />
       
       <Typography
-        variant="body2"
+        variant="h6"
         sx={{
-          color: theme.palette.mode === 'dark' ? 'grey.400' : 'grey.600',
+          color: theme.palette.mode === 'dark' ? 'grey.300' : 'grey.700',
           textAlign: 'center',
-          fontWeight: 500,
+          fontWeight: 600,
           zIndex: 1,
+          mb: 1,
         }}
       >
         {projectName || '프로젝트'}
       </Typography>
       
       <Typography
-        variant="caption"
+        variant="body2"
         sx={{
-          color: theme.palette.mode === 'dark' ? 'grey.500' : 'grey.500',
+          color: theme.palette.mode === 'dark' ? 'grey.400' : 'grey.600',
           textAlign: 'center',
-          mt: 0.5,
           zIndex: 1,
+          fontWeight: 500,
+          px: 2,
         }}
       >
-        스크린샷 준비중
+        No Image Available
       </Typography>
     </Box>
   )

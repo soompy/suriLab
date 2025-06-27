@@ -404,30 +404,17 @@ export default function Header() {
             onClose={handleSearchClose}
             maxWidth="md"
             fullWidth
-            sx={{
-              '& .MuiDialog-paper': {
-                borderRadius: 2,
-                mt: { xs: 2, md: 8 },
-                mx: { xs: 2, md: 'auto' },
-                maxHeight: '80vh',
-              },
-            }}
           >
-            <DialogTitle sx={{ pb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                  🔍 블로그 검색
+            <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+                <SearchIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+                <Typography variant="h5" component="div">
+                  블로그 검색
                 </Typography>
-                <IconButton
-                  onClick={handleSearchClose}
-                  size="small"
-                  sx={{ color: 'text.secondary' }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
+                <Typography variant="body2" color="text.secondary">
+                  원하는 글을 빠르게 찾아보세요
+                </Typography>
             </DialogTitle>
-            <DialogContent sx={{ pt: 0, pb: 3 }}>
+            <DialogContent>
               <form onSubmit={handleSearchSubmit}>
                 <TextField
                   autoFocus
@@ -439,24 +426,45 @@ export default function Header() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon sx={{ color: 'text.secondary' }} />
+                        <SearchIcon sx={{ color: '#9e9e9e' }} />
                       </InputAdornment>
                     ),
                     endAdornment: isSearching && (
                       <InputAdornment position="end">
-                        <CircularProgress size={20} />
+                        <CircularProgress size={20} sx={{ color: '#9e9e9e' }} />
                       </InputAdornment>
                     ),
                   }}
                   sx={{
-                    mb: 2,
+                    mb: 3,
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: 'primary.main',
+                      borderRadius: 3,
+                      fontSize: '1.1rem',
+                      py: 1,
+                      background: 'rgba(189, 189, 189, 0.02)',
+                      border: '2px solid transparent',
+                      '& fieldset': {
+                        border: '2px solid rgba(189, 189, 189, 0.1)',
+                        transition: 'all 0.3s ease',
                       },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'primary.main',
+                      '&:hover': {
+                        background: 'rgba(189, 189, 189, 0.04)',
+                        '& fieldset': {
+                          borderColor: 'rgba(189, 189, 189, 0.3)',
+                        },
+                      },
+                      '&.Mui-focused': {
+                        background: 'rgba(189, 189, 189, 0.06)',
+                        boxShadow: '0 0 0 4px rgba(189, 189, 189, 0.1)',
+                        '& fieldset': {
+                          borderColor: '#9e9e9e',
+                        },
+                      },
+                    },
+                    '& .MuiInputBase-input': {
+                      '&::placeholder': {
+                        color: 'rgba(189, 189, 189, 0.6)',
+                        opacity: 1,
                       },
                     },
                   }}
@@ -468,9 +476,17 @@ export default function Header() {
                 <Box sx={{ mt: 2 }}>
                   {searchResults.length > 0 ? (
                     <>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          총 {searchResults.length}개의 검색 결과
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        mb: 3,
+                        p: 2,
+                        background: 'linear-gradient(135deg, rgba(189, 189, 189, 0.1) 0%, rgba(224, 224, 224, 0.1) 100%)',
+                        borderRadius: 2,
+                        border: '1px solid rgba(189, 189, 189, 0.2)',
+                      }}>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#9e9e9e' }}>
+                          총 {searchResults.length}개의 검색 결과를 찾았습니다
                         </Typography>
                       </Box>
                       <List sx={{ p: 0 }}>
@@ -480,27 +496,64 @@ export default function Header() {
                               onClick={() => handlePostClick(post)}
                               sx={{
                                 cursor: 'pointer',
-                                borderRadius: 1,
-                                mb: 1,
-                                p: 2,
+                                borderRadius: 3,
+                                mb: 2,
+                                p: 3,
+                                background: 'background.paper',
+                                border: '1px solid rgba(189, 189, 189, 0.1)',
+                                backdropFilter: 'blur(10px)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                '&::before': {
+                                  content: '""',
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: '4px',
+                                  height: '100%',
+                                  background: 'linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 100%)',
+                                  opacity: 0,
+                                  transition: 'opacity 0.3s ease',
+                                },
                                 '&:hover': {
-                                  bgcolor: 'action.hover',
+                                  background: 'action.hover',
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: '0 8px 25px rgba(189, 189, 189, 0.15)',
+                                  borderColor: 'rgba(189, 189, 189, 0.3)',
+                                  '&::before': {
+                                    opacity: 1,
+                                  },
                                 },
                               }}
                             >
                               <ListItemText
                                 primary={
                                   <Box sx={{ mb: 1 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                    <Typography 
+                                      variant="h6" 
+                                      sx={{ 
+                                        fontWeight: 600, 
+                                        mb: 0.5,
+                                        color: 'text.primary',
+                                      }}
+                                    >
                                       {post.title}
                                     </Typography>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                       <Chip
                                         label={post.category}
                                         size="small"
-                                        color="primary"
-                                        variant="outlined"
-                                        sx={{ fontSize: '0.75rem' }}
+                                        sx={{ 
+                                          fontSize: '0.75rem',
+                                          fontWeight: 600,
+                                          background: 'linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 100%)',
+                                          color: '#424242',
+                                          border: 'none',
+                                          '&:hover': {
+                                            background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+                                          },
+                                        }}
                                       />
                                       {post.publishedAt && (
                                         <Typography variant="caption" color="text.secondary">
@@ -533,16 +586,31 @@ export default function Header() {
                                             key={tagIndex}
                                             label={typeof tag === 'string' ? tag : tag.name}
                                             size="small"
-                                            variant="outlined"
-                                            sx={{ fontSize: '0.7rem', height: '20px' }}
+                                            sx={{ 
+                                              fontSize: '0.7rem', 
+                                              height: '22px',
+                                              background: 'rgba(189, 189, 189, 0.1)',
+                                              color: '#9e9e9e',
+                                              border: '1px solid rgba(189, 189, 189, 0.3)',
+                                              fontWeight: 500,
+                                              '&:hover': {
+                                                background: 'rgba(189, 189, 189, 0.2)',
+                                              },
+                                            }}
                                           />
                                         ))}
                                         {post.tags.length > 3 && (
                                           <Chip
                                             label={`+${post.tags.length - 3}`}
                                             size="small"
-                                            variant="outlined"
-                                            sx={{ fontSize: '0.7rem', height: '20px' }}
+                                            sx={{ 
+                                              fontSize: '0.7rem', 
+                                              height: '22px',
+                                              background: 'rgba(224, 224, 224, 0.1)',
+                                              color: '#bdbdbd',
+                                              border: '1px solid rgba(224, 224, 224, 0.3)',
+                                              fontWeight: 500,
+                                            }}
                                           />
                                         )}
                                       </Box>
@@ -557,12 +625,30 @@ export default function Header() {
                       </List>
                     </>
                   ) : (
-                    <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
-                      <SearchIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                      <Typography variant="h6" color="text.secondary" gutterBottom>
+                    <Paper sx={{ 
+                      p: 6, 
+                      textAlign: 'center', 
+                      background: 'linear-gradient(135deg, rgba(189, 189, 189, 0.05) 0%, rgba(224, 224, 224, 0.05) 100%)',
+                      border: '2px dashed rgba(189, 189, 189, 0.2)',
+                      borderRadius: 4,
+                    }}>
+                      <Box sx={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, rgba(189, 189, 189, 0.1) 0%, rgba(224, 224, 224, 0.1) 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mx: 'auto',
+                        mb: 3,
+                      }}>
+                        <SearchIcon sx={{ fontSize: 40, color: '#9e9e9e' }} />
+                      </Box>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#9e9e9e', mb: 2 }}>
                         검색 결과가 없습니다
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body1" color="text.secondary">
                         다른 검색어를 시도해보세요
                       </Typography>
                     </Paper>
@@ -571,12 +657,27 @@ export default function Header() {
               )}
 
               {!hasSearched && searchQuery.trim() === '' && (
-                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
-                  <SearchIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                <Paper sx={{ 
+                  p: 6, 
+                  textAlign: 'center', 
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderRadius: 4,
+                  boxShadow: 'none',
+                }}>
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mx: 'auto',
+                    mb: 3,
+                  }}>
+                    <SearchIcon sx={{ fontSize: 48, color: '#9e9e9e' }} />
+                  </Box>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: '#9e9e9e', mb: 2 }}>
                     블로그에서 원하는 글을 찾아보세요
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.1rem' }}>
                     제목, 내용, 카테고리, 태그로 검색할 수 있습니다
                   </Typography>
                 </Paper>

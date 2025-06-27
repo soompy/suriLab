@@ -49,6 +49,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
         '&:hover': {
           transform: 'translateY(-2px)',
           boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
         },
       }}
     >
@@ -105,7 +106,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
             WebkitLineClamp: 2,
             transition: 'color 0.15s ease',
             '&:hover': {
-              color: theme.palette.mode === 'dark' ? 'grey.300' : 'grey.600',
+              color: theme.palette.mode === 'dark' ? 'primary.light' : 'primary.main',
             },
           }}
         >

@@ -390,6 +390,29 @@ function WriteContent() {
   const insertHighlight = () => insertMarkdown('<mark>', '</mark>', '하이라이트 텍스트')
   const insertInlineMath = () => insertMarkdown('$', '$', '수식')
   const insertBlockMath = () => insertMarkdown('$$\n', '\n$$', '수식 블록', true)
+  const insertCodePen = () => {
+    // 사용자에게 CodePen URL을 입력받습니다
+    const codePenUrl = prompt('CodePen URL을 입력해주세요 (예: https://codepen.io/username/pen/abc123):')
+    
+    if (!codePenUrl) return
+    
+    // CodePen URL에서 username과 pen-id 추출
+    const match = codePenUrl.match(/codepen\.io\/([^\/]+)\/pen\/([^\/\?]+)/)
+    
+    if (!match) {
+      alert('올바른 CodePen URL을 입력해주세요.')
+      return
+    }
+    
+    const [, username, penId] = match
+    const embedUrl = `https://codepen.io/${username}/embed/${penId}?height=400&theme-id=dark&default-tab=html,result`
+    
+    const codePenEmbed = `<iframe height="400" style="width: 100%;" scrolling="no" title="CodePen - ${penId}" src="${embedUrl}" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="${codePenUrl}">${penId}</a> by ${username} on <a href="https://codepen.io">CodePen</a>.
+</iframe>`
+    
+    insertMarkdown(codePenEmbed, '', '', true)
+  }
 
   // 포커스 관리
   const handleFocus = (field: string) => () => setIsFocused(field)
@@ -924,6 +947,14 @@ function WriteContent() {
                       <Tooltip title="수식 블록">
                         <IconButton size="small" onClick={insertBlockMath} sx={{ p: 0.75 }}>
                           <BlockMathIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Divider orientation="vertical" flexItem />
+                      
+                      {/* 코드펜 */}
+                      <Tooltip title="CodePen 임베드">
+                        <IconButton size="small" onClick={insertCodePen} sx={{ p: 0.75 }}>
+                          <Typography sx={{ fontWeight: 'bold', fontSize: '10px' }}>CP</Typography>
                         </IconButton>
                       </Tooltip>
                     </Box>
