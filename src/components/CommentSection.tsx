@@ -173,25 +173,14 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         borderBottom: `2px solid ${theme.palette.divider}`
       }}>
         <CommentIcon sx={{ 
-          fontSize: 28, 
-          color: 'primary.main',
-          background: theme.palette.mode === 'dark' 
-            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
+          fontSize: 24, 
+          color: 'primary.main'
         }} />
         <Typography 
-          variant="h4" 
+          variant="h5" 
           sx={{ 
-            fontWeight: 700,
-            background: theme.palette.mode === 'dark' 
-              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            fontWeight: 600,
+            color: 'text.primary'
           }}
         >
           댓글
@@ -324,11 +313,9 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                   py: 1,
                   fontWeight: 600,
                   textTransform: 'none',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
                     transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                   },
                   transition: 'all 0.2s ease'
                 }}
@@ -604,11 +591,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
             sx={{
               borderRadius: 2,
               textTransform: 'none',
-              px: 3,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)'
-              }
+              px: 3
             }}
           >
             수정 완료
