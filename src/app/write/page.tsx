@@ -143,11 +143,8 @@ function WriteContent() {
       
       if (authenticated) {
         setCurrentUser(AuthService.getUser())
-      } else {
-        // 인증되지 않은 사용자는 메인 페이지로 리다이렉트
-        router.push('/')
-        return
       }
+      // 인증되지 않은 사용자는 로그인 화면을 보여주되, 리다이렉트하지 않음
     }
 
     checkAuth()
@@ -470,6 +467,10 @@ function WriteContent() {
   }
 
   const handlePublish = async () => {
+    console.log('[WRITE] handlePublish called')
+    console.log('[WRITE] formData:', formData)
+    console.log('[WRITE] tags:', tags)
+    
     if (!formData.title.trim()) {
       alert('제목을 입력해주세요.')
       return
@@ -555,8 +556,8 @@ function WriteContent() {
       }
       setSaveStatus('idle')
     } catch (error) {
-      console.error('Error publishing post:', error)
-      alert(`포스트 ${isEditing ? '수정' : '발행'}에 실패했습니다.`)
+      console.error('[WRITE] Error publishing post:', error)
+      alert(`포스트 발행 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`)
     }
   }
 
@@ -697,9 +698,10 @@ function WriteContent() {
             alignItems: 'center',
             mb: 4,
             p: 3,
-            bgcolor: 'background.paper',
+            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
             borderRadius: 2,
-            boxShadow: 'none'
+            boxShadow: 'none',
+            border: `1px solid ${theme.palette.divider}`
           }}>
             <Box>
               <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1, fontSize: '1.5rem' }}>
@@ -750,7 +752,7 @@ function WriteContent() {
                 <Box sx={{ 
                   p: 3, 
                   borderBottom: `1px solid ${theme.palette.divider}`,
-                  background: theme.palette.background.paper
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.05)' : 'background.paper'
                 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center' }}>
@@ -772,7 +774,7 @@ function WriteContent() {
                       flexWrap: 'wrap', 
                       gap: 0.5,
                       p: 2,
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'grey.50',
+                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.05)' : 'grey.50',
                       borderRadius: 1.5,
                       border: `1px solid ${theme.palette.divider}`
                     }}>
@@ -945,7 +947,7 @@ function WriteContent() {
                         borderRadius: 1.5,
                         fontSize: '1.2rem',
                         fontWeight: 500,
-                        bgcolor: 'background.paper',
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                         color: 'text.primary',
                         '& input': {
                           color: 'inherit'
@@ -975,7 +977,7 @@ function WriteContent() {
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 1.5,
-                          bgcolor: 'background.paper',
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                           color: 'text.primary',
                           '& textarea': {
                             color: 'inherit'
@@ -1035,11 +1037,11 @@ function WriteContent() {
                           onClick={handleManualSummaryGeneration}
                           disabled={isGeneratingSummary || formData.content.trim().length < 50}
                           sx={{ 
-                            bgcolor: 'background.paper',
+                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                             border: '1px solid',
                             borderColor: 'divider',
                             '&:hover': {
-                              bgcolor: 'primary.50',
+                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50',
                               borderColor: 'primary.main'
                             }
                           }}
@@ -1084,7 +1086,7 @@ function WriteContent() {
                           fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", monospace',
                           fontSize: '14px',
                           lineHeight: 1.6,
-                          bgcolor: 'background.paper',
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                           color: 'text.primary',
                           '& textarea': {
                             resize: 'vertical',
@@ -1107,7 +1109,7 @@ function WriteContent() {
                         p: 3,
                         border: `1px solid ${theme.palette.divider}`,
                         borderRadius: 1.5,
-                        bgcolor: 'background.paper',
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                         '& h1, & h2, & h3, & h4, & h5, & h6': {
                           fontWeight: 600,
                           mb: 2,
@@ -1272,7 +1274,7 @@ function WriteContent() {
                   p: 3, 
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: 'background.paper',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
@@ -1295,7 +1297,7 @@ function WriteContent() {
                         fontSize: '1rem',
                         '&:hover': {
                           borderColor: 'primary.main',
-                          bgcolor: 'primary.50'
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
                         }
                       }}
                     >
@@ -1329,7 +1331,7 @@ function WriteContent() {
                   p: 3, 
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: 'background.paper',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
@@ -1395,7 +1397,7 @@ function WriteContent() {
                   p: 3, 
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: 'background.paper',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
@@ -1422,7 +1424,7 @@ function WriteContent() {
                               borderRadius: 1.5,
                               '&:hover': {
                                 borderColor: 'primary.main',
-                                bgcolor: 'primary.50'
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
                               }
                             }}
                           />
@@ -1461,7 +1463,7 @@ function WriteContent() {
                   p: 3, 
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: 'background.paper',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
@@ -1473,11 +1475,11 @@ function WriteContent() {
                     <Box sx={{ 
                       textAlign: 'center', 
                       p: 2, 
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'grey.50',
+                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'grey.50',
                       borderRadius: 1.5,
                       border: `1px solid ${theme.palette.divider}`
                     }}>
-                      <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: 'secondary.main' }}>
                         {wordCount.toLocaleString()}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -1487,7 +1489,7 @@ function WriteContent() {
                     <Box sx={{ 
                       textAlign: 'center', 
                       p: 2, 
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'grey.50',
+                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'grey.50',
                       borderRadius: 1.5,
                       border: `1px solid ${theme.palette.divider}`
                     }}>
@@ -1500,12 +1502,12 @@ function WriteContent() {
                     </Box>
                   </Box>
                   
-                  <Box sx={{ mt: 2, p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'grey.50', borderRadius: 1.5 }}>
+                  <Box sx={{ mt: 2, p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'grey.50', borderRadius: 1.5 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Typography variant="body2" color="text.secondary">
                         문자 수
                       </Typography>
-                      <Typography variant="body2" fontWeight="600">
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: 'secondary.main' }}>
                         {charCount.toLocaleString()}
                       </Typography>
                     </Box>
@@ -1517,7 +1519,7 @@ function WriteContent() {
                   p: 3, 
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: 'background.paper',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
@@ -1530,7 +1532,7 @@ function WriteContent() {
                       p: 2, 
                       bgcolor: summaryStatus === 'generating' 
                         ? (theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50')
-                        : (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'grey.50'),
+                        : (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'grey.50'),
                       borderRadius: 1.5,
                       border: `1px solid ${summaryStatus === 'generating' ? theme.palette.primary.main : theme.palette.divider}`
                     }}>
@@ -1557,14 +1559,14 @@ function WriteContent() {
                         textTransform: 'none',
                         '&:hover': {
                           borderColor: 'primary.main',
-                          bgcolor: 'primary.50'
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
                         }
                       }}
                     >
                       {isGeneratingSummary ? '생성 중...' : '수동으로 요약 생성'}
                     </Button>
 
-                    <Box sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(3, 169, 244, 0.1)' : 'info.50', borderRadius: 1.5, border: `1px solid ${theme.palette.info.main}` }}>
+                    <Box sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(3, 169, 244, 0.05)' : 'info.50', borderRadius: 1.5, border: `1px solid ${theme.palette.info.main}` }}>
                       <Typography variant="body2" color="info.main" sx={{ fontWeight: 600, mb: 1 }}>
                         💡 AI 요약 팁
                       </Typography>
@@ -1586,7 +1588,7 @@ function WriteContent() {
                   p: 3, 
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: 'background.paper',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>

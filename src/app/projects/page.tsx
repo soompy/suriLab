@@ -21,6 +21,7 @@ import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ProjectImage } from '@/components/image'
+import SkillTag from '@/components/SkillTag'
 
 interface Project {
   id: number
@@ -80,7 +81,7 @@ export default function Projects() {
       id: 4,
       title: 'toy_3_nuxt_nyomnyom',
       description: 'Nuxt.js와 Vue.js를 활용한 토이 프로젝트입니다. Tailwind CSS를 사용하여 모던하고 반응형인 사용자 인터페이스를 구현했습니다.',
-      image: `https://image.thum.io/get/width/1200/crop/800/https://toy-3-nuxt-nyomnyom.vercel.app`,
+      // image: `https://image.thum.io/get/width/1200/crop/800/https://toy-3-nuxt-nyomnyom.vercel.app`,
       technologies: ['Nuxt.js', 'Vue.js', 'Tailwind CSS', 'SSR'],
       github: 'https://github.com/soompy/toy_3_nuxt_nyomnyom',
       demo: 'https://toy-3-nuxt-nyomnyom.vercel.app',
@@ -399,19 +400,10 @@ export default function Projects() {
                                                   >
                                                       {project.technologies.map(
                                                           (tech) => (
-                                                              <Chip
+                                                              <SkillTag
                                                                   key={tech}
                                                                   label={tech}
-                                                                  size="small"
-                                                                  sx={{
-                                                                      fontSize: "0.75rem",
-                                                                      backgroundColor: getTagColor(tech),
-                                                                      border: '1px solid #e0e0e0',
-                                                                      color: '#555',
-                                                                      '&:hover': {
-                                                                          backgroundColor: getTagColor(tech)
-                                                                      }
-                                                                  }}
+                                                                  getColor={getTagColor}
                                                               />
                                                           )
                                                       )}

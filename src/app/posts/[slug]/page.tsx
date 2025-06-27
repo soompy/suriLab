@@ -35,6 +35,8 @@ import OptimizedMarkdown from '@/components/OptimizedMarkdown'
 import CommentSection from '@/components/CommentSection'
 import LikeButton from '@/components/LikeButton'
 import { AuthService } from '@/lib/auth'
+import { CATEGORY_COLORS } from '@/shared/constants/categories'
+import SkillTag from '@/components/SkillTag'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -295,22 +297,18 @@ export default function PostDetailPage() {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
                   <Chip 
                     label={post.category} 
-                    color="primary" 
-                    variant="filled"
+                    sx={{
+                      background: CATEGORY_COLORS[post.category as keyof typeof CATEGORY_COLORS] || 'linear-gradient(135deg, #f0f0f0, #e0e0e0)',
+                      color: '#000000',
+                      fontWeight: 'bold',
+                      border: '1px solid rgba(0, 0, 0, 0.1)'
+                    }}
                   />
                   {post.tags.map((tag) => (
-                    <Chip 
+                    <SkillTag 
                       key={tag} 
-                      label={tag} 
-                      size="small"
-                      sx={{ 
-                        backgroundColor: getTagColor(tag),
-                        border: 'none',
-                        color: '#555',
-                        '&:hover': {
-                          backgroundColor: getTagColor(tag)
-                        }
-                      }}
+                      label={tag}
+                      getColor={getTagColor}
                     />
                   ))}
                   {post.featured && (

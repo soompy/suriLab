@@ -40,10 +40,11 @@ import {
   getFilteredArchiveData,
   getYearStats,
   getMonthStats,
-  getTagColor,
   formatDate,
   formatViews
 } from '@/utils/archiveHelpers'
+import { CATEGORY_COLORS } from '@/shared/constants/categories'
+import SkillTag from '@/components/SkillTag'
 
 export default function Archives() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -612,7 +613,7 @@ export default function Archives() {
                         <Collapse in={expandedYears.includes(year)}>
                           <Box sx={{ px: 3, pb: 3 }}>
                             {/* 연도 통계 */}
-                            <Paper sx={{ p: 2, mb: 3, bgcolor: 'grey.50', boxShadow: 'none' }}>
+                            <Paper sx={{ p: 2, mb: 3, bgcolor: 'background.paper', boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
                               <Box sx={{ 
                                 display: 'grid',
                                 gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
@@ -705,7 +706,7 @@ export default function Archives() {
                                                   transform: 'translateY(-2px)',
                                                   borderColor: 'primary.main',
                                                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                                  backgroundColor: 'grey.50'
+                                                  backgroundColor: 'action.hover'
                                                 }
                                               }}
                                               onClick={() => handlePostClick(post)}
@@ -716,9 +717,13 @@ export default function Archives() {
                                                     <Chip 
                                                       label={post.category} 
                                                       size="small" 
-                                                      color="primary" 
-                                                      variant="outlined"
-                                                      sx={{ fontSize: '0.7rem' }}
+                                                      sx={{ 
+                                                        fontSize: '0.7rem',
+                                                        background: CATEGORY_COLORS[post.category as keyof typeof CATEGORY_COLORS] || 'linear-gradient(135deg, #f0f0f0, #e0e0e0)',
+                                                        color: '#000000',
+                                                        fontWeight: 'bold',
+                                                        border: '1px solid rgba(0, 0, 0, 0.1)'
+                                                      }}
                                                     />
                                                     {post.featured && (
                                                       <Chip label="Featured" size="small" color="secondary" />
@@ -747,21 +752,10 @@ export default function Archives() {
                                                   {post.tags.length > 0 && (
                                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1.5 }}>
                                                       {post.tags.slice(0, 4).map((tag) => (
-                                                        <Chip 
+                                                        <SkillTag 
                                                           key={tag} 
-                                                          label={tag} 
-                                                          size="small" 
-                                                          sx={{ 
-                                                            fontSize: '0.65rem', 
-                                                            height: '18px',
-                                                            backgroundColor: getTagColor(tag),
-                                                            border: `1px solid ${getTagColor(tag)}`,
-                                                            color: '#555',
-                                                            '&:hover': {
-                                                              backgroundColor: getTagColor(tag),
-                                                              borderColor: getTagColor(tag)
-                                                            }
-                                                          }}
+                                                          label={tag}
+                                                          variant="small"
                                                         />
                                                       ))}
                                                       {post.tags.length > 4 && (

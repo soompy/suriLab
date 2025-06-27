@@ -27,7 +27,7 @@ import Footer from '@/components/Footer'
 import HeroSection from '@/components/HeroSection'
 import Loading from '@/components/Loading'
 import { BLOG_CATEGORIES, CATEGORY_DESCRIPTIONS, CATEGORY_COLORS } from '@/shared/constants/categories'
-import { getTagColor } from '@/utils/archiveHelpers'
+import SkillTag from '@/components/SkillTag'
 
 type BlogCategory = typeof BLOG_CATEGORIES[number]
 
@@ -289,7 +289,7 @@ export default function HomePage() {
                           minHeight: 40,
                           '&.Mui-selected': {
                             backgroundColor: 'primary.main',
-                            color: 'white',
+                            color: 'primary.contrastText',
                             fontWeight: 600
                           },
                           '&:hover': {
@@ -329,7 +329,7 @@ export default function HomePage() {
                           minHeight: 48,
                           '&.Mui-selected': {
                             backgroundColor: 'primary.main',
-                            color: 'white',
+                            color: 'primary.contrastText',
                             fontWeight: 600
                           },
                           '&:hover': {
@@ -359,7 +359,7 @@ export default function HomePage() {
                         label={selectedCategory}
                         sx={{
                           background: getCategoryInfo(selectedCategory as BlogCategory).color,
-                          color: 'black',
+                          color: '#000000',
                           fontWeight: 'bold',
                           mb: 2
                         }}
@@ -400,11 +400,13 @@ export default function HomePage() {
                               flexDirection: 'column',
                               cursor: 'pointer',
                               transition: 'all 0.2s',
-                              border: 'none',
+                              border: '1px solid',
+                              borderColor: 'divider',
                               boxShadow: 'none',
+                              backgroundColor: 'background.paper',
                               '&:hover': {
                                 transform: 'translateY(-4px)',
-                                backgroundColor: 'grey.50'
+                                backgroundColor: 'action.hover'
                               }
                             }}
                             onClick={() => handlePostClick(post)}
@@ -416,8 +418,9 @@ export default function HomePage() {
                                   size="small"
                                   sx={{
                                     background: getCategoryInfo(post.category as BlogCategory).color,
-                                    color: 'black',
-                                    fontWeight: 'bold'
+                                    color: '#000000',
+                                    fontWeight: 'bold',
+                                    border: '1px solid rgba(0, 0, 0, 0.1)'
                                   }}
                                 />
                                 {post.featured && (
@@ -435,7 +438,7 @@ export default function HomePage() {
                                     sx={{ 
                                       ml: 1,
                                       backgroundColor: '#ff4444',
-                                      color: 'white',
+                                      color: 'primary.contrastText',
                                       fontWeight: 'bold',
                                       animation: 'pulse 2s infinite',
                                       '@keyframes pulse': {
@@ -454,12 +457,11 @@ export default function HomePage() {
                               
                               <Typography 
                                 variant="body1" 
-                                color="text.primary"
+                                color="text.secondary"
                                 sx={{ 
                                   mb: 2,
                                   fontSize: '0.9rem',
-                                  lineHeight: 1.6,
-                                  opacity: 0.8
+                                  lineHeight: 1.6
                                 }}
                               >
                                 {post.excerpt}
@@ -469,21 +471,10 @@ export default function HomePage() {
                               {post.tags && post.tags.length > 0 && (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
                                   {post.tags.slice(0, 3).map((tag) => (
-                                    <Chip 
+                                    <SkillTag 
                                       key={tag} 
-                                      label={tag} 
-                                      size="small" 
-                                      sx={{ 
-                                        fontSize: '0.65rem', 
-                                        height: '18px',
-                                        backgroundColor: getTagColor(tag),
-                                        border: `1px solid ${getTagColor(tag)}`,
-                                        color: '#555',
-                                        '&:hover': {
-                                          backgroundColor: getTagColor(tag),
-                                          borderColor: getTagColor(tag)
-                                        }
-                                      }}
+                                      label={tag}
+                                      variant="small"
                                     />
                                   ))}
                                   {post.tags.length > 3 && (
@@ -491,7 +482,7 @@ export default function HomePage() {
                                       label={`+${post.tags.length - 3}`} 
                                       size="small" 
                                       variant="outlined"
-                                      sx={{ fontSize: '0.65rem', height: '18px', color: '#666' }}
+                                      sx={{ fontSize: '0.65rem', height: '18px', color: 'text.secondary' }}
                                     />
                                   )}
                                 </Box>

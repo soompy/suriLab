@@ -27,6 +27,7 @@ import Header from '@/components/Header'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Footer from '@/components/Footer'
 import { AvatarImage } from '@/components/image'
+import SkillTag from '@/components/SkillTag'
 
 export default function AboutPage() {
 
@@ -50,6 +51,10 @@ export default function AboutPage() {
     'Bootstrap': '#f3e5f5',
     'Material-UI': '#e3f2fd',
     'Responsive Design': '#ffebee'
+  }
+
+  const getSkillColor = (skill: string) => {
+    return skillColors[skill as keyof typeof skillColors] || '#f5f5f5'
   }
 
   const skills = [
@@ -303,23 +308,10 @@ export default function AboutPage() {
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {skillGroup.items.map((skill, skillIndex) => (
-                      <Chip
+                      <SkillTag
                         key={skillIndex}
                         label={skill}
-                        size="small"
-                        sx={{ 
-                          fontSize: '0.75rem',
-                          backgroundColor: skillColors[skill as keyof typeof skillColors] || '#f5f5f5',
-                          color: '#555',
-                          fontWeight: 500,
-                          border: '1px solid #e0e0e0',
-                          '&:hover': {
-                            backgroundColor: skillColors[skill as keyof typeof skillColors] || '#f5f5f5',
-                            opacity: 0.8,
-                            transform: 'translateY(-1px)',
-                          },
-                          transition: 'all 0.2s ease'
-                        }}
+                        getColor={getSkillColor}
                       />
                     ))}
                   </Box>
