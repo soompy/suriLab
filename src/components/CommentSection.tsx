@@ -14,14 +14,18 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Alert
+  Alert,
+  Chip,
+  useTheme
 } from '@mui/material'
 import Loading from './Loading'
 import {
   Send as SendIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  ChatBubbleOutline as CommentIcon,
+  Reply as ReplyIcon
 } from '@mui/icons-material'
 
 interface Comment {
@@ -38,6 +42,7 @@ interface CommentSectionProps {
 }
 
 export default function CommentSection({ postId }: CommentSectionProps) {
+  const theme = useTheme()
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -157,21 +162,93 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   }
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        댓글 ({comments.length})
-      </Typography>
+    <Box sx={{ mt: 6 }}>
+      {/* 댓글 섹션 헤더 */}
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 2, 
+        mb: 4,
+        pb: 2,
+        borderBottom: `2px solid ${theme.palette.divider}`
+      }}>
+        <CommentIcon sx={{ 
+          fontSize: 28, 
+          color: 'primary.main',
+          background: theme.palette.mode === 'dark' 
+            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }} />
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700,
+            background: theme.palette.mode === 'dark' 
+              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}
+        >
+          댓글
+        </Typography>
+        <Chip 
+          label={comments.length} 
+          size="small"
+          sx={{
+            bgcolor: 'primary.main',
+            color: 'white',
+            fontWeight: 600,
+            minWidth: 32,
+            height: 24
+          }}
+        />
+      </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 3,
+            borderRadius: 2,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}
+        >
           {error}
         </Alert>
       )}
 
       {/* 댓글 작성 폼 */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper 
+        elevation={0}
+        sx={{ 
+          p: 4, 
+          mb: 4,
+          borderRadius: 3,
+          border: `1px solid ${theme.palette.divider}`,
+          bgcolor: theme.palette.mode === 'dark' 
+            ? 'rgba(255,255,255,0.02)' 
+            : 'rgba(0,0,0,0.01)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            borderColor: 'primary.main'
+          }
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+          <ReplyIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            댓글 작성하기
+          </Typography>
+        </Box>
+        
         <form onSubmit={handleSubmitComment}>
-          <Stack spacing={2}>
+          <Stack spacing={3}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="이름"
@@ -179,6 +256,17 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                 onChange={(e) => setNewComment({ ...newComment, authorName: e.target.value })}
                 required
                 size="small"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      }
+                    }
+                  }
+                }}
               />
               <TextField
                 label="이메일 (선택사항)"
@@ -186,15 +274,43 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                 value={newComment.authorEmail}
                 onChange={(e) => setNewComment({ ...newComment, authorEmail: e.target.value })}
                 size="small"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      }
+                    }
+                  }
+                }}
               />
             </Stack>
             <TextField
-              label="댓글을 입력하세요"
+              label="댓글을 입력하세요..."
               multiline
-              rows={3}
+              rows={4}
               value={newComment.content}
               onChange={(e) => setNewComment({ ...newComment, content: e.target.value })}
               required
+              placeholder="정중하고 건설적인 댓글을 작성해주세요."
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    }
+                  },
+                  '&.Mui-focused': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderWidth: 2
+                    }
+                  }
+                }
+              }}
             />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button
@@ -202,6 +318,20 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                 variant="contained"
                 disabled={submitting}
                 startIcon={<SendIcon />}
+                sx={{
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+                  },
+                  transition: 'all 0.2s ease'
+                }}
               >
                 {submitting ? '작성 중...' : '댓글 작성'}
               </Button>
@@ -211,43 +341,149 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       </Paper>
 
       {/* 댓글 목록 */}
-      <Stack spacing={2}>
-        {comments.map((comment) => (
-          <Paper key={comment.id} sx={{ p: 3 }}>
-            <Stack direction="row" spacing={2}>
-              <Avatar sx={{ bgcolor: 'primary.main' }}>
-                <PersonIcon />
+      <Stack spacing={3}>
+        {comments.map((comment, index) => (
+          <Paper 
+            key={comment.id} 
+            elevation={0}
+            sx={{ 
+              p: 4,
+              borderRadius: 3,
+              border: `1px solid ${theme.palette.divider}`,
+              bgcolor: theme.palette.mode === 'dark' 
+                ? 'rgba(255,255,255,0.01)' 
+                : 'rgba(0,0,0,0.005)',
+              position: 'relative',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                borderColor: theme.palette.mode === 'dark' 
+                  ? 'rgba(255,255,255,0.1)' 
+                  : 'rgba(0,0,0,0.1)',
+                transform: 'translateY(-1px)'
+              },
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: 4,
+                height: '100%',
+                background: `linear-gradient(180deg, 
+                  ${theme.palette.primary.main} 0%, 
+                  ${theme.palette.secondary.main} 100%)`,
+                borderRadius: '2px 0 0 2px',
+                opacity: 0.8
+              }
+            }}
+          >
+            <Stack direction="row" spacing={3}>
+              <Avatar 
+                sx={{ 
+                  bgcolor: 'primary.main',
+                  width: 48,
+                  height: 48,
+                  background: `linear-gradient(135deg, 
+                    ${theme.palette.primary.main} 0%, 
+                    ${theme.palette.secondary.main} 100%)`,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                }}
+              >
+                <PersonIcon sx={{ fontSize: 24 }} />
               </Avatar>
               <Box sx={{ flex: 1 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
                   <Box>
-                    <Typography variant="subtitle2" fontWeight="bold">
-                      {comment.authorName}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 0.5 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                        {comment.authorName}
+                      </Typography>
+                      <Chip 
+                        label={`#${index + 1}`}
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: '0.7rem',
+                          bgcolor: theme.palette.mode === 'dark' 
+                            ? 'rgba(255,255,255,0.1)' 
+                            : 'rgba(0,0,0,0.06)',
+                          color: 'text.secondary'
+                        }}
+                      />
+                    </Stack>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
                       {formatDate(comment.createdAt)}
-                      {comment.updatedAt !== comment.createdAt && ' (수정됨)'}
+                      {comment.updatedAt !== comment.createdAt && (
+                        <Chip 
+                          label="수정됨" 
+                          size="small" 
+                          sx={{ 
+                            ml: 1, 
+                            height: 16, 
+                            fontSize: '0.6rem',
+                            bgcolor: 'warning.main',
+                            color: 'white'
+                          }} 
+                        />
+                      )}
                     </Typography>
                   </Box>
-                  <Stack direction="row" spacing={1}>
+                  <Stack direction="row" spacing={0.5}>
                     <IconButton
                       size="small"
                       onClick={() => setEditingComment(comment)}
+                      sx={{
+                        bgcolor: theme.palette.mode === 'dark' 
+                          ? 'rgba(255,255,255,0.05)' 
+                          : 'rgba(0,0,0,0.04)',
+                        '&:hover': {
+                          bgcolor: 'primary.main',
+                          color: 'white',
+                          transform: 'scale(1.1)'
+                        },
+                        transition: 'all 0.2s ease'
+                      }}
                     >
-                      <EditIcon fontSize="small" />
+                      <EditIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                     <IconButton
                       size="small"
-                      color="error"
                       onClick={() => setDeleteDialog({ open: true, commentId: comment.id })}
+                      sx={{
+                        bgcolor: theme.palette.mode === 'dark' 
+                          ? 'rgba(255,255,255,0.05)' 
+                          : 'rgba(0,0,0,0.04)',
+                        '&:hover': {
+                          bgcolor: 'error.main',
+                          color: 'white',
+                          transform: 'scale(1.1)'
+                        },
+                        transition: 'all 0.2s ease'
+                      }}
                     >
-                      <DeleteIcon fontSize="small" />
+                      <DeleteIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Stack>
                 </Stack>
-                <Typography variant="body2" sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
-                  {comment.content}
-                </Typography>
+                <Box 
+                  sx={{ 
+                    pl: 2,
+                    borderLeft: `2px solid ${theme.palette.divider}`,
+                    borderRadius: 1
+                  }}
+                >
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      whiteSpace: 'pre-wrap',
+                      lineHeight: 1.7,
+                      color: 'text.primary',
+                      fontSize: '0.95rem'
+                    }}
+                  >
+                    {comment.content}
+                  </Typography>
+                </Box>
               </Box>
             </Stack>
           </Paper>
@@ -255,11 +491,34 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       </Stack>
 
       {comments.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography color="text.secondary">
-            아직 댓글이 없습니다. 첫 댓글을 작성해보세요!
+        <Paper 
+          elevation={0}
+          sx={{ 
+            textAlign: 'center', 
+            py: 6,
+            px: 4,
+            borderRadius: 3,
+            border: `2px dashed ${theme.palette.divider}`,
+            bgcolor: theme.palette.mode === 'dark' 
+              ? 'rgba(255,255,255,0.01)' 
+              : 'rgba(0,0,0,0.005)'
+          }}
+        >
+          <CommentIcon 
+            sx={{ 
+              fontSize: 48, 
+              color: 'text.secondary', 
+              mb: 2,
+              opacity: 0.5
+            }} 
+          />
+          <Typography variant="h6" sx={{ color: 'text.secondary', mb: 1 }}>
+            아직 댓글이 없습니다
           </Typography>
-        </Box>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            첫 댓글을 작성해서 대화를 시작해보세요! 💬
+          </Typography>
+        </Paper>
       )}
 
       {/* 댓글 수정 다이얼로그 */}
@@ -268,10 +527,27 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         onClose={() => setEditingComment(null)}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)'
+          }
+        }}
       >
-        <DialogTitle>댓글 수정</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
+        <DialogTitle sx={{ 
+          pb: 1,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}>
+          <EditIcon sx={{ color: 'primary.main' }} />
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            댓글 수정
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Stack spacing={3}>
             <TextField
               label="이름"
               value={editingComment?.authorName || ''}
@@ -280,6 +556,11 @@ export default function CommentSection({ postId }: CommentSectionProps) {
               )}
               fullWidth
               size="small"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2
+                }
+              }}
             />
             <TextField
               label="댓글 내용"
@@ -290,11 +571,23 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                 prev ? { ...prev, content: e.target.value } : null
               )}
               fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2
+                }
+              }}
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditingComment(null)}>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button 
+            onClick={() => setEditingComment(null)}
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              px: 3
+            }}
+          >
             취소
           </Button>
           <Button
@@ -308,8 +601,17 @@ export default function CommentSection({ postId }: CommentSectionProps) {
               }
             }}
             variant="contained"
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              px: 3,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)'
+              }
+            }}
           >
-            수정
+            수정 완료
           </Button>
         </DialogActions>
       </Dialog>
@@ -318,13 +620,42 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       <Dialog
         open={deleteDialog.open}
         onClose={() => setDeleteDialog({ open: false, commentId: null })}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)'
+          }
+        }}
       >
-        <DialogTitle>댓글 삭제</DialogTitle>
-        <DialogContent>
-          <Typography>정말로 이 댓글을 삭제하시겠습니까?</Typography>
+        <DialogTitle sx={{ 
+          pb: 1,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}>
+          <DeleteIcon sx={{ color: 'error.main' }} />
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            댓글 삭제
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Typography sx={{ fontSize: '1rem', lineHeight: 1.6 }}>
+            정말로 이 댓글을 삭제하시겠습니까?
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
+            삭제된 댓글은 복구할 수 없습니다.
+          </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog({ open: false, commentId: null })}>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button 
+            onClick={() => setDeleteDialog({ open: false, commentId: null })}
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              px: 3
+            }}
+          >
             취소
           </Button>
           <Button
@@ -335,8 +666,13 @@ export default function CommentSection({ postId }: CommentSectionProps) {
             }}
             color="error"
             variant="contained"
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              px: 3
+            }}
           >
-            삭제
+            삭제하기
           </Button>
         </DialogActions>
       </Dialog>
