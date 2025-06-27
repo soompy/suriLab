@@ -3,7 +3,7 @@
 import { Chip, ChipProps } from '@mui/material'
 import { getTagColor } from '@/utils/archiveHelpers'
 
-interface SkillTagProps extends Omit<ChipProps, 'label'> {
+interface SkillTagProps extends Omit<ChipProps, 'label' | 'variant'> {
   label: string
   variant?: 'default' | 'small'
   getColor?: (tag: string) => string
