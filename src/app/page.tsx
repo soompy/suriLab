@@ -215,7 +215,7 @@ export default function HomePage() {
         <main>
           <HeroSection />
           
-          <Container maxWidth="lg" sx={{ py: 8 }}>
+          <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 }, py: { xs: 3, sm: 4, md: 4, lg: 6 } }}>
             <Box ref={sectionRef} sx={{ height: '1px', mb: 6 }} />
             <Typography variant="h4" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 6 }}>
               최신 포스트
@@ -257,7 +257,7 @@ export default function HomePage() {
                     xs: 'none', 
                     md: isSticky && !isNearFooter ? '0 4px 20px rgba(0,0,0,0.1)' : 'none'
                   },
-                  p: { xs: 0, md: isSticky && !isNearFooter ? 2 : 0 },
+                  p: { xs: 0, md: isSticky && !isNearFooter ? 1 : 0 },
                   transition: 'all 0.3s ease-in-out'
                 }}>
                   {/* Mobile Tabs */}
@@ -266,8 +266,8 @@ export default function HomePage() {
                       value={selectedCategory}
                       onChange={handleCategoryChange}
                       orientation="horizontal"
-                      variant="scrollable"
-                      scrollButtons="auto"
+                      variant="fullWidth"
+                      scrollButtons={false}
                       textColor="primary"
                       sx={{
                         borderBottom: '1px solid',

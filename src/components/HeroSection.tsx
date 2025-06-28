@@ -9,17 +9,30 @@ interface CategoryStats {
   [key: string]: number
 }
 
+interface BlogStats {
+  totalPosts: number
+  totalViews: number
+  totalCategories: number
+  totalTags: number
+}
+
 export default function HeroSection() {
   const theme = useTheme()
   const [categoryStats, setCategoryStats] = useState<CategoryStats>({})
+  const [blogStats, setBlogStats] = useState<BlogStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchCategoryStats = async () => {
+    const fetchStats = async () => {
       try {
-        const response = await fetch('/api/posts')
-        if (response.ok) {
-          const data = await response.json()
+        // 카테고리별 통계와 전체 블로그 통계를 병렬로 요청
+        const [postsResponse, statsResponse] = await Promise.all([
+          fetch('/api/posts'),
+          fetch('/api/blog/stats')
+        ])
+        
+        if (postsResponse.ok) {
+          const data = await postsResponse.json()
           const posts = data.posts || []
           
           // 카테고리별 게시글 수 계산
@@ -32,14 +45,19 @@ export default function HeroSection() {
           
           setCategoryStats(stats)
         }
+
+        if (statsResponse.ok) {
+          const blogStatsData = await statsResponse.json()
+          setBlogStats(blogStatsData)
+        }
       } catch (error) {
-        console.error('Failed to fetch category stats:', error)
+        console.error('Failed to fetch stats:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchCategoryStats()
+    fetchStats()
   }, [])
 
   return (
@@ -84,7 +102,7 @@ export default function HeroSection() {
         },
       }}
     >
-      <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, position: 'relative', zIndex: 2 }}>
+      <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 }, position: 'relative', zIndex: 2 }}>
         <Box
           sx={{
             textAlign: 'center',
@@ -188,6 +206,97 @@ export default function HeroSection() {
             함께 성장하는 개발자 커뮤니티를 만들어갑니다
           </Typography>
 
+          {/* 블로그 전체 통계 */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: { xs: 3, md: 6 },
+              flexWrap: 'wrap',
+              mb: 4,
+            }}
+          >
+            <Box
+              sx={{
+                textAlign: 'center',
+                opacity: 0.8,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  opacity: 1,
+                  transform: 'translateY(-2px)',
+                },
+              }}
+            >
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  fontSize: { xs: '1.8rem', md: '2.2rem' },
+                  mb: 0.5,
+                  animation: loading ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                  '@keyframes pulse': {
+                    '0%, 100%': { opacity: 0.7 },
+                    '50%': { opacity: 1 },
+                  },
+                }}
+              >
+                {loading ? '...' : blogStats?.totalViews?.toLocaleString() || 0}
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'text.primary',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  opacity: 0.9
+                }}
+              >
+                총 조회수
+              </Typography>
+            </Box>
+            
+            <Box
+              sx={{
+                textAlign: 'center',
+                opacity: 0.8,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  opacity: 1,
+                  transform: 'translateY(-2px)',
+                },
+              }}
+            >
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  color: 'secondary.main',
+                  fontSize: { xs: '1.8rem', md: '2.2rem' },
+                  mb: 0.5,
+                  animation: loading ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                  '@keyframes pulse': {
+                    '0%, 100%': { opacity: 0.7 },
+                    '50%': { opacity: 1 },
+                  },
+                }}
+              >
+                {loading ? '...' : blogStats?.totalPosts || 0}
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'text.primary',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  opacity: 0.9
+                }}
+              >
+                총 포스트
+              </Typography>
+            </Box>
+          </Box>
+
           {/* 카테고리별 실시간 통계 */}
           <Box
             sx={{
@@ -195,7 +304,7 @@ export default function HeroSection() {
               justifyContent: 'center',
               gap: { xs: 4, md: 8 },
               flexWrap: 'wrap',
-              mt: 6,
+              mt: 4,
             }}
           >
             {BLOG_CATEGORIES.map((category, index) => (
@@ -249,7 +358,7 @@ export default function HeroSection() {
         sx={{
           position: 'absolute',
           top: '15%',
-          left: '5%',
+          left: '10%',
           width: '8px',
           height: '8px',
           background: theme.palette.primary.main,
@@ -266,7 +375,7 @@ export default function HeroSection() {
         sx={{
           position: 'absolute',
           bottom: '20%',
-          right: '8%',
+          right: '15%',
           width: '12px',
           height: '12px',
           background: 'transparent',
@@ -287,7 +396,7 @@ export default function HeroSection() {
         sx={{
           position: 'absolute',
           top: '60%',
-          left: '15%',
+          left: '20%',
           width: '6px',
           height: '6px',
           background: theme.palette.mode === 'dark' ? '#8b5cf6' : '#7c3aed',
@@ -308,7 +417,7 @@ export default function HeroSection() {
         sx={{
           position: 'absolute',
           top: '30%',
-          right: '20%',
+          right: '25%',
           width: '4px',
           height: '20px',
           background: `linear-gradient(to bottom, ${theme.palette.primary.main}, transparent)`,
@@ -325,7 +434,7 @@ export default function HeroSection() {
         sx={{
           position: 'absolute',
           bottom: '30%',
-          left: '25%',
+          left: '30%',
           width: '10px',
           height: '10px',
           background: 'transparent',
@@ -343,7 +452,7 @@ export default function HeroSection() {
         sx={{
           position: 'absolute',
           top: '40%',
-          left: '8%',
+          left: '15%',
           width: '14px',
           height: '2px',
           background: theme.palette.primary.main,

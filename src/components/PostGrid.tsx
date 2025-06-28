@@ -26,16 +26,16 @@ interface PostGridProps {
 export default function PostGrid({ posts, onPostClick }: PostGridProps) {
   return (
     <Box component="section" sx={{ py: { xs: 4, md: 6 } }}>
-      <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4 }}>
+      <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 } }}>
         {/* Section Header */}
-        <Box sx={{ mb: 6 }}>
+        <Box sx={{ mb: { xs: 3, sm: 4, md: 6 } }}>
           <Typography
             variant="h2"
             component="h2"
             sx={{
-              fontSize: '27px',
+              fontSize: { xs: '1.5rem', md: '27px' },
               fontWeight: 700,
-              mb: 1.5,
+              mb: { xs: 0.75, sm: 1, md: 1.5 },
               color: 'text.primary',
             }}
           >
@@ -51,10 +51,10 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
         </Box>
 
         {/* Content Categories */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 3, sm: 4, md: 6 } }}>
           {/* Tech Insights Section */}
           <Box>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: { xs: 2, sm: 2.5, md: 3 } }}>
               <Typography
                 variant="h3"
                 component="h3"
@@ -84,7 +84,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
             <Box sx={{ 
               display: 'grid', 
               gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-              gap: 3 
+              gap: { xs: 1.5, sm: 2, md: 3 } 
             }}>
               {posts.filter(post => post.category === 'Tech Insights').length === 0 ? (
                 <Box sx={{ 
@@ -114,7 +114,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
 
           {/* Code Solutions Section */}
           <Box>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: { xs: 2, sm: 2.5, md: 3 } }}>
               <Typography
                 variant="h3"
                 component="h3"
@@ -144,7 +144,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
             <Box sx={{ 
               display: 'grid', 
               gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-              gap: 3 
+              gap: { xs: 1.5, sm: 2, md: 3 } 
             }}>
               {posts.filter(post => post.category === 'Code Solutions').length === 0 ? (
                 <Box sx={{ 
@@ -174,7 +174,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
 
           {/* Study Journal Section */}
           <Box>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: { xs: 2, sm: 2.5, md: 3 } }}>
               <Typography
                 variant="h3"
                 component="h3"
@@ -204,7 +204,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
             <Box sx={{ 
               display: 'grid', 
               gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-              gap: 3 
+              gap: { xs: 1.5, sm: 2, md: 3 } 
             }}>
               {posts.filter(post => post.category === 'Study Journal').length === 0 ? (
                 <Box sx={{ 
@@ -234,7 +234,7 @@ export default function PostGrid({ posts, onPostClick }: PostGridProps) {
         </Box>
 
         {/* Load More Button */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: 2.5, sm: 3, md: 4 } }}>
           <Button
             variant="text"
             endIcon={<ExpandMore />}

@@ -233,9 +233,26 @@ export class PrismaPostRepository implements PostRepository {
     totalTags: number
   }> {
     const [totalPosts, totalViews, totalCategories, totalTags] = await Promise.all([
-      this.prisma.post.count(),
+      this.prisma.post.count({
+        where: { 
+          isPublished: true,
+          author: {
+            email: {
+              not: 'yzsumin@naver.com'
+            }
+          }
+        }
+      }),
       this.prisma.post.aggregate({
-        _sum: { views: true }
+        _sum: { views: true },
+        where: { 
+          isPublished: true,
+          author: {
+            email: {
+              not: 'yzsumin@naver.com'
+            }
+          }
+        }
       }),
       this.prisma.category.count(),
       this.prisma.tag.count()

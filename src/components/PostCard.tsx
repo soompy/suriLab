@@ -43,9 +43,9 @@ export default function PostCard({ post, onClick }: PostCardProps) {
         cursor: 'pointer',
         transition: 'border 0.2s ease, background-color 0.2s ease, transform 0.2s ease',
         border: '1px solid rgba(0, 29, 58, 0.18)',
-        borderRadius: '14px',
+        borderRadius: { xs: '12px', md: '14px' },
         overflow: 'hidden',
-        mb: 3,
+        mb: { xs: 1.5, sm: 2, md: 3 },
         '&:hover': {
           transform: 'translateY(-2px)',
           boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
@@ -54,7 +54,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
       }}
     >
       {/* Image Header */}
-      <Box sx={{ position: 'relative', height: 160 }}>
+      <Box sx={{ position: 'relative', height: { xs: 120, sm: 140, md: 160 } }}>
         <ThumbnailImage
           src={post.thumbnail}
           alt={post.title}
@@ -77,11 +77,11 @@ export default function PostCard({ post, onClick }: PostCardProps) {
             size="small"
             sx={{
               position: 'absolute',
-              top: 12,
-              left: 12,
+              top: { xs: 8, md: 12 },
+              left: { xs: 8, md: 12 },
               backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
               color: theme.palette.mode === 'dark' ? 'white' : 'grey.700',
-              fontSize: '0.75rem',
+              fontSize: { xs: '0.7rem', md: '0.75rem' },
               fontWeight: 500,
               zIndex: 2,
             }}
@@ -90,15 +90,15 @@ export default function PostCard({ post, onClick }: PostCardProps) {
       </Box>
 
       {/* Content */}
-      <CardContent sx={{ p: 2 }}>
+      <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
         {/* Title */}
         <Typography
           variant="h6"
           component="h2"
           sx={{
-            fontSize: '1rem',
+            fontSize: { xs: '0.9rem', md: '1rem' },
             fontWeight: 600,
-            mb: 1,
+            mb: { xs: 0.5, sm: 0.75, md: 1 },
             lineHeight: 1.4,
             display: '-webkit-box',
             overflow: 'hidden',
@@ -118,8 +118,9 @@ export default function PostCard({ post, onClick }: PostCardProps) {
           variant="body2"
           color="text.secondary"
           sx={{
-            mb: 2,
+            mb: { xs: 1, sm: 1.5, md: 2 },
             lineHeight: 1.5,
+            fontSize: { xs: '0.8rem', md: '0.875rem' },
             display: '-webkit-box',
             overflow: 'hidden',
             WebkitBoxOrient: 'vertical',
@@ -130,8 +131,14 @@ export default function PostCard({ post, onClick }: PostCardProps) {
         </Typography>
 
         {/* Meta info */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 0.75, sm: 0 },
+          alignItems: { xs: 'flex-start', sm: 'center' }
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 0.75, md: 1 } }}>
             <Typography variant="caption" color="text.secondary">
               {post.category || '일반'}
             </Typography>
@@ -143,7 +150,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
             </Typography>
           </Box>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1, md: 1.5 } }}>
             {post.readTime && (
               <Typography variant="caption" color="text.secondary">
                 {post.readTime}분

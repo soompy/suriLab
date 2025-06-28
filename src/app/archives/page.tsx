@@ -156,7 +156,7 @@ export default function Archives() {
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
           <Header />
           
-          <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, py: 6 }}>
+          <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 }, py: { xs: 3, sm: 4, md: 6 } }}>
             {/* 헤더 스켈레톤 */}
             <Box sx={{ textAlign: 'center', mb: 6 }}>
               <Box sx={{

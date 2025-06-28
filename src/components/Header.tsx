@@ -147,7 +147,7 @@ export default function Header() {
 
   return (
     <AppBar position="sticky" elevation={0}>
-      <Box sx={{ maxWidth: '1300px', width: '100%', mx: 'auto', px: { xs: 2, md: 3 } }}>
+      <Box sx={{ maxWidth: '1200px', width: '100%', mx: 'auto', px: { xs: 2, sm: 3, md: 2 } }}>
         <Toolbar sx={{ height: '76px', minHeight: '76px !important', px: '0 !important' }}>
           {/* Logo */}
           <Link href="/" passHref style={{ textDecoration: 'none' }}>

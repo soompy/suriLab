@@ -238,7 +238,7 @@ export default function PostDetailPage() {
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         <Header />
         
-        <Container maxWidth="md" sx={{ py: 4 }}>
+        <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 }, py: { xs: 3, sm: 4, md: 4 } }}>
           <Box sx={{ mb: 4 }}>
             <IconButton 
               onClick={handleBack}
@@ -248,7 +248,7 @@ export default function PostDetailPage() {
             </IconButton>
           </Box>
 
-          <Paper sx={{ p: { xs: 3, md: 6 }, boxShadow: 'none' }}>
+          <Paper sx={{ p: { xs: 2, md: 4 }, boxShadow: 'none', maxWidth: '800px', mx: 'auto' }}>
             <Stack spacing={4}>
               {/* Header */}
               <Box>
