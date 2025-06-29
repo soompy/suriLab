@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import {
   Container,
@@ -47,8 +47,8 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [viewCounted, setViewCounted] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const viewCountedRef = useRef(false)
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -63,10 +63,14 @@ export default function PostDetailPage() {
         const postData = await response.json()
         setPost(postData)
         
-        // 조회수 증가 (한 번만 실행)
-        if (!viewCounted) {
+        // 조회수 증가 (한 번만 실행) - useRef + sessionStorage로 중복 방지
+        const viewKey = `post_viewed_${postData.id}`
+        const alreadyViewed = sessionStorage.getItem(viewKey)
+        
+        if (!viewCountedRef.current && !alreadyViewed) {
+          viewCountedRef.current = true
+          sessionStorage.setItem(viewKey, 'true')
           incrementViews(postData.id)
-          setViewCounted(true)
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load post')
@@ -78,7 +82,7 @@ export default function PostDetailPage() {
     if (slug) {
       fetchPost()
     }
-  }, [slug, viewCounted])
+  }, [slug])
 
   // 관리자 인증 확인
   useEffect(() => {
@@ -95,8 +99,10 @@ export default function PostDetailPage() {
       })
       
       if (response.ok) {
-        const updatedPost = await response.json()
-        setPost(prev => prev ? { ...prev, views: updatedPost.views } : null)
+        const result = await response.json()
+        if (result.success && result.views !== undefined) {
+          setPost(prev => prev ? { ...prev, views: result.views } : null)
+        }
       }
     } catch (error) {
       console.error('Failed to increment views:', error)
