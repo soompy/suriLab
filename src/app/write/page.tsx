@@ -31,7 +31,11 @@ import {
   Alert,
   Tooltip,
   Fade,
-  useTheme
+  useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material'
 import {
   Edit as EditIcon,
@@ -62,7 +66,11 @@ import {
   CheckBox as CheckboxIcon,
   Undo as UndoIcon,
   Redo as RedoIcon,
-  FormatColorText as HighlightIcon
+  FormatColorText as HighlightIcon,
+  Drafts as DraftIcon,
+  FolderOpen as FolderOpenIcon,
+  AccessTime as TimeIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
@@ -98,12 +106,22 @@ function WriteContent() {
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const [history, setHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
+  const [drafts, setDrafts] = useState<any[]>([])
+  const [showDrafts, setShowDrafts] = useState(false)
+  const [isDraftLoading, setIsDraftLoading] = useState(false)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
+  const autoSaveRef = useRef<NodeJS.Timeout | null>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [showRecoverDialog, setShowRecoverDialog] = useState(false)
+  const [originalPostStatus, setOriginalPostStatus] = useState<'draft' | 'published' | null>(null)
 
   // 수정할 포스트 로딩
   useEffect(() => {
     const loadPost = async () => {
       if (!editId) {
         setIsEditing(false)
+        setOriginalPostStatus(null) // 새 글의 경우 상태 초기화
         return
       }
 
@@ -116,14 +134,16 @@ function WriteContent() {
         
         const post = await response.json()
         setIsEditing(true)
+        const status = post.isPublished ? 'published' : 'draft'
         setFormData({
           title: post.title,
           summary: post.excerpt,
           content: post.content,
           category: post.category,
-          status: post.isPublished ? 'published' : 'draft'
+          status: status
         })
         setTags(post.tags || [])
+        setOriginalPostStatus(status) // 원래 발행 상태 기록
       } catch (error) {
         console.error('Error loading post:', error)
         alert('포스트를 불러오는데 실패했습니다.')
@@ -158,6 +178,292 @@ function WriteContent() {
       }
     }
   }, [])
+
+  // Draft 목록 가져오기
+  const loadDrafts = useCallback(async () => {
+    if (!isAuthenticated) return
+    
+    setIsDraftLoading(true)
+    try {
+      const response = await fetch('/api/posts?isPublished=false&limit=10&sortField=updatedAt&sortOrder=desc', {
+        headers: AuthService.getAuthHeaders()
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setDrafts(data.posts || [])
+      }
+    } catch (error) {
+      console.error('Error loading drafts:', error)
+    } finally {
+      setIsDraftLoading(false)
+    }
+  }, [isAuthenticated])
+
+  // 인증 상태 변경시 draft 목록 로드
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadDrafts()
+    }
+  }, [isAuthenticated, loadDrafts])
+
+  // Draft 선택 시 편집 모드로 전환
+  const handleDraftSelect = useCallback((draft: any) => {
+    const status = draft.isPublished ? 'published' : 'draft'
+    setFormData({
+      title: draft.title,
+      summary: draft.excerpt || '',
+      content: draft.content,
+      category: draft.category,
+      status: status
+    })
+    setTags(draft.tags || [])
+    setShowDrafts(false)
+    setOriginalPostStatus(status) // 선택된 draft의 원래 상태 기록
+    
+    // URL에 edit 파라미터 추가
+    const newUrl = new URL(window.location.href)
+    newUrl.searchParams.set('edit', draft.id)
+    window.history.pushState({}, '', newUrl.toString())
+  }, [])
+
+  // Draft 삭제
+  const handleDraftDelete = useCallback(async (draftId: string) => {
+    if (!confirm('이 임시저장 글을 삭제하시겠습니까?')) return
+    
+    try {
+      const response = await fetch(`/api/posts/${draftId}`, {
+        method: 'DELETE',
+        headers: AuthService.getAuthHeaders()
+      })
+      
+      if (response.ok) {
+        loadDrafts() // 목록 새로고침
+      } else {
+        alert('삭제에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('Error deleting draft:', error)
+      alert('삭제에 실패했습니다.')
+    }
+  }, [loadDrafts])
+
+  // 자동 저장 함수
+  const autoSave = useCallback(async () => {
+    if (!isAuthenticated || !formData.title.trim() && !formData.content.trim()) {
+      return
+    }
+
+    setAutoSaveStatus('saving')
+    
+    try {
+      // 자동 저장 시 원래 발행 상태 보존 (새 글의 경우 draft로)
+      const shouldBePublished = originalPostStatus === 'published'
+      
+      const postData = {
+        title: formData.title || '제목 없음',
+        content: formData.content,
+        excerpt: formData.summary,
+        category: formData.category,
+        tags: tags,
+        isPublished: shouldBePublished,
+        isFeatured: false
+      }
+
+      let response
+      if (editId) {
+        // 기존 포스트 업데이트
+        response = await fetch(`/api/posts/${editId}`, {
+          method: 'PUT',
+          headers: {
+            ...AuthService.getAuthHeaders(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+        })
+      } else {
+        // 새 포스트 생성
+        response = await fetch('/api/posts', {
+          method: 'POST',
+          headers: {
+            ...AuthService.getAuthHeaders(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+        })
+        
+        // 새로 생성된 경우 edit ID 설정
+        if (response.ok) {
+          const newPost = await response.json()
+          const newUrl = new URL(window.location.href)
+          newUrl.searchParams.set('edit', newPost.id)
+          window.history.replaceState({}, '', newUrl.toString())
+          // 새로 생성된 포스트의 발행 상태 기록
+          setOriginalPostStatus(shouldBePublished ? 'published' : 'draft')
+        }
+      }
+
+      if (response.ok) {
+        setAutoSaveStatus('saved')
+        setLastSavedAt(new Date())
+        loadDrafts() // draft 목록 새로고침
+      } else {
+        setAutoSaveStatus('error')
+      }
+    } catch (error) {
+      console.error('Auto-save error:', error)
+      setAutoSaveStatus('error')
+    }
+  }, [isAuthenticated, formData, tags, editId, loadDrafts, originalPostStatus])
+
+  // 폼 데이터 변경 시 자동 저장 예약
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    // 기존 타이머 제거
+    if (autoSaveRef.current) {
+      clearTimeout(autoSaveRef.current)
+    }
+
+    // 내용이 있는 경우에만 자동 저장 예약 (30초 후)
+    if (formData.title.trim() || formData.content.trim()) {
+      autoSaveRef.current = setTimeout(() => {
+        autoSave()
+      }, 30000) // 30초
+    }
+
+    return () => {
+      if (autoSaveRef.current) {
+        clearTimeout(autoSaveRef.current)
+      }
+    }
+  }, [formData, tags, isAuthenticated, autoSave])
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (autoSaveRef.current) {
+        clearTimeout(autoSaveRef.current)
+      }
+    }
+  }, [])
+
+  // localStorage 키
+  const STORAGE_KEY = 'blog_draft_backup'
+
+  // localStorage에 폼 데이터 저장
+  const saveToLocalStorage = useCallback(() => {
+    if (typeof window === 'undefined') return
+    
+    const backupData = {
+      formData,
+      tags,
+      timestamp: Date.now(),
+      editId,
+      originalPostStatus
+    }
+    
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(backupData))
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error)
+    }
+  }, [formData, tags, editId, originalPostStatus])
+
+  // localStorage에서 폼 데이터 복원
+  const loadFromLocalStorage = useCallback(() => {
+    if (typeof window === 'undefined') return null
+    
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        const backupData = JSON.parse(stored)
+        // 24시간 이내의 데이터만 유효
+        const isValid = Date.now() - backupData.timestamp < 24 * 60 * 60 * 1000
+        if (isValid) {
+          return backupData
+        } else {
+          // 오래된 데이터 삭제
+          localStorage.removeItem(STORAGE_KEY)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load from localStorage:', error)
+      localStorage.removeItem(STORAGE_KEY)
+    }
+    return null
+  }, [])
+
+  // localStorage 데이터 삭제
+  const clearLocalStorage = useCallback(() => {
+    if (typeof window === 'undefined') return
+    localStorage.removeItem(STORAGE_KEY)
+  }, [])
+
+  // 페이지 로드 시 localStorage에서 데이터 복원 확인
+  useEffect(() => {
+    const backupData = loadFromLocalStorage()
+    if (backupData && !editId) {
+      // 현재 작성 중인 내용과 다른 경우에만 복원 대화상자 표시
+      const hasCurrentContent = formData.title.trim() || formData.content.trim()
+      const hasBackupContent = backupData.formData.title.trim() || backupData.formData.content.trim()
+      
+      if (hasBackupContent && !hasCurrentContent) {
+        setShowRecoverDialog(true)
+      }
+    }
+  }, [])
+
+  // 폼 데이터 변경 시 localStorage에 저장 및 변경 사항 추적
+  useEffect(() => {
+    saveToLocalStorage()
+    setHasUnsavedChanges(true)
+  }, [formData, tags, saveToLocalStorage])
+
+  // 자동 저장 성공 시 변경 사항 초기화
+  useEffect(() => {
+    if (autoSaveStatus === 'saved') {
+      setHasUnsavedChanges(false)
+    }
+  }, [autoSaveStatus])
+
+  // 페이지 떠나기 전 경고
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = '저장되지 않은 변경사항이 있습니다. 정말 페이지를 떠나시겠습니까?'
+        return e.returnValue
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasUnsavedChanges])
+
+  // localStorage 데이터 복원
+  const recoverFromLocalStorage = useCallback(() => {
+    const backupData = loadFromLocalStorage()
+    if (backupData) {
+      setFormData(backupData.formData)
+      setTags(backupData.tags)
+      setOriginalPostStatus(backupData.originalPostStatus || null)
+      setShowRecoverDialog(false)
+      
+      // 복원된 데이터의 editId가 있는 경우 URL 업데이트
+      if (backupData.editId) {
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.set('edit', backupData.editId)
+        window.history.replaceState({}, '', newUrl.toString())
+      }
+    }
+  }, [loadFromLocalStorage])
+
+  // 복원 대화상자 무시
+  const dismissRecoverDialog = useCallback(() => {
+    setShowRecoverDialog(false)
+    clearLocalStorage()
+  }, [clearLocalStorage])
 
   // AI 요약 생성 함수
   const generateAISummary = useCallback(async (content: string, title?: string) => {
@@ -438,6 +744,9 @@ function WriteContent() {
 
     setSaveStatus('saving')
     try {
+      // 수동 저장 시 formData.status에 따라 발행 상태 결정
+      const isPublished = formData.status === 'published'
+      
       const postData = {
         title: formData.title,
         content: formData.content,
@@ -447,7 +756,7 @@ function WriteContent() {
         category: formData.category,
         authorId: BLOG_CONFIG.owner.id,
         featured: false,
-        isPublished: false
+        isPublished: isPublished
       }
 
       const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
@@ -736,8 +1045,9 @@ function WriteContent() {
             </Box>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
               {/* 저장 상태 표시 */}
-              <Fade in={saveStatus !== 'idle'}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Fade in={saveStatus !== 'idle' || autoSaveStatus !== 'idle'}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {/* 수동 저장 상태 */}
                   {saveStatus === 'saving' && (
                     <Alert severity="info" sx={{ py: 0.5 }}>저장 중...</Alert>
                   )}
@@ -746,6 +1056,27 @@ function WriteContent() {
                   )}
                   {saveStatus === 'error' && (
                     <Alert severity="error" sx={{ py: 0.5 }}>저장 실패</Alert>
+                  )}
+                  
+                  {/* 자동 저장 상태 */}
+                  {autoSaveStatus === 'saving' && (
+                    <Alert severity="info" sx={{ py: 0.5, fontSize: '0.75rem' }}>
+                      <RefreshIcon sx={{ fontSize: 16, mr: 0.5, animation: 'spin 1s linear infinite' }} />
+                      자동 저장 중...
+                    </Alert>
+                  )}
+                  {autoSaveStatus === 'saved' && lastSavedAt && (
+                    <Alert severity="success" sx={{ py: 0.5, fontSize: '0.75rem' }}>
+                      자동 저장됨 ({lastSavedAt.toLocaleTimeString('ko-KR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })})
+                    </Alert>
+                  )}
+                  {autoSaveStatus === 'error' && (
+                    <Alert severity="warning" sx={{ py: 0.5, fontSize: '0.75rem' }}>
+                      자동 저장 실패
+                    </Alert>
                   )}
                 </Box>
               </Fade>
@@ -760,6 +1091,138 @@ function WriteContent() {
               </Button>
             </Box>
           </Box>
+
+          {/* Draft Management Section */}
+          {isAuthenticated && (
+            <Box sx={{ mb: 4 }}>
+              <Paper sx={{ 
+                p: 3, 
+                borderRadius: 2,
+                border: `1px solid ${theme.palette.divider}`,
+                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+              }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center' }}>
+                    <DraftIcon sx={{ mr: 1, color: 'primary.main' }} />
+                    임시저장 글 ({drafts.length})
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={showDrafts ? <FolderOpenIcon /> : <DraftIcon />}
+                    onClick={() => setShowDrafts(!showDrafts)}
+                    sx={{ borderRadius: 1 }}
+                  >
+                    {showDrafts ? '목록 숨기기' : '목록 보기'}
+                  </Button>
+                </Box>
+
+                {showDrafts && (
+                  <Box sx={{ mt: 2 }}>
+                    {isDraftLoading ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          로딩 중...
+                        </Typography>
+                      </Box>
+                    ) : drafts.length === 0 ? (
+                      <Box sx={{ 
+                        p: 3, 
+                        textAlign: 'center', 
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.50',
+                        borderRadius: 1,
+                        border: `1px dashed ${theme.palette.divider}`
+                      }}>
+                        <DraftIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+                        <Typography variant="body2" color="text.secondary">
+                          저장된 임시글이 없습니다.
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Stack spacing={2}>
+                        {drafts.map((draft) => (
+                          <Box
+                            key={draft.id}
+                            sx={{
+                              p: 2,
+                              border: `1px solid ${theme.palette.divider}`,
+                              borderRadius: 1,
+                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'background.paper',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              '&:hover': {
+                                borderColor: 'primary.main',
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
+                              }
+                            }}
+                            onClick={() => handleDraftSelect(draft)}
+                          >
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography variant="h6" sx={{ 
+                                  fontWeight: 600, 
+                                  mb: 0.5,
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 1,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden'
+                                }}>
+                                  {draft.title || '제목 없음'}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ 
+                                  mb: 1,
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden'
+                                }}>
+                                  {draft.excerpt || draft.content?.substring(0, 100) + '...' || '내용 없음'}
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                                  <Chip 
+                                    label={draft.category || '카테고리 없음'} 
+                                    size="small" 
+                                    color="primary" 
+                                    variant="outlined" 
+                                  />
+                                  <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+                                    <TimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                                    <Typography variant="caption">
+                                      {new Date(draft.updatedAt).toLocaleDateString('ko-KR', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              </Box>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDraftDelete(draft.id)
+                                }}
+                                sx={{ 
+                                  ml: 1,
+                                  color: 'error.main',
+                                  '&:hover': { bgcolor: 'error.50' }
+                                }}
+                              >
+                                <DeleteIcon sx={{ fontSize: 18 }} />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                        ))}
+                      </Stack>
+                    )}
+                  </Box>
+                )}
+              </Paper>
+            </Box>
+          )}
 
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 4 }}>
             {/* Main Editor Section */}
@@ -1644,6 +2107,34 @@ function WriteContent() {
             </Box>
           </Box>
         </Container>
+        
+        {/* 복원 대화상자 */}
+        <Dialog 
+          open={showRecoverDialog} 
+          onClose={dismissRecoverDialog}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>
+            임시저장된 내용 발견
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              이전에 작성하던 내용이 임시저장되어 있습니다. 복원하시겠습니까?
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              복원하지 않으면 임시저장된 내용은 삭제됩니다.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={dismissRecoverDialog} color="inherit">
+              삭제하기
+            </Button>
+            <Button onClick={recoverFromLocalStorage} variant="contained" autoFocus>
+              복원하기
+            </Button>
+          </DialogActions>
+        </Dialog>
         
         <Footer />
       </Box>
