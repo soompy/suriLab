@@ -6,9 +6,10 @@ import remarkBreaks from 'remark-breaks'
 import rehypeRaw from 'rehype-raw'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { ContentImage } from './image'
+import { ContentImage } from './image/ContentImage'
 import { Box, Typography } from '@mui/material'
 import type { Components } from 'react-markdown'
+import { memo, useMemo, Suspense } from 'react'
 
 interface OptimizedMarkdownProps {
   content: string
@@ -16,12 +17,84 @@ interface OptimizedMarkdownProps {
   style?: React.CSSProperties
 }
 
-export default function OptimizedMarkdown({ 
+// Memoized CodeBlock component for better performance
+const CodeBlock = memo(({ children, className }: { children: string; className?: string }) => {
+  const match = /language-(\w+)/.exec(className || '')
+  const language = match ? match[1] : 'text'
+  
+  // Only render syntax highlighter for code blocks with language
+  if (!match) {
+    return (
+      <Box
+        component="pre"
+        sx={{
+          backgroundColor: (theme) => 
+            theme.palette.mode === 'dark' 
+              ? 'rgba(255, 255, 255, 0.05)' 
+              : 'rgba(0, 0, 0, 0.05)',
+          border: '1px solid',
+          borderColor: (theme) => 
+            theme.palette.mode === 'dark' 
+              ? 'rgba(255, 255, 255, 0.1)' 
+              : 'rgba(0, 0, 0, 0.1)',
+          borderRadius: '8px',
+          padding: '1rem',
+          margin: '1.5rem 0',
+          overflow: 'auto',
+          fontSize: '0.875rem',
+          lineHeight: 1.5,
+          fontFamily: 'var(--font-jetbrains-mono), monospace',
+        }}
+      >
+        <Box component="code">{children}</Box>
+      </Box>
+    )
+  }
+  
+  return (
+    <Suspense fallback={
+      <Box
+        sx={{
+          height: '100px',
+          backgroundColor: 'rgba(0,0,0,0.05)',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '0.875rem',
+          color: 'text.secondary',
+          margin: '1.5rem 0',
+        }}
+      >
+        Loading code...
+      </Box>
+    }>
+      <SyntaxHighlighter
+        style={vscDarkPlus as any}
+        language={language}
+        PreTag="div"
+        customStyle={{
+          borderRadius: '8px',
+          fontSize: '0.875rem',
+          lineHeight: 1.5,
+          margin: '1.5rem 0',
+        }}
+      >
+        {String(children).replace(/\n$/, '')}
+      </SyntaxHighlighter>
+    </Suspense>
+  )
+})
+
+CodeBlock.displayName = 'CodeBlock'
+
+const OptimizedMarkdown = memo(function OptimizedMarkdown({ 
   content, 
   className = '', 
   style = {} 
 }: OptimizedMarkdownProps) {
-  const customComponents: Components = {
+  // Memoize custom components to prevent re-creation on every render
+  const customComponents: Components = useMemo(() => ({
     img: ({ src, alt, title }) => {
       if (!src || typeof src !== 'string') return null
       
@@ -156,26 +229,13 @@ export default function OptimizedMarkdown({
       </Box>
     ),
     
-    // 커스텀 코드 스타일
+    // 커스텀 코드 스타일 - 최적화된 버전
     code: ({ children, className }) => {
       const match = /language-(\w+)/.exec(className || '')
       
-      // 코드 블록인 경우
+      // 코드 블록인 경우 - 메모이제이션된 컴포넌트 사용
       if (match) {
-        return (
-          <SyntaxHighlighter
-            style={vscDarkPlus as any}
-            language={match[1]}
-            PreTag="div"
-            customStyle={{
-              borderRadius: '8px',
-              fontSize: '0.875rem',
-              lineHeight: 1.5,
-            }}
-          >
-            {String(children).replace(/\n$/, '')}
-          </SyntaxHighlighter>
-        )
+        return <CodeBlock className={className}>{String(children)}</CodeBlock>
       }
       
       // 인라인 코드인 경우
@@ -375,7 +435,10 @@ export default function OptimizedMarkdown({
         />
       )
     },
-  }
+  }), []) // Empty dependency array since components don't depend on props
+
+  // Memoize the markdown content processing
+  const memoizedContent = useMemo(() => content, [content])
 
   return (
     <Box className={className} style={style}>
@@ -384,8 +447,12 @@ export default function OptimizedMarkdown({
         rehypePlugins={[rehypeRaw]}
         components={customComponents}
       >
-        {content}
+        {memoizedContent}
       </ReactMarkdown>
     </Box>
   )
-}
+})
+
+OptimizedMarkdown.displayName = 'OptimizedMarkdown'
+
+export default OptimizedMarkdown

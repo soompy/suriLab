@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, forwardRef } from 'react'
+import { useState, forwardRef, memo } from 'react'
 import Image from 'next/image'
 import { Box, Skeleton, useTheme } from '@mui/material'
 import { PhotoIcon } from '@heroicons/react/24/outline'
@@ -31,7 +31,7 @@ interface OptimizedImageProps {
   containerProps?: any
 }
 
-const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(({
+const OptimizedImage = memo(forwardRef<HTMLDivElement, OptimizedImageProps>(({
   src,
   alt,
   width,
@@ -179,7 +179,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(({
       )}
     </Box>
   )
-})
+}))
 
 OptimizedImage.displayName = 'OptimizedImage'
 

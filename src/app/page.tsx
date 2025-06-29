@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { 
   Container, 
   Typography, 
@@ -46,7 +46,7 @@ export default function HomePage() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const footerRef = useRef<HTMLElement>(null)
 
-  const fetchPosts = async (showNotification = false, page = 1, reset = false) => {
+  const fetchPosts = useCallback(async (showNotification = false, page = 1, reset = false) => {
     try {
       if (showNotification) setLoading(false)
       else if (page === 1) setLoading(true)
@@ -80,7 +80,7 @@ export default function HomePage() {
       }
       setLoadingMore(false)
     }
-  }
+  }, []) // Empty dependency array since fetchPosts doesn't depend on any props/state
 
   useEffect(() => {
     fetchPosts()
@@ -96,15 +96,14 @@ export default function HomePage() {
     return () => {
       window.removeEventListener('focus', handleFocus)
     }
-  }, [])
+  }, [fetchPosts])
 
   // 카테고리 변경 시 포스트 목록 리셋
   useEffect(() => {
     setCurrentPage(1)
     setHasMorePosts(true)
     fetchPosts(false, 1, true)
-  }, [selectedCategory])
-
+  }, [selectedCategory, fetchPosts])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -124,40 +123,57 @@ export default function HomePage() {
     return () => observer.disconnect()
   }, [])
 
+  // Throttled scroll handler for better performance
+  const throttledScrollHandler = useCallback(() => {
+    let isThrottled = false
+    
+    return () => {
+      if (isThrottled) return
+      isThrottled = true
+      
+      setTimeout(() => {
+        if (!footerRef.current) {
+          isThrottled = false
+          return
+        }
+
+        const footerRect = footerRef.current.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        
+        // Footer가 화면에 들어오기 시작하면 (sticky 탭의 높이만큼 여유를 둠)
+        const footerThreshold = 400 // sticky 탭 컨테이너의 대략적인 높이
+        const isFooterNear = footerRect.top < windowHeight - footerThreshold
+        
+        setIsNearFooter(isFooterNear)
+
+        // 무한스크롤: 페이지 하단에 가까워지면 다음 페이지 로드
+        const scrollThreshold = 800 // 하단에서 800px 전에 로드
+        const shouldLoadMore = 
+          footerRect.top < windowHeight + scrollThreshold &&
+          hasMorePosts &&
+          !loadingMore &&
+          !loading
+
+        if (shouldLoadMore) {
+          const nextPage = currentPage + 1
+          setCurrentPage(nextPage)
+          fetchPosts(false, nextPage, false)
+        }
+        
+        isThrottled = false
+      }, 100) // 100ms throttle
+    }
+  }, [currentPage, hasMorePosts, loadingMore, loading, fetchPosts])
+
   // Footer와의 겹침을 방지하고 무한스크롤을 위한 스크롤 이벤트 리스너
   useEffect(() => {
-    const handleScroll = () => {
-      if (!footerRef.current) return
+    const handleScroll = throttledScrollHandler()
 
-      const footerRect = footerRef.current.getBoundingClientRect()
-      const windowHeight = window.innerHeight
-      
-      // Footer가 화면에 들어오기 시작하면 (sticky 탭의 높이만큼 여유를 둠)
-      const footerThreshold = 400 // sticky 탭 컨테이너의 대략적인 높이
-      const isFooterNear = footerRect.top < windowHeight - footerThreshold
-      
-      setIsNearFooter(isFooterNear)
-
-      // 무한스크롤: 페이지 하단에 가까워지면 다음 페이지 로드
-      const scrollThreshold = 800 // 하단에서 800px 전에 로드
-      const shouldLoadMore = 
-        footerRect.top < windowHeight + scrollThreshold &&
-        hasMorePosts &&
-        !loadingMore &&
-        !loading
-
-      if (shouldLoadMore) {
-        const nextPage = currentPage + 1
-        setCurrentPage(nextPage)
-        fetchPosts(false, nextPage, false)
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll() // 초기 실행
 
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [currentPage, hasMorePosts, loadingMore, loading])
+  }, [throttledScrollHandler])
 
   const handleCategoryChange = (_: React.SyntheticEvent, newValue: string) => {
     setSelectedCategory(newValue)
@@ -167,20 +183,24 @@ export default function HomePage() {
     router.push(`/posts/${post.slug}`)
   }
 
-  const filteredPosts = selectedCategory === 'all' 
-    ? posts.filter(post => post.isPublished)
-    : posts.filter(post => post.isPublished && post.category === selectedCategory)
+  // Memoize filtered posts to prevent unnecessary re-calculations
+  const filteredPosts = useMemo(() => {
+    return selectedCategory === 'all' 
+      ? posts.filter(post => post.isPublished)
+      : posts.filter(post => post.isPublished && post.category === selectedCategory)
+  }, [posts, selectedCategory])
 
-  const formatDate = (dateString: string | Date) => {
+  // Memoize date formatting functions to prevent re-creation
+  const formatDate = useCallback((dateString: string | Date) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     })
-  }
+  }, [])
 
-  const getRelativeTime = (dateString: string | Date) => {
+  const getRelativeTime = useCallback((dateString: string | Date) => {
     const date = new Date(dateString)
     const now = new Date()
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
@@ -193,19 +213,19 @@ export default function HomePage() {
     if (diffInDays < 7) return `${diffInDays}일 전`
     
     return formatDate(dateString)
-  }
+  }, [formatDate])
 
-  const isNewPost = (dateString: string | Date) => {
+  const isNewPost = useCallback((dateString: string | Date) => {
     const date = new Date(dateString)
     const now = new Date()
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     return diffInHours < 24 // 24시간 이내를 새 포스트로 간주
-  }
+  }, [])
 
-  const getCategoryInfo = (category: BlogCategory) => ({
+  const getCategoryInfo = useCallback((category: BlogCategory) => ({
     description: CATEGORY_DESCRIPTIONS[category],
     color: CATEGORY_COLORS[category]
-  })
+  }), [])
 
   return (
     <MuiThemeProvider>

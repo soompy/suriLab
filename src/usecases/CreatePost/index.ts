@@ -11,11 +11,8 @@ export class CreatePostUseCaseImpl implements CreatePostUseCase {
   async execute(input: CreatePostInput): Promise<PostEntity> {
     this.validateInput(input)
     
-    const existingPost = await this.postRepository.findBySlug(input.slug)
-    if (existingPost) {
-      throw new Error('Post with this slug already exists')
-    }
-
+    // Repository handles slug duplication automatically by appending timestamp
+    // No need to check for duplicates here
     return await this.postRepository.create(input)
   }
 
@@ -42,9 +39,10 @@ export class CreatePostUseCaseImpl implements CreatePostUseCase {
       throw new Error('At least one tag is required')
     }
 
-    const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+    // More flexible slug pattern that allows Korean characters, alphanumeric, and hyphens
+    const slugPattern = /^[a-z0-9가-힣]+(?:-[a-z0-9가-힣]+)*$/i
     if (!slugPattern.test(input.slug)) {
-      throw new Error('Slug must be lowercase alphanumeric with hyphens only')
+      throw new Error('Slug must contain only alphanumeric characters, Korean characters, and hyphens')
     }
   }
 }

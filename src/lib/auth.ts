@@ -89,18 +89,53 @@ export class AuthService {
     if (typeof window === 'undefined') return {}
     
     const authData = localStorage.getItem(AUTH_KEY)
-    if (!authData) return {}
+    if (!authData) {
+      console.log('[AUTH] No auth data in localStorage')
+      return {}
+    }
     
     try {
       const { token } = JSON.parse(authData)
-      if (!token) return {}
+      if (!token) {
+        console.log('[AUTH] No token in auth data')
+        return {}
+      }
+      
+      console.log(`[AUTH] Token available, length: ${token.length}`)
       
       return {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
-    } catch {
+    } catch (error) {
+      console.error('[AUTH] Error parsing auth data:', error)
       return {}
+    }
+  }
+
+  // 디버깅용: 현재 인증 상태 확인
+  static debugAuthState() {
+    if (typeof window === 'undefined') return { error: 'Not in browser' }
+    
+    const authData = localStorage.getItem(AUTH_KEY)
+    if (!authData) return { authenticated: false, reason: 'No auth data' }
+    
+    try {
+      const parsed = JSON.parse(authData)
+      const now = Date.now()
+      const isExpired = now - parsed.timestamp > SESSION_TIMEOUT
+      
+      return {
+        authenticated: this.isAuthenticated(),
+        hasToken: !!parsed.token,
+        tokenLength: parsed.token?.length || 0,
+        timestamp: parsed.timestamp,
+        age: now - parsed.timestamp,
+        isExpired,
+        user: parsed.user
+      }
+    } catch (error) {
+      return { authenticated: false, reason: 'Parse error', error: error instanceof Error ? error.message : 'Unknown error' }
     }
   }
 
@@ -114,8 +149,8 @@ export class AuthService {
     }
 
     const authHeaders = this.getAuthHeaders()
-    const authToken = typeof authHeaders === 'object' && 'Authorization' in authHeaders ? authHeaders.Authorization : null
-    console.log(`[AUTH] Authorization header: ${authToken ? `Bearer ${authToken.toString().substring(7, 15)}...` : 'None'}`)
+    const authToken = typeof authHeaders === 'object' && authHeaders && 'Authorization' in authHeaders ? authHeaders['Authorization'] as string : null
+    console.log(`[AUTH] Authorization header: ${authToken ? `${authToken.substring(0, 15)}...` : 'None'}`)
     
     const headers = {
       ...authHeaders,
@@ -123,6 +158,7 @@ export class AuthService {
     }
 
     console.log(`[AUTH] Request method: ${options.method || 'GET'}`)
+    console.log(`[AUTH] Final headers:`, Object.keys(headers))
     
     return fetch(url, {
       ...options,

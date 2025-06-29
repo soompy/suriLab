@@ -1,7 +1,7 @@
 export { default as OptimizedImage } from '../OptimizedImage'
 export { default as AvatarImage } from './AvatarImage'
 export { default as ThumbnailImage } from './ThumbnailImage'
-export { default as ContentImage } from './ContentImage'
+export { ContentImage } from './ContentImage'
 export { default as ProjectImage } from './ProjectImage'
 
 // Re-export common types

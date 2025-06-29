@@ -34,16 +34,25 @@ export function verifyAdminToken(request: NextRequest): boolean {
   
   console.log(`[AUTH] Verifying request to: ${request.nextUrl.pathname}`)
   console.log(`[AUTH] Authorization header: ${authHeader ? `Bearer ${authHeader.substring(7, 15)}...` : 'None'}`)
+  console.log(`[AUTH] All headers:`, Object.fromEntries(request.headers.entries()))
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     console.log('[AUTH] Missing or invalid authorization header format')
+    console.log('[AUTH] Expected format: Bearer <token>')
     return false
   }
   
   const token = authHeader.replace('Bearer ', '')
+  console.log(`[AUTH] Extracted token length: ${token.length}`)
+  
+  if (!token || token.length < 10) {
+    console.log('[AUTH] Token is too short or empty')
+    return false
+  }
   
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload
+    console.log(`[AUTH] JWT payload decoded:`, { admin: decoded.admin, iat: decoded.iat, exp: decoded.exp })
     
     if (decoded.admin === true) {
       console.log(`[AUTH] JWT token validated successfully`)
@@ -54,7 +63,7 @@ export function verifyAdminToken(request: NextRequest): boolean {
     }
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      console.log(`[AUTH] JWT token expired`)
+      console.log(`[AUTH] JWT token expired at:`, (error as any).expiredAt)
     } else if (error instanceof jwt.JsonWebTokenError) {
       console.log(`[AUTH] JWT token invalid:`, error.message)
     } else {

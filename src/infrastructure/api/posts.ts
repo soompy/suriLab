@@ -139,6 +139,11 @@ export class PostsAPIHandler {
   static async POST(request: NextRequest) {
     try {
       console.log('[POSTS] POST request received')
+      const authHeader = request.headers.get('authorization')
+      console.log(`[POSTS] Authorization header present: ${!!authHeader}`)
+      if (authHeader) {
+        console.log(`[POSTS] Auth header format: ${authHeader.substring(0, 15)}...`)
+      }
       
       // 관리자 권한 확인
       const isAuthorized = verifyAdminPassword(request)
@@ -146,7 +151,9 @@ export class PostsAPIHandler {
       
       if (!isAuthorized) {
         console.log('[POSTS] Authorization failed, returning 401')
-        return createAuthResponse('포스트 작성 권한이 없습니다.')
+        console.log('[POSTS] Expected Authorization header format: Bearer <jwt-token>')
+        console.log('[POSTS] Actual header:', authHeader ? `Bearer ${authHeader.substring(7, 15)}...` : 'None')
+        return createAuthResponse('포스트 작성 권한이 없습니다. 세션이 만료되었을 수 있습니다.')
       }
 
       const body = await request.json()
@@ -204,6 +211,8 @@ export class PostAPIHandler {
   static async PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
       console.log(`[POSTS] PUT request received for post ID: ${params.id}`)
+      const authHeader = request.headers.get('authorization')
+      console.log(`[POSTS] Authorization header present: ${!!authHeader}`)
       
       // 관리자 권한 확인
       const isAuthorized = verifyAdminPassword(request)
@@ -211,7 +220,9 @@ export class PostAPIHandler {
       
       if (!isAuthorized) {
         console.log('[POSTS] Authorization failed for PUT request, returning 401')
-        return createAuthResponse('포스트 수정 권한이 없습니다.')
+        console.log('[POSTS] Expected Authorization header format: Bearer <jwt-token>')
+        console.log('[POSTS] Actual header:', authHeader ? `Bearer ${authHeader.substring(7, 15)}...` : 'None')
+        return createAuthResponse('포스트 수정 권한이 없습니다. 세션이 만료되었을 수 있습니다.')
       }
 
       const body = await request.json()
@@ -246,16 +257,31 @@ export class PostAPIHandler {
 
   static async DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+      console.log(`[POSTS] DELETE request received for post ID: ${params.id}`)
+      const authHeader = request.headers.get('authorization')
+      console.log(`[POSTS] Authorization header present: ${!!authHeader}`)
+      
       // 관리자 권한 확인
-      if (!verifyAdminPassword(request)) {
-        return createAuthResponse('포스트 삭제 권한이 없습니다.')
+      const isAuthorized = verifyAdminPassword(request)
+      console.log(`[POSTS] Authorization check result: ${isAuthorized}`)
+      
+      if (!isAuthorized) {
+        console.log('[POSTS] Authorization failed for DELETE request, returning 401')
+        console.log('[POSTS] Actual header:', authHeader ? `Bearer ${authHeader.substring(7, 15)}...` : 'None')
+        return createAuthResponse('포스트 삭제 권한이 없습니다. 세션이 만료되었을 수 있습니다.')
       }
 
+      console.log(`[POSTS] Attempting to delete post: ${params.id}`)
       await deletePost(params.id)
+      console.log(`[POSTS] Post deleted successfully: ${params.id}`)
       return NextResponse.json({ success: true })
-    } catch {
+    } catch (error) {
+      console.error(`[POSTS] Error deleting post ${params.id}:`, error)
       return NextResponse.json(
-        { error: 'Failed to delete post' },
+        { 
+          error: 'Failed to delete post', 
+          details: error instanceof Error ? error.message : 'Unknown error' 
+        },
         { status: 400 }
       )
     }

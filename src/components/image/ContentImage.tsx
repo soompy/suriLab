@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useState } from 'react'
+import { forwardRef, useState, memo } from 'react'
 import { Box, IconButton, Modal, Fade, useTheme } from '@mui/material'
 import { XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import OptimizedImage from '../OptimizedImage'
@@ -18,7 +18,7 @@ interface ContentImageProps {
   borderRadius?: string | number
 }
 
-const ContentImage = forwardRef<HTMLDivElement, ContentImageProps>(({
+const ContentImage = memo(forwardRef<HTMLDivElement, ContentImageProps>(({
   src,
   alt,
   caption,
@@ -192,8 +192,8 @@ const ContentImage = forwardRef<HTMLDivElement, ContentImageProps>(({
       </Modal>
     </>
   )
-})
+}))
 
 ContentImage.displayName = 'ContentImage'
 
-export default ContentImage
+export { ContentImage }
