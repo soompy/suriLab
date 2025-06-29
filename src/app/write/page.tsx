@@ -232,19 +232,34 @@ function WriteContent() {
     if (!confirm('이 임시저장 글을 삭제하시겠습니까?')) return
     
     try {
-      const response = await fetch(`/api/posts/${draftId}`, {
-        method: 'DELETE',
-        headers: AuthService.getAuthHeaders()
+      console.log(`[DRAFT] Attempting to delete draft: ${draftId}`)
+      const response = await AuthService.authenticatedFetch(`/api/posts/${draftId}`, {
+        method: 'DELETE'
       })
       
       if (response.ok) {
+        console.log(`[DRAFT] Draft deleted successfully: ${draftId}`)
         loadDrafts() // 목록 새로고침
+        alert('임시저장 글이 삭제되었습니다.')
       } else {
-        alert('삭제에 실패했습니다.')
+        const errorData = await response.json().catch(() => ({}))
+        console.error(`[DRAFT] Delete failed:`, { status: response.status, error: errorData })
+        
+        if (response.status === 401) {
+          AuthService.logout()
+          setIsAuthenticated(false)
+          setCurrentUser(null)
+          setShowLoginDialog(true)
+          alert('세션이 만료되었습니다. 다시 로그인해주세요.')
+          return
+        }
+        
+        const errorMessage = errorData.details || errorData.error || '알 수 없는 오류'
+        alert(`삭제에 실패했습니다: ${errorMessage}`)
       }
     } catch (error) {
       console.error('Error deleting draft:', error)
-      alert('삭제에 실패했습니다.')
+      alert(`삭제 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`)
     }
   }, [loadDrafts])
 
@@ -260,10 +275,15 @@ function WriteContent() {
       // 자동 저장 시 원래 발행 상태 보존 (새 글의 경우 draft로)
       const shouldBePublished = originalPostStatus === 'published'
       
+      // 요약이 비어있는 경우 컨텐츠의 첫 부분을 사용
+      const excerpt = formData.summary.trim() || 
+        (formData.content ? formData.content.substring(0, 200).replace(/\n/g, ' ').trim() + 
+        (formData.content.length > 200 ? '...' : '') : '자동 생성된 요약')
+      
       const postData = {
         title: formData.title || '제목 없음',
         content: formData.content,
-        excerpt: formData.summary,
+        excerpt: excerpt,
         category: formData.category,
         tags: tags,
         isPublished: shouldBePublished,
@@ -730,7 +750,7 @@ function WriteContent() {
       return `post-${Date.now()}`
     }
     
-    return title
+    let slug = title
       .toLowerCase()
       .normalize('NFD') // Unicode 정규화
       .replace(/[\u0300-\u036f]/g, '') // 발음 구별 기호 제거
@@ -738,7 +758,19 @@ function WriteContent() {
       .replace(/\s+/g, '-') // 공백을 하이픈으로
       .replace(/-+/g, '-') // 연속 하이픈을 단일 하이픈으로
       .replace(/^-|-$/g, '') // 앞뒤 하이픈 제거
-      || `post-${Date.now()}` // 빈 문자열인 경우 fallback
+      .trim()
+    
+    // 결과가 비어있거나 너무 짧은 경우 fallback
+    if (!slug || slug.length < 3) {
+      slug = `post-${Date.now()}`
+    }
+    
+    // 너무 긴 경우 잘라내기 (최대 100자)
+    if (slug.length > 100) {
+      slug = slug.substring(0, 100).replace(/-$/, '')
+    }
+    
+    return slug
   }, [])
 
   const handleSave = async () => {
@@ -767,10 +799,15 @@ function WriteContent() {
       // 수동 저장 시 formData.status에 따라 발행 상태 결정
       const isPublished = formData.status === 'published'
       
+      // 요약이 비어있는 경우 컨텐츠의 첫 부분을 사용
+      const excerpt = formData.summary.trim() || 
+        formData.content.substring(0, 200).replace(/\n/g, ' ').trim() + 
+        (formData.content.length > 200 ? '...' : '')
+      
       const postData = {
         title: formData.title,
         content: formData.content,
-        excerpt: formData.summary,
+        excerpt: excerpt,
         slug: generateSlug(formData.title),
         tags,
         category: formData.category,
@@ -823,7 +860,8 @@ function WriteContent() {
           return
         }
         
-        throw new Error(`Failed to ${isEditing ? 'update' : 'save'} post: ${errorData.error || response.statusText}`)
+        const errorMessage = errorData.details || errorData.error || response.statusText
+        throw new Error(`Failed to ${isEditing ? 'update' : 'save'} post: ${errorMessage}`)
       }
 
       const savedPost = await response.json()
@@ -860,10 +898,15 @@ function WriteContent() {
     }
 
     try {
+      // 요약이 비어있는 경우 컨텐츠의 첫 부분을 사용
+      const excerpt = formData.summary.trim() || 
+        formData.content.substring(0, 200).replace(/\n/g, ' ').trim() + 
+        (formData.content.length > 200 ? '...' : '')
+      
       const postData = {
         title: formData.title,
         content: formData.content,
-        excerpt: formData.summary,
+        excerpt: excerpt,
         slug: generateSlug(formData.title),
         tags,
         category: formData.category,
@@ -910,7 +953,8 @@ function WriteContent() {
           return
         }
         
-        throw new Error(`Failed to ${isEditing ? 'update' : 'publish'} post: ${errorData.error || response.statusText}`)
+        const errorMessage = errorData.details || errorData.error || response.statusText
+        throw new Error(`Failed to ${isEditing ? 'update' : 'publish'} post: ${errorMessage}`)
       }
 
       const publishedPost = await response.json()
