@@ -122,12 +122,22 @@ export class PrismaPostRepository implements PostRepository {
       }
     })
 
+    // slug 중복 확인 및 처리
+    let finalSlug = input.slug
+    const existingPost = await this.prisma.post.findUnique({ 
+      where: { slug: input.slug },
+      select: { id: true }
+    })
+    if (existingPost) {
+      finalSlug = `${input.slug}-${Date.now()}`
+    }
+
     const post = await this.prisma.post.create({
       data: {
         title: input.title,
         content: input.content,
         excerpt: input.excerpt,
-        slug: input.slug,
+        slug: finalSlug,
         featured: input.featured || false,
         isPublished: input.isPublished || false,
         readTime: Math.ceil(input.content.split(' ').length / 200),
@@ -159,9 +169,32 @@ export class PrismaPostRepository implements PostRepository {
       updateData.readTime = Math.ceil(input.content.split(' ').length / 200)
     }
     if (input.excerpt) updateData.excerpt = input.excerpt
-    if (input.slug) updateData.slug = input.slug
+    if (input.slug) {
+      // slug 중복 확인 및 처리
+      const existingPost = await this.prisma.post.findUnique({ 
+        where: { slug: input.slug },
+        select: { id: true }
+      })
+      if (existingPost && existingPost.id !== input.id) {
+        updateData.slug = `${input.slug}-${Date.now()}`
+      } else {
+        updateData.slug = input.slug
+      }
+    }
     if (input.featured !== undefined) updateData.featured = input.featured
-    if (input.isPublished !== undefined) updateData.isPublished = input.isPublished
+    if (input.isPublished !== undefined) {
+      updateData.isPublished = input.isPublished
+      // 처음 발행될 때 publishedAt 업데이트
+      if (input.isPublished === true) {
+        const currentPost = await this.prisma.post.findUnique({ 
+          where: { id: input.id },
+          select: { isPublished: true }
+        })
+        if (currentPost && !currentPost.isPublished) {
+          updateData.publishedAt = new Date()
+        }
+      }
+    }
 
     if (input.category) {
       const category = await this.prisma.category.upsert({

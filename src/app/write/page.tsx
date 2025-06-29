@@ -724,6 +724,23 @@ function WriteContent() {
   const handleFocus = (field: string) => () => setIsFocused(field)
   const handleBlur = () => setIsFocused('')
 
+  // 개선된 slug 생성 함수
+  const generateSlug = useCallback((title: string): string => {
+    if (!title.trim()) {
+      return `post-${Date.now()}`
+    }
+    
+    return title
+      .toLowerCase()
+      .normalize('NFD') // Unicode 정규화
+      .replace(/[\u0300-\u036f]/g, '') // 발음 구별 기호 제거
+      .replace(/[^\w\s가-힣-]/g, '') // 한글, 영숫자, 공백, 하이픈만 유지
+      .replace(/\s+/g, '-') // 공백을 하이픈으로
+      .replace(/-+/g, '-') // 연속 하이픈을 단일 하이픈으로
+      .replace(/^-|-$/g, '') // 앞뒤 하이픈 제거
+      || `post-${Date.now()}` // 빈 문자열인 경우 fallback
+  }, [])
+
   const handleSave = async () => {
     if (!formData.title.trim()) {
       alert('제목을 입력해주세요.')
@@ -751,7 +768,7 @@ function WriteContent() {
         title: formData.title,
         content: formData.content,
         excerpt: formData.summary,
-        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        slug: generateSlug(formData.title),
         tags,
         category: formData.category,
         authorId: BLOG_CONFIG.owner.id,
@@ -825,7 +842,7 @@ function WriteContent() {
         title: formData.title,
         content: formData.content,
         excerpt: formData.summary,
-        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        slug: generateSlug(formData.title),
         tags,
         category: formData.category,
         authorId: BLOG_CONFIG.owner.id,

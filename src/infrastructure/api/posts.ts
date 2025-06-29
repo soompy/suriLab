@@ -98,7 +98,8 @@ export class PostsAPIHandler {
       const authorId = searchParams.get('authorId') || undefined
       const searchQuery = searchParams.get('search') || undefined
       const featured = searchParams.get('featured') === 'true' ? true : undefined
-      const isPublished = searchParams.get('isPublished') !== 'false' ? true : searchParams.get('isPublished') === 'false' ? false : undefined
+      const isPublishedParam = searchParams.get('isPublished')
+      const isPublished = isPublishedParam === 'true' ? true : isPublishedParam === 'false' ? false : undefined
       
       const sortField = (searchParams.get('sortField') as PostSort['field']) || 'publishedAt'
       const sortOrder = (searchParams.get('sortOrder') as PostSort['order']) || 'desc'
