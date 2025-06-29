@@ -742,6 +742,9 @@ function WriteContent() {
   }, [])
 
   const handleSave = async () => {
+    console.log('[WRITE] handleSave started')
+    console.log('[WRITE] Auth state:', AuthService.debugAuthState())
+    
     if (!formData.title.trim()) {
       alert('제목을 입력해주세요.')
       return
@@ -801,6 +804,25 @@ function WriteContent() {
           statusText: response.statusText,
           error: errorData
         })
+        
+        // 인증 오류인 경우 사용자를 로그아웃시키고 재로그인 유도
+        if (response.status === 401) {
+          console.log('[WRITE] Authentication failed, logging out user')
+          console.log('[WRITE] Auth debug state before logout:', AuthService.debugAuthState())
+          console.log('[WRITE] Current form data:', { 
+            title: formData.title, 
+            status: formData.status,
+            isEditing: isEditing 
+          })
+          
+          AuthService.logout()
+          setIsAuthenticated(false)
+          setCurrentUser(null)
+          setShowLoginDialog(true)
+          alert('인증이 만료되었습니다. 다시 로그인해주세요.')
+          return
+        }
+        
         throw new Error(`Failed to ${isEditing ? 'update' : 'save'} post: ${errorData.error || response.statusText}`)
       }
 
@@ -875,6 +897,19 @@ function WriteContent() {
           statusText: response.statusText,
           error: errorData
         })
+        
+        // 인증 오류인 경우 사용자를 로그아웃시키고 재로그인 유도
+        if (response.status === 401) {
+          console.log('[WRITE] Authentication failed during publish, logging out user')
+          console.log('[WRITE] Auth debug state:', AuthService.debugAuthState())
+          AuthService.logout()
+          setIsAuthenticated(false)
+          setCurrentUser(null)
+          setShowLoginDialog(true)
+          alert('세션이 만료되었습니다. 다시 로그인해주세요.')
+          return
+        }
+        
         throw new Error(`Failed to ${isEditing ? 'update' : 'publish'} post: ${errorData.error || response.statusText}`)
       }
 
