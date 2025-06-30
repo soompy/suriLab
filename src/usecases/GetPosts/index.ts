@@ -44,9 +44,6 @@ export class GetPostByIdUseCaseImpl implements GetPostByIdUseCase {
 
   async execute(id: string): Promise<PostEntity | null> {
     const post = await this.postRepository.findById(id)
-    if (post) {
-      await this.postRepository.incrementViews(id)
-    }
     return post
   }
 }
@@ -60,9 +57,6 @@ export class GetPostBySlugUseCaseImpl implements GetPostBySlugUseCase {
 
   async execute(slug: string): Promise<PostEntity | null> {
     const post = await this.postRepository.findBySlug(slug)
-    if (post) {
-      await this.postRepository.incrementViews(post.id)
-    }
     return post
   }
 }
