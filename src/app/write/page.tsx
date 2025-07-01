@@ -41,7 +41,6 @@ import {
   Edit as EditIcon,
   Publish as PublishIcon,
   Save as SaveIcon,
-  Tag as TagIcon,
   Analytics as AnalyticsIcon,
   Lock as LockIcon,
   ExitToApp as LogoutIcon,

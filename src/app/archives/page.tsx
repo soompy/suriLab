@@ -387,7 +387,7 @@ export default function Archives() {
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         <Header />
         
-        <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: 4, py: 6 }}>
+        <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 4 }, py: { xs: 4, md: 6 } }}>
           <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Typography variant="h2" component="h1" gutterBottom>
               Archives
@@ -453,13 +453,16 @@ export default function Archives() {
           <Box sx={{ 
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' },
-            gap: 4
+            gap: { xs: 2, md: 4 },
+            width: '100%',
+            minWidth: 0,
+            overflow: 'hidden'
           }}>
             {/* 메인 콘텐츠 */}
-            <Box>
+            <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
               {/* 검색 및 필터 */}
               <Paper sx={{ p: 3, mb: 4, boxShadow: 'none' }}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} sx={{ width: '100%' }}>
                   <TextField
                     fullWidth
                     placeholder="포스트 제목, 내용, 태그를 검색하세요..."
@@ -504,7 +507,9 @@ export default function Archives() {
                   display: 'flex', 
                   flexWrap: 'wrap', 
                   gap: 1,
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  width: '100%',
+                  overflow: 'hidden'
                 }}>
                   {categories.map((category) => (
                     <Chip
@@ -515,10 +520,11 @@ export default function Archives() {
                       variant={selectedCategory === category ? 'filled' : 'outlined'}
                       sx={{ 
                         cursor: 'pointer',
-                        whiteSpace: 'nowrap',
+                        maxWidth: { xs: '100px', sm: '120px' },
                         '& .MuiChip-label': {
-                          overflow: 'visible',
-                          textOverflow: 'unset'
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
                         }
                       }}
                     />
@@ -586,8 +592,8 @@ export default function Archives() {
                           <DateIcon sx={{ mr: 2, color: 'primary.main' }} />
                           <ListItemText
                             primary={
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                                <Typography variant="h5" fontWeight="bold">
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, flexWrap: 'wrap', minWidth: 0 }}>
+                                <Typography variant="h5" fontWeight="bold" sx={{ minWidth: 0, whiteSpace: 'nowrap' }}>
                                   {year}년
                                 </Typography>
                                 <Badge badgeContent={yearData.count} color="primary" />
@@ -812,7 +818,7 @@ export default function Archives() {
             </Box>
 
             {/* 사이드바 */}
-            <Box>
+            <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
               <Box sx={{ position: 'sticky', top: 24 }}>
                 {/* 인기 포스트 */}
                 <Paper sx={{ p: 3, mb: 3, boxShadow: 'none' }}>

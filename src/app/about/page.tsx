@@ -121,7 +121,7 @@ export default function AboutPage() {
       <div style={{ minHeight: '100vh' }}>
         <Header />
         <Box sx={{ py: { xs: 4, md: 8 }, minHeight: '100vh' }}>
-          <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 } }}>
+          <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 }, overflow: 'hidden' }}>
         {/* Header Section */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>

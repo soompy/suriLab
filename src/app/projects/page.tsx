@@ -161,8 +161,9 @@ export default function Projects() {
                   sx={{
                       maxWidth: { xs: "100%", md: "1300px" },
                       mx: "auto",
-                      px: 4,
-                      py: 6,
+                      px: { xs: 2, sm: 3, md: 4 },
+                      py: { xs: 4, md: 6 },
+                      overflow: 'hidden'
                   }}
               >
                   <Box sx={{ textAlign: "center", mb: 6 }}>
@@ -288,11 +289,14 @@ export default function Projects() {
                                               xs: "1fr",
                                               md: "1fr 2fr",
                                           },
-                                          gap: 4,
+                                          gap: { xs: 2, md: 4 },
+                                          width: '100%',
+                                          minWidth: 0,
+                                          overflow: 'hidden'
                                       }}
                                   >
                                       {/* 프로젝트 이미지 */}
-                                      <Box>
+                                      <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
                                           <ProjectImage
                                               src={project.image}
                                               alt={`${project.title} 프로젝트 스크린샷`}
@@ -311,7 +315,7 @@ export default function Projects() {
                                       </Box>
 
                                       {/* 프로젝트 정보 */}
-                                      <Box>
+                                      <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
                                           <Box
                                               sx={{
                                                   height: "100%",
@@ -331,8 +335,10 @@ export default function Projects() {
                                                       sx={{
                                                           display: "flex",
                                                           alignItems: "center",
-                                                          gap: 2,
+                                                          gap: { xs: 1, sm: 2 },
                                                           mb: 2,
+                                                          flexWrap: 'wrap',
+                                                          minWidth: 0
                                                       }}
                                                   >
                                                       <Chip
@@ -396,6 +402,8 @@ export default function Projects() {
                                                           display: "flex",
                                                           flexWrap: "wrap",
                                                           gap: 1,
+                                                          width: '100%',
+                                                          overflow: 'hidden'
                                                       }}
                                                   >
                                                       {project.technologies.map(
@@ -414,8 +422,9 @@ export default function Projects() {
                                               <Box
                                                   sx={{
                                                       display: "flex",
-                                                      gap: 2,
+                                                      gap: { xs: 1, sm: 2 },
                                                       mt: "auto",
+                                                      flexWrap: 'wrap'
                                                   }}
                                               >
                                                   {project.github && (

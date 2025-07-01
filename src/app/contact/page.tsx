@@ -84,7 +84,7 @@ export default function Contact() {
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         <Header />
         
-        <Container maxWidth={false} sx={{ py: 6, px: 4, maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto' }}>
+        <Container maxWidth={false} sx={{ py: { xs: 4, md: 6 }, px: { xs: 2, sm: 3, md: 4 }, maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', overflow: 'hidden' }}>
           <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Typography variant="h2" component="h1" gutterBottom>
               Contact
@@ -101,8 +101,10 @@ export default function Contact() {
                 xs: '1fr', 
                 md: '1.2fr 0.8fr' 
               },
-              gap: 4,
-              width: '100%'
+              gap: { xs: 2, md: 4 },
+              width: '100%',
+              minWidth: 0,
+              overflow: 'hidden'
             }}
           >
             {/* Contact Form Section */}
