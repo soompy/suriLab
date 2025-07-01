@@ -115,6 +115,30 @@ function WriteContent() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [showRecoverDialog, setShowRecoverDialog] = useState(false)
   const [originalPostStatus, setOriginalPostStatus] = useState<'draft' | 'published' | null>(null)
+  const [isSticky, setIsSticky] = useState(true)
+  const stickyTriggerRef = useRef<HTMLDivElement | null>(null)
+
+  // Intersection Observer for sticky control
+  useEffect(() => {
+    if (!stickyTriggerRef.current) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // 트리거 요소가 보이지 않으면 sticky 표시
+        setIsSticky(!entry.isIntersecting)
+      },
+      {
+        threshold: 0,
+        rootMargin: '0px 0px -100px 0px' // 하단에서 100px 여백
+      }
+    )
+
+    observer.observe(stickyTriggerRef.current)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   // 수정할 포스트 로딩
   useEffect(() => {
@@ -1320,21 +1344,31 @@ function WriteContent() {
             </Box>
           )}
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 4 }}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, 
+            gap: 4,
+            minHeight: { xs: 'auto', lg: 'calc(100vh - 200px)' },
+            position: 'relative',
+            alignItems: { xs: 'stretch', lg: 'start' }
+          }}>
             {/* Main Editor Section */}
-            <Box>
+            <Box sx={{ height: { xs: 'auto', lg: 'calc(100vh - 200px)' } }}>
               <Paper sx={{ 
-                height: '100%',
+                height: { xs: 'auto', lg: '100%' },
                 borderRadius: 2,
                 border: `1px solid ${theme.palette.divider}`,
                 overflow: 'hidden',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.05)'
+                boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
+                display: 'flex',
+                flexDirection: 'column'
               }}>
                 {/* Editor Header */}
                 <Box sx={{ 
                   p: 3, 
                   borderBottom: `1px solid ${theme.palette.divider}`,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.05)' : 'background.paper'
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.05)' : 'background.paper',
+                  flexShrink: 0
                 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center' }}>
@@ -1654,48 +1688,64 @@ function WriteContent() {
                       </Typography>
                     </Box>
                   </Box>
+                </Box>
 
+                {/* Content Area */}
+                <Box sx={{ 
+                  flex: 1, 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                  p: 3
+                }}>
                   {activeTab === 0 && (
-                    <TextField
-                      fullWidth
-                      label={isFocused === 'content' ? '' : '내용'}
-                      value={formData.content}
-                      onChange={handleInputChange('content')}
-                      onFocus={handleFocus('content')}
-                      onBlur={handleBlur}
-                      onKeyDown={handleKeyDown}
-                      placeholder={isFocused === 'content' || formData.content ? '마크다운 형식으로 내용을 작성하세요...\n\n예시:\n# 제목\n## 소제목\n\n본문 내용을 여기에 작성하세요.\n\n**굵은 글씨** *기울임* `코드`\n\n> 인용문\n\n- 목록 항목\n\n```javascript\nfunction example() {\n  console.log("코드 블록");\n}\n```' : ''}
-                      variant="outlined"
-                      multiline
-                      rows={20}
-                      required
-                      inputRef={contentRef}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 1.5,
-                          fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", monospace',
-                          fontSize: '14px',
-                          lineHeight: 1.6,
-                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
-                          color: 'text.primary',
-                          '& textarea': {
-                            resize: 'vertical',
-                            color: 'inherit'
-                          },
-                          '&:hover': {
-                            '& .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'primary.main'
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <TextField
+                        fullWidth
+                        label={isFocused === 'content' ? '' : '내용'}
+                        value={formData.content}
+                        onChange={handleInputChange('content')}
+                        onFocus={handleFocus('content')}
+                        onBlur={handleBlur}
+                        onKeyDown={handleKeyDown}
+                        placeholder={isFocused === 'content' || formData.content ? '마크다운 형식으로 내용을 작성하세요...\n\n예시:\n# 제목\n## 소제목\n\n본문 내용을 여기에 작성하세요.\n\n**굵은 글씨** *기울임* `코드`\n\n> 인용문\n\n- 목록 항목\n\n```javascript\nfunction example() {\n  console.log("코드 블록");\n}\n```' : ''}
+                        variant="outlined"
+                        multiline
+                        required
+                        inputRef={contentRef}
+                        sx={{
+                          flex: 1,
+                          '& .MuiOutlinedInput-root': {
+                            height: { xs: '400px', lg: '100%' },
+                            borderRadius: 1.5,
+                            fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", monospace',
+                            fontSize: '14px',
+                            lineHeight: 1.6,
+                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
+                            color: 'text.primary',
+                            '& textarea': {
+                              resize: 'none',
+                              color: 'inherit',
+                              height: '100% !important',
+                              overflow: 'auto'
+                            },
+                            '&:hover': {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'primary.main'
+                              }
                             }
                           }
-                        }
-                      }}
-                    />
+                        }}
+                      />
+                    </Box>
                   )}
 
                   {activeTab === 1 && (
                     <Box
                       sx={{
-                        minHeight: '500px',
+                        flex: 1,
+                        height: { xs: '400px', lg: '100%' },
+                        overflow: 'auto',
                         p: 3,
                         border: `1px solid ${theme.palette.divider}`,
                         borderRadius: 1.5,
@@ -1812,7 +1862,7 @@ function WriteContent() {
                               return (
                                 <p style={{ 
                                   marginBottom: '1.5em', 
-                                  lineHeight: '1.2',
+                                  lineHeight: '1.4',
                                   whiteSpace: 'pre-wrap'
                                 }} {...props}>
                                   {children}
@@ -1857,196 +1907,25 @@ function WriteContent() {
             </Box>
 
             {/* Sidebar */}
-            <Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Action Buttons */}
-                <Paper sx={{ 
-                  p: 3, 
-                  borderRadius: 2,
-                  border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
-                    <PublishIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    발행 관리
-                  </Typography>
+            <Box sx={{ 
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              height: { xs: 'auto', lg: 'calc(100vh - 200px)' },
+              minHeight: { xs: 'auto', lg: 'calc(100vh - 200px)' }
+            }}>
+              {/* Scrollable Content */}
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: 3,
+                flex: 1,
+                overflow: { xs: 'visible', lg: 'auto' },
+                paddingBottom: { xs: 0, lg: '200px' }, // 하단 고정 영역을 위한 여백
+                height: { xs: 'auto', lg: '100%' }
+              }}>
 
-                  <Stack spacing={2}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      size="large"
-                      startIcon={<SaveIcon />}
-                      onClick={handleSave}
-                      disabled={saveStatus === 'saving'}
-                      sx={{ 
-                        borderRadius: 1.5,
-                        py: 1.5,
-                        textTransform: 'none',
-                        fontSize: '1rem',
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
-                        }
-                      }}
-                    >
-                      {saveStatus === 'saving' ? '저장 중...' : '임시 저장'}
-                    </Button>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      size="large"
-                      startIcon={<PublishIcon />}
-                      onClick={handlePublish}
-                      sx={{ 
-                        borderRadius: 1.5,
-                        py: 1.5,
-                        textTransform: 'none',
-                        fontSize: '1rem',
-                        fontWeight: 600,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                        '&:hover': {
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                        }
-                      }}
-                    >
-                      {isEditing ? '수정 완료' : '발행하기'}
-                    </Button>
-                  </Stack>
-                </Paper>
 
-                {/* Category & Status */}
-                <Paper sx={{ 
-                  p: 3, 
-                  borderRadius: 2,
-                  border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                    📂 분류 설정
-                  </Typography>
-
-                  <Stack spacing={3}>
-                    <FormControl fullWidth required>
-                      <InputLabel>카테고리 *</InputLabel>
-                      <Select
-                        value={formData.category}
-                        onChange={handleInputChange('category')}
-                        label="카테고리 *"
-                        required
-                        sx={{ 
-                          borderRadius: 1.5,
-                          color: 'text.primary',
-                          '& .MuiOutlinedInput-root': {
-                            '&:hover': {
-                              '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'primary.main'
-                              }
-                            }
-                          }
-                        }}
-                      >
-                        {categories.map((category) => (
-                          <MenuItem key={category} value={category}>
-                            {category}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-
-                    <FormControl fullWidth>
-                      <InputLabel>상태</InputLabel>
-                      <Select
-                        value={formData.status}
-                        onChange={handleInputChange('status')}
-                        label="상태"
-                        sx={{ 
-                          borderRadius: 1.5,
-                          color: 'text.primary',
-                          '& .MuiOutlinedInput-root': {
-                            '&:hover': {
-                              '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'primary.main'
-                              }
-                            }
-                          }
-                        }}
-                      >
-                        <MenuItem value="draft">📝 초안</MenuItem>
-                        <MenuItem value="published">🌍 발행됨</MenuItem>
-                        <MenuItem value="private">🔒 비공개</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Stack>
-                </Paper>
-
-                {/* Tags */}
-                <Paper sx={{ 
-                  p: 3, 
-                  borderRadius: 2,
-                  border: `1px solid ${theme.palette.divider}`,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
-                    <TagIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    태그
-                  </Typography>
-
-                  <Autocomplete
-                    multiple
-                    options={tagSuggestions}
-                    value={tags}
-                    onChange={(_, newValue) => setTags(newValue)}
-                    freeSolo
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => {
-                        const { key, ...tagProps } = getTagProps({ index })
-                        return (
-                          <Chip
-                            variant="outlined"
-                            label={option}
-                            {...tagProps}
-                            key={key}
-                            sx={{ 
-                              borderRadius: 1.5,
-                              '&:hover': {
-                                borderColor: 'primary.main',
-                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
-                              }
-                            }}
-                          />
-                        )
-                      })
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder={tags.length === 0 ? "태그를 추가하세요 (Enter로 구분)" : ""}
-                        variant="outlined"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: 1.5,
-                            color: 'text.primary',
-                            '& input': {
-                              color: 'inherit'
-                            },
-                            '&:hover': {
-                              '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'primary.main'
-                              }
-                            }
-                          }
-                        }}
-                      />
-                    )}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                    💡 태그는 검색과 분류에 도움이 됩니다
-                  </Typography>
-                </Paper>
 
                 {/* Statistics */}
                 <Paper sx={{ 
@@ -2199,10 +2078,174 @@ function WriteContent() {
                     </Typography>
                   </Box>
                 </Paper>
+                
+                {/* Intersection Observer Trigger */}
+                <Box ref={stickyTriggerRef} sx={{ height: '1px', width: '100%' }} />
               </Box>
+              
             </Box>
           </Box>
         </Container>
+        
+        {/* Sticky Publishing Controls - 전체 화면 하단 고정 */}
+        <Box sx={{
+          position: 'sticky',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          width: '100%',
+          zIndex: 1000,
+          bgcolor: 'background.paper',
+          borderTop: `1px solid ${theme.palette.divider}`,
+          boxShadow: isSticky ? '0 -4px 20px rgba(0,0,0,0.15)' : '0 -2px 10px rgba(0,0,0,0.08)',
+          backdropFilter: 'blur(10px)',
+          transition: 'box-shadow 0.3s ease, transform 0.3s ease',
+          transform: isSticky ? 'translateY(0)' : 'translateY(0)'
+        }}>
+          <Container maxWidth="lg">
+            <Box sx={{ py: 2 }}>
+              <Stack spacing={2}>
+                {/* 첫 번째 줄: 카테고리, 상태, 발행 버튼 */}
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ flex: 1 }}>
+                    <FormControl sx={{ minWidth: 120 }} size="small">
+                      <InputLabel>카테고리</InputLabel>
+                      <Select
+                        value={formData.category}
+                        onChange={handleInputChange('category')}
+                        label="카테고리"
+                        sx={{ 
+                          borderRadius: 1,
+                          bgcolor: 'background.paper'
+                        }}
+                      >
+                        {categories.map((category) => (
+                          <MenuItem key={category} value={category}>
+                            {category}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    
+                    <FormControl sx={{ minWidth: 100 }} size="small">
+                      <InputLabel>상태</InputLabel>
+                      <Select
+                        value={formData.status}
+                        onChange={handleInputChange('status')}
+                        label="상태"
+                        sx={{ 
+                          borderRadius: 1,
+                          bgcolor: 'background.paper'
+                        }}
+                      >
+                        <MenuItem value="draft">📝 초안</MenuItem>
+                        <MenuItem value="published">🌍 발행됨</MenuItem>
+                        <MenuItem value="private">🔒 비공개</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Stack>
+                  
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      startIcon={<SaveIcon />}
+                      onClick={handleSave}
+                      disabled={saveStatus === 'saving'}
+                      sx={{ 
+                        borderRadius: 1,
+                        textTransform: 'none',
+                        minWidth: 'auto',
+                        px: 2
+                      }}
+                    >
+                      {saveStatus === 'saving' ? '저장중' : '임시저장'}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="medium"
+                      startIcon={<PublishIcon />}
+                      onClick={handlePublish}
+                      sx={{ 
+                        borderRadius: 1,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        px: 3
+                      }}
+                    >
+                      {isEditing ? '수정완료' : '발행하기'}
+                    </Button>
+                  </Stack>
+                </Stack>
+                
+                {/* 두 번째 줄: 태그 */}
+                <Box>
+                  <Autocomplete
+                    multiple
+                    options={tagSuggestions}
+                    value={tags}
+                    onChange={(_, newValue) => setTags(newValue)}
+                    freeSolo
+                    size="small"
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => {
+                        const { key, ...tagProps } = getTagProps({ index })
+                        return (
+                          <Chip
+                            variant="outlined"
+                            label={option}
+                            {...tagProps}
+                            key={key}
+                            size="small"
+                            sx={{ 
+                              borderRadius: 1,
+                              fontSize: '0.75rem',
+                              height: '24px',
+                              '&:hover': {
+                                borderColor: 'primary.main',
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
+                              }
+                            }}
+                          />
+                        )
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="태그 입력하세요 (Enter로 구분)"
+                        variant="outlined"
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                            bgcolor: 'background.paper',
+                            minHeight: '36px',
+                            '&:hover': {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'primary.main'
+                              }
+                            },
+                            '&.Mui-focused': {
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'primary.main'
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    )}
+                    sx={{
+                      '& .MuiAutocomplete-tag': {
+                        margin: '2px'
+                      }
+                    }}
+                  />
+                </Box>
+              </Stack>
+            </Box>
+          </Container>
+        </Box>
         
         {/* 복원 대화상자 */}
         <Dialog 
