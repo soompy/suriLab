@@ -1812,7 +1812,7 @@ function WriteContent() {
                               return (
                                 <p style={{ 
                                   marginBottom: '1.5em', 
-                                  lineHeight: '1.8',
+                                  lineHeight: '1.2',
                                   whiteSpace: 'pre-wrap'
                                 }} {...props}>
                                   {children}

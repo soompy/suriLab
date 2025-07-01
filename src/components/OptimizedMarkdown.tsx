@@ -161,7 +161,7 @@ const OptimizedMarkdown = memo(function OptimizedMarkdown({
         component="p" 
         sx={{ 
           mb: 2.5, 
-          lineHeight: 1.8,
+          lineHeight: 1.2,
           color: 'text.primary',
           whiteSpace: 'pre-wrap', // 줄바꿈 보존
         }}
