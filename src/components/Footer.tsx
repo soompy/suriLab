@@ -6,8 +6,7 @@ import {
   Container, 
   Typography, 
   IconButton, 
-  Divider,
-  Link
+  Divider
 } from '@mui/material'
 import { 
   GitHub, 
@@ -45,24 +44,6 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
     }
   ]
 
-  const footerLinks = [
-    {
-      title: "블로그",
-      links: [
-        { name: "최근 포스트", href: "/" },
-        { name: "아카이브", href: "/archives" },
-        { name: "프로젝트", href: "/projects" }
-      ]
-    },
-    {
-      title: "소개",
-      links: [
-        { name: "About", href: "/about" },
-        { name: "연락하기", href: "/contact" },
-        { name: "글쓰기", href: "/write" }
-      ]
-    }
-  ]
 
   return (
     <Box 
@@ -78,8 +59,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
       <Container maxWidth="lg">
         {/* Main Footer Content */}
         <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 2fr' }, 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexDirection: { xs: 'column', md: 'row' },
           gap: 4, 
           mb: 4 
         }}>
@@ -98,105 +81,28 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </Typography>
           </Box>
 
-          {/* Footer Links */}
-          {footerLinks.map((section, index) => (
-            <Box key={index}>
-              <Typography 
-                variant="h6" 
-                component="h3" 
-                sx={{ 
-                  fontSize: '1rem',
-                  fontWeight: 600, 
-                  mb: 2,
-                  color: 'text.primary'
-                }}
-              >
-                {section.title}
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {section.links.map((link, linkIndex) => (
-                  <Link
-                    key={linkIndex}
-                    href={link.href}
-                    sx={{
-                      color: 'text.secondary',
-                      textDecoration: 'none',
-                      fontSize: '0.875rem',
-                      '&:hover': {
-                        color: 'primary.main',
-                        textDecoration: 'underline'
-                      },
-                      transition: 'color 0.2s ease'
-                    }}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </Box>
-            </Box>
-          ))}
-
-          {/* Tech Stack & Contact */}
-          <Box>
-            <Typography 
-              variant="h6" 
-              component="h3" 
-              sx={{ 
-                fontSize: '1rem',
-                fontWeight: 600, 
-                mb: 2,
-                color: 'text.primary'
-              }}
-            >
-              기술 스택
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 3 }}>
-              {['React', 'Next.js', 'TypeScript', 'Vue', 'Nuxt'].map((tech) => (
-                <Box
-                  key={tech}
-                  sx={{
-                    px: 1.5,
-                    py: 0.5,
+          {/* Social Links */}
+          <Box sx={{ display: 'flex', gap: 1, justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+            {socialLinks.map((social, index) => (
+              <IconButton
+                key={index}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  color: 'text.secondary',
+                  '&:hover': {
+                    color: social.color,
                     backgroundColor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.200',
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
-                    color: 'text.secondary'
-                  }}
-                >
-                  {tech}
-                </Box>
-              ))}
-            </Box>
-
-            {/* Social Links */}
-            <Typography 
-              variant="subtitle2" 
-              sx={{ mb: 2, color: 'text.primary', fontWeight: 600 }}
-            >
-              연결하기
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              {socialLinks.map((social, index) => (
-                <IconButton
-                  key={index}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    color: 'text.secondary',
-                    '&:hover': {
-                      color: social.color,
-                      backgroundColor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.200',
-                      transform: 'translateY(-2px)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                  aria-label={social.label}
-                >
-                  {social.icon}
-                </IconButton>
-              ))}
-            </Box>
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.2s ease'
+                }}
+                aria-label={social.label}
+              >
+                {social.icon}
+              </IconButton>
+            ))}
           </Box>
         </Box>
 

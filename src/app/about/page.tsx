@@ -100,6 +100,11 @@ export default function AboutPage() {
 
   const projects = [
     {
+      name: 'artBox',
+      tech: 'React',
+      description: '인터렉티브 효과를 활용한 아트 전시 플랫폼 (진행중)'
+    },
+    {
       name: 'Nyom Nyom Ground',
       tech: 'Nuxt',
       description: 'Mobile responsive website with modern UI/UX'
@@ -166,7 +171,7 @@ export default function AboutPage() {
               fontSize: '1.1rem'
             }}
           >
-            &quot;기술의 구조와 사용자 경험 사이에서, 자연스럽고 정제된 인터페이스를 만들어갑니다.&quot;
+            &quot;예술과 기술을 좋아합니다!&quot;
           </Typography>
         </Box>
 
@@ -272,14 +277,29 @@ export default function AboutPage() {
                       <Typography variant="h6" component="h4" sx={{ mb: 1, fontWeight: 600 }}>
                         {project.name}
                       </Typography>
-                      <Chip 
-                        label={project.tech} 
-                        size="small" 
-                        color="primary" 
-                        sx={{ mb: 2 }}
-                      />
+                      <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                        <Chip 
+                          label={project.tech} 
+                          size="small" 
+                          color="primary" 
+                        />
+                        {project.name === 'artBox' && (
+                          <Chip
+                            label="진행중"
+                            size="small"
+                            sx={{
+                              backgroundColor: '#ffebee',
+                              color: '#c62828',
+                              fontWeight: 'bold',
+                              '& .MuiChip-label': {
+                                fontSize: '0.75rem'
+                              }
+                            }}
+                          />
+                        )}
+                      </Box>
                       <Typography variant="body2" color="text.secondary">
-                        {project.description}
+                        {project.description.replace(' (진행중)', '')}
                       </Typography>
                     </CardContent>
                   </Card>

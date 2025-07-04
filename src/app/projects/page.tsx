@@ -34,6 +34,7 @@ interface Project {
   date: string
   category: string
   featured?: boolean
+  status?: string
 }
 
 export default function Projects() {
@@ -43,10 +44,20 @@ export default function Projects() {
   // GitHub 실제 저장소 데이터 (최신 커밋 순으로 정렬)
   const allProjects: Project[] = [
     {
+      id: 5,
+      title: 'artBox',
+      description: '인터렉티브 효과를 활용한 아트 전시 플랫폼입니다. React와 현대적인 UI/UX 라이브러리를 통해 몰입감 있는 작품 감상 경험을 제공합니다.',
+      technologies: ['React', 'TypeScript', 'CSS3', 'UI/UX Design'],
+      github: 'https://github.com/soompy/artBox',
+      demo: 'https://artbox-project-soomins.vercel.app/',
+      date: '2025-07-02',
+      category: '웹 개발',
+      status: '진행중'
+    },
+    {
       id: 1,
       title: 'PF2024_magazine',
       description: '더매거진 홈페이지 반응형 리뉴얼 포트폴리오입니다. 최신 웹 트렌드를 반영한 모던한 디자인과 완벽한 반응형 레이아웃을 구현했습니다.',
-      image: `https://image.thum.io/get/width/1200/crop/800/https://pf-2024-magazine.vercel.app`,
       technologies: ['JavaScript', 'HTML5', 'CSS3', 'Responsive Design'],
       github: 'https://github.com/soompy/PF2024_magazine',
       demo: 'https://pf-2024-magazine.vercel.app',
@@ -58,18 +69,16 @@ export default function Projects() {
       id: 2,
       title: 'PF2024_hanmi',
       description: '2024년 한미 관련 프로젝트로 깔끔하고 전문적인 웹사이트를 구축했습니다. 사용자 경험을 최우선으로 고려한 인터페이스 설계가 특징입니다.',
-      image: `https://image.thum.io/get/width/1200/crop/800/https://pf-2024-hanmi.vercel.app`,
       technologies: ['HTML5', 'CSS3', 'JavaScript', 'Responsive Design'],
       github: 'https://github.com/soompy/PF2024_hanmi',
       demo: 'https://pf-2024-hanmi.vercel.app',
-      date: '2024-07-28',
+      date: '2024-07-29',
       category: '웹 개발'
     },
     {
       id: 3,
       title: 'PF2023_interactiveVanilla',
       description: '2023년 하반기 Vite와 Vanilla.js로 제작한 인터랙티브 웹 포트폴리오입니다. 프레임워크 없이 순수 자바스크립트로 구현한 동적 인터랙션이 돋보입니다.',
-      image: `https://image.thum.io/get/width/1200/crop/800/https://pf-2023-interactive-vanilla.vercel.app`,
       technologies: ['Vite', 'Vanilla JavaScript', 'SCSS', 'Interactive Design'],
       github: 'https://github.com/soompy/PF2023_interactiveVanilla',
       demo: 'https://pf-2023-interactive-vanilla.vercel.app',
@@ -81,7 +90,6 @@ export default function Projects() {
       id: 4,
       title: 'toy_3_nuxt_nyomnyom',
       description: 'Nuxt.js와 Vue.js를 활용한 토이 프로젝트입니다. Tailwind CSS를 사용하여 모던하고 반응형인 사용자 인터페이스를 구현했습니다.',
-      // image: `https://image.thum.io/get/width/1200/crop/800/https://toy-3-nuxt-nyomnyom.vercel.app`,
       technologies: ['Nuxt.js', 'Vue.js', 'Tailwind CSS', 'SSR'],
       github: 'https://github.com/soompy/toy_3_nuxt_nyomnyom',
       demo: 'https://toy-3-nuxt-nyomnyom.vercel.app',
@@ -284,36 +292,12 @@ export default function Projects() {
 
                                   <Box
                                       sx={{
-                                          display: "grid",
-                                          gridTemplateColumns: {
-                                              xs: "1fr",
-                                              md: "1fr 2fr",
-                                          },
-                                          gap: { xs: 2, md: 4 },
+                                          display: "block",
                                           width: '100%',
                                           minWidth: 0,
                                           overflow: 'hidden'
                                       }}
                                   >
-                                      {/* 프로젝트 이미지 */}
-                                      <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
-                                          <ProjectImage
-                                              src={project.image}
-                                              alt={`${project.title} 프로젝트 스크린샷`}
-                                              projectName={project.title}
-                                              width={400}
-                                              height={250}
-                                              priority={project.featured}
-                                              quality={85}
-                                              onClick={() => project.demo && handleLinkClick(project.demo)}
-                                              borderRadius="12px"
-                                              showOverlay={true}
-                                              style={{
-                                                  border: "1px solid rgba(0,0,0,0.1)",
-                                              }}
-                                          />
-                                      </Box>
-
                                       {/* 프로젝트 정보 */}
                                       <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
                                           <Box
@@ -348,6 +332,20 @@ export default function Projects() {
                                                           size="small"
                                                           variant="outlined"
                                                       />
+                                                      {project.status && (
+                                                          <Chip
+                                                              label={project.status}
+                                                              size="small"
+                                                              sx={{
+                                                                  backgroundColor: '#ffebee',
+                                                                  color: '#c62828',
+                                                                  fontWeight: 'bold',
+                                                                  '& .MuiChip-label': {
+                                                                      fontSize: '0.75rem'
+                                                                  }
+                                                              }}
+                                                          />
+                                                      )}
                                                       <Box
                                                           sx={{
                                                               display: "flex",
