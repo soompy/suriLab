@@ -1726,7 +1726,24 @@ function WriteContent() {
                               resize: 'none',
                               color: 'inherit',
                               height: '100% !important',
-                              overflow: 'auto'
+                              overflow: 'auto !important',
+                              overflowY: 'auto',
+                              overflowX: 'hidden',
+                              scrollbarWidth: 'thin',
+                              '&::-webkit-scrollbar': {
+                                width: '8px'
+                              },
+                              '&::-webkit-scrollbar-track': {
+                                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                borderRadius: '4px'
+                              },
+                              '&::-webkit-scrollbar-thumb': {
+                                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                                borderRadius: '4px',
+                                '&:hover': {
+                                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
+                                }
+                              }
                             },
                             '&:hover': {
                               '& .MuiOutlinedInput-notchedOutline': {
@@ -2094,28 +2111,44 @@ function WriteContent() {
           right: 0,
           width: '100%',
           zIndex: 1000,
-          bgcolor: 'background.paper',
+          bgcolor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.95)' : 'rgba(255, 255, 255, 0.95)',
           borderTop: `1px solid ${theme.palette.divider}`,
-          boxShadow: isSticky ? '0 -4px 20px rgba(0,0,0,0.15)' : '0 -2px 10px rgba(0,0,0,0.08)',
-          backdropFilter: 'blur(10px)',
-          transition: 'box-shadow 0.3s ease, transform 0.3s ease',
-          transform: isSticky ? 'translateY(0)' : 'translateY(0)'
+          boxShadow: isSticky ? '0 -8px 32px rgba(0,0,0,0.12)' : '0 -4px 16px rgba(0,0,0,0.08)',
+          backdropFilter: 'blur(12px)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '1px',
+            background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}40, transparent)`,
+            opacity: isSticky ? 1 : 0,
+            transition: 'opacity 0.3s ease'
+          }
         }}>
           <Container maxWidth="lg">
-            <Box sx={{ py: 2 }}>
-              <Stack spacing={2}>
+            <Box sx={{ py: 2.5 }}>
+              <Stack spacing={2.5}>
                 {/* 첫 번째 줄: 카테고리, 상태, 발행 버튼 */}
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ flex: 1 }}>
-                    <FormControl sx={{ minWidth: 120 }} size="small">
+                    <FormControl sx={{ minWidth: 140 }} size="small">
                       <InputLabel>카테고리</InputLabel>
                       <Select
                         value={formData.category}
                         onChange={handleInputChange('category')}
                         label="카테고리"
                         sx={{ 
-                          borderRadius: 1,
-                          bgcolor: 'background.paper'
+                          borderRadius: 2,
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: theme.palette.primary.main
+                          }
                         }}
                       >
                         {categories.map((category) => (
@@ -2126,15 +2159,21 @@ function WriteContent() {
                       </Select>
                     </FormControl>
                     
-                    <FormControl sx={{ minWidth: 100 }} size="small">
+                    <FormControl sx={{ minWidth: 120 }} size="small">
                       <InputLabel>상태</InputLabel>
                       <Select
                         value={formData.status}
                         onChange={handleInputChange('status')}
                         label="상태"
                         sx={{ 
-                          borderRadius: 1,
-                          bgcolor: 'background.paper'
+                          borderRadius: 2,
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: theme.palette.primary.main
+                          }
                         }}
                       >
                         <MenuItem value="draft">📝 초안</MenuItem>
@@ -2144,7 +2183,7 @@ function WriteContent() {
                     </FormControl>
                   </Stack>
                   
-                  <Stack direction="row" spacing={1}>
+                  <Stack direction="row" spacing={1.5}>
                     <Button
                       variant="outlined"
                       size="medium"
@@ -2152,10 +2191,17 @@ function WriteContent() {
                       onClick={handleSave}
                       disabled={saveStatus === 'saving'}
                       sx={{ 
-                        borderRadius: 1,
+                        borderRadius: 2,
                         textTransform: 'none',
                         minWidth: 'auto',
-                        px: 2
+                        px: 2.5,
+                        fontWeight: 500,
+                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                        color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+                        '&:hover': {
+                          borderColor: theme.palette.primary.main,
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'rgba(33, 150, 243, 0.05)'
+                        }
                       }}
                     >
                       {saveStatus === 'saving' ? '저장중' : '임시저장'}
@@ -2166,10 +2212,16 @@ function WriteContent() {
                       startIcon={<PublishIcon />}
                       onClick={handlePublish}
                       sx={{ 
-                        borderRadius: 1,
+                        borderRadius: 2,
                         textTransform: 'none',
                         fontWeight: 600,
-                        px: 3
+                        px: 3,
+                        boxShadow: '0 2px 8px rgba(33, 150, 243, 0.3)',
+                        '&:hover': {
+                          boxShadow: '0 4px 16px rgba(33, 150, 243, 0.4)',
+                          transform: 'translateY(-1px)'
+                        },
+                        transition: 'all 0.2s ease'
                       }}
                     >
                       {isEditing ? '수정완료' : '발행하기'}
@@ -2197,13 +2249,23 @@ function WriteContent() {
                             key={key}
                             size="small"
                             sx={{ 
-                              borderRadius: 1,
+                              borderRadius: 1.5,
                               fontSize: '0.75rem',
-                              height: '24px',
+                              height: '26px',
+                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                              borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                               '&:hover': {
-                                borderColor: 'primary.main',
-                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'primary.50'
-                              }
+                                borderColor: theme.palette.primary.main,
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(33, 150, 243, 0.1)' : 'rgba(33, 150, 243, 0.05)',
+                                transform: 'translateY(-1px)'
+                              },
+                              '& .MuiChip-deleteIcon': {
+                                color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+                                '&:hover': {
+                                  color: theme.palette.primary.main
+                                }
+                              },
+                              transition: 'all 0.2s ease'
                             }}
                           />
                         )
@@ -2217,17 +2279,20 @@ function WriteContent() {
                         size="small"
                         sx={{
                           '& .MuiOutlinedInput-root': {
-                            borderRadius: 1,
-                            bgcolor: 'background.paper',
-                            minHeight: '36px',
+                            borderRadius: 2,
+                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                            minHeight: '42px',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                            },
                             '&:hover': {
                               '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'primary.main'
+                                borderColor: theme.palette.primary.main
                               }
                             },
                             '&.Mui-focused': {
                               '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'primary.main'
+                                borderColor: theme.palette.primary.main
                               }
                             }
                           }
@@ -2236,7 +2301,7 @@ function WriteContent() {
                     )}
                     sx={{
                       '& .MuiAutocomplete-tag': {
-                        margin: '2px'
+                        margin: '3px'
                       }
                     }}
                   />
