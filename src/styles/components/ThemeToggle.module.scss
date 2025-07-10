@@ -1,37 +1,88 @@
 // ThemeToggle Component Styles
 .container {
-  @apply relative;
+  position: relative;
 }
 
 .button {
-  @apply p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: rgb(243, 244, 246);
+  }
   
   &:focus {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(59, 130, 246);
+  }
+  
+  :global(.dark) & {
+    &:hover {
+      background-color: rgb(31, 41, 55);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgb(59, 130, 246);
+    }
   }
 }
 
 .icon {
-  @apply w-5 h-5 text-gray-600 dark:text-gray-400 transition-colors;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: rgb(75, 85, 99);
+  transition: color 0.2s ease;
   
   &.light {
-    @apply text-yellow-500;
+    color: rgb(245, 158, 11);
   }
   
   &.dark {
-    @apply text-gray-300;
+    color: rgb(209, 213, 219);
+  }
+  
+  :global(.dark) & {
+    color: rgb(156, 163, 175);
   }
 }
 
 .tooltip {
-  @apply absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs rounded whitespace-nowrap opacity-0 transition-opacity pointer-events-none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background-color: rgb(17, 24, 39);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
   
   &.visible {
-    @apply opacity-100;
+    opacity: 1;
+  }
+  
+  :global(.dark) & {
+    background-color: rgb(55, 65, 81);
+    color: rgb(229, 231, 235);
   }
   
   &::after {
     content: '';
-    @apply absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: rgb(17, 24, 39);
+    
+    :global(.dark) & {
+      border-top-color: rgb(55, 65, 81);
+    }
   }
 }

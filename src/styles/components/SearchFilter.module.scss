@@ -1,71 +1,206 @@
 // SearchFilter Component Styles
 .container {
-  @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  
+  :global(.dark) & {
+    background-color: rgb(31, 41, 55);
+  }
 }
 
 .grid {
-  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .searchInput {
-  @apply relative;
+  position: relative;
   
   .input {
-    @apply w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white;
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid rgb(209, 213, 219);
+    border-radius: 0.5rem;
+    background-color: white;
+    color: rgb(17, 24, 39);
+    
+    &:focus {
+      outline: 2px solid rgb(59, 130, 246);
+      outline-offset: 2px;
+      border-color: transparent;
+    }
+    
+    :global(.dark) & {
+      border-color: rgb(75, 85, 99);
+      background-color: rgb(55, 65, 81);
+      color: white;
+    }
   }
   
   .searchIcon {
-    @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding-left: 0.75rem;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
     
     svg {
-      @apply h-5 w-5 text-gray-400;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: rgb(156, 163, 175);
     }
   }
   
   .clearButton {
-    @apply absolute inset-y-0 right-0 pr-3 flex items-center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    padding-right: 0.75rem;
+    display: flex;
+    align-items: center;
     
     svg {
-      @apply h-5 w-5 text-gray-400 hover:text-gray-600;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: rgb(156, 163, 175);
+      
+      &:hover {
+        color: rgb(75, 85, 99);
+      }
     }
   }
 }
 
 .select {
-  @apply w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(209, 213, 219);
+  border-radius: 0.5rem;
+  background-color: white;
+  color: rgb(17, 24, 39);
+  
+  &:focus {
+    outline: 2px solid rgb(59, 130, 246);
+    outline-offset: 2px;
+    border-color: transparent;
+  }
+  
+  :global(.dark) & {
+    border-color: rgb(75, 85, 99);
+    background-color: rgb(55, 65, 81);
+    color: white;
+  }
 }
 
 .resultsSummary {
-  @apply mt-4 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: rgb(75, 85, 99);
+  
+  :global(.dark) & {
+    color: rgb(156, 163, 175);
+  }
   
   .clearFiltersButton {
-    @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium;
+    color: rgb(37, 99, 235);
+    font-weight: 500;
+    
+    &:hover {
+      color: rgb(30, 64, 175);
+    }
+    
+    :global(.dark) & {
+      color: rgb(96, 165, 250);
+      
+      &:hover {
+        color: rgb(147, 197, 253);
+      }
+    }
   }
 }
 
 .activeFilters {
-  @apply mt-3 flex flex-wrap gap-2;
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   
   .filterTag {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
     
     &.search {
-      @apply bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200;
+      background-color: rgb(219, 234, 254);
+      color: rgb(30, 64, 175);
+      
+      :global(.dark) & {
+        background-color: rgb(30, 58, 138);
+        color: rgb(147, 197, 253);
+      }
     }
     
     &.tag {
-      @apply bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200;
+      background-color: rgb(220, 252, 231);
+      color: rgb(20, 83, 45);
+      
+      :global(.dark) & {
+        background-color: rgb(20, 83, 45);
+        color: rgb(187, 247, 208);
+      }
     }
     
     .removeButton {
-      @apply ml-2;
+      margin-left: 0.5rem;
       
       &.search {
-        @apply text-blue-600 dark:text-blue-400 hover:text-blue-800;
+        color: rgb(37, 99, 235);
+        
+        &:hover {
+          color: rgb(30, 64, 175);
+        }
+        
+        :global(.dark) & {
+          color: rgb(96, 165, 250);
+          
+          &:hover {
+            color: rgb(147, 197, 253);
+          }
+        }
       }
       
       &.tag {
-        @apply text-green-600 dark:text-green-400 hover:text-green-800;
+        color: rgb(34, 197, 94);
+        
+        &:hover {
+          color: rgb(22, 163, 74);
+        }
+        
+        :global(.dark) & {
+          color: rgb(74, 222, 128);
+          
+          &:hover {
+            color: rgb(134, 239, 172);
+          }
+        }
       }
     }
   }

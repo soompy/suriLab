@@ -1,64 +1,173 @@
 // PostCard Component Styles
 .card {
-  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
   
   &:hover {
-    @apply transform hover:scale-[1.02];
+    transform: scale(1.02);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  :global(.dark) & {
+    background-color: #111827;
+    border-color: #374151;
   }
 }
 
 .imageContainer {
-  @apply relative h-40 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 overflow-hidden;
+  position: relative;
+  height: 160px;
+  background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+  overflow: hidden;
+  
+  :global(.dark) & {
+    background: linear-gradient(135deg, #1f2937, #374151);
+  }
   
   .image {
-    @apply object-cover group-hover:scale-105 transition-transform duration-300;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover .image {
+    transform: scale(1.05);
   }
   
   .placeholder {
-    @apply w-full h-full flex items-center justify-center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
     .placeholderText {
-      @apply text-blue-600 dark:text-blue-400 text-3xl font-bold;
+      color: #2563eb;
+      font-size: 1.875rem;
+      font-weight: 700;
+      
+      :global(.dark) & {
+        color: #60a5fa;
+      }
     }
   }
   
   .readTimeBadge {
-    @apply absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full font-medium;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #374151;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 9999px;
+    font-weight: 500;
+    
+    :global(.dark) & {
+      background-color: rgba(17, 24, 39, 0.9);
+      color: #d1d5db;
+    }
   }
 }
 
 .content {
-  @apply p-6;
+  padding: 24px;
   
   .tags {
-    @apply flex flex-wrap gap-2 mb-4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
     
     .tag {
-      @apply px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full font-medium;
+      padding: 4px 8px;
+      background-color: #eff6ff;
+      color: #2563eb;
+      font-size: 0.75rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      
+      :global(.dark) & {
+        background-color: rgba(37, 99, 235, 0.3);
+        color: #60a5fa;
+      }
     }
     
     .moreTag {
-      @apply px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs rounded-full;
+      padding: 4px 8px;
+      background-color: #f3f4f6;
+      color: #6b7280;
+      font-size: 0.75rem;
+      border-radius: 9999px;
+      
+      :global(.dark) & {
+        background-color: #1f2937;
+        color: #9ca3af;
+      }
     }
   }
   
   .title {
-    @apply text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s ease;
+    
+    :global(.dark) & {
+      color: #ffffff;
+    }
+  }
+  
+  .card:hover .title {
+    color: #2563eb;
+    
+    :global(.dark) & {
+      color: #60a5fa;
+    }
   }
   
   .summary {
-    @apply text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4 line-clamp-3;
+    color: #4b5563;
+    font-size: 0.875rem;
+    line-height: 1.625;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    
+    :global(.dark) & {
+      color: #d1d5db;
+    }
   }
   
   .meta {
-    @apply flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #6b7280;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
     
-    .metaInfo {
-      @apply flex items-center gap-4;
+    :global(.dark) & {
+      color: #9ca3af;
+      border-top-color: #374151;
     }
     
-    .views {
-      // 뷰 수 스타일
+    .metaInfo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
   }
 }

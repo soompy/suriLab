@@ -1,8 +1,20 @@
 // Home Page Styles
 .container {
-  @apply min-h-screen bg-white dark:bg-gray-950 transition-colors;
+  min-height: 100vh;
+  background-color: white;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  
+  :global(.dark) & {
+    background-color: rgb(3, 7, 18);
+  }
 }
 
 .main {
-  @apply max-w-[1400px] mx-auto px-4 md:px-6 py-12;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 3rem 1.5rem;
+  }
 }

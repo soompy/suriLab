@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { ReactNode, useMemo } from 'react'
 import { useTheme } from './ThemeContext'
+import { designTokens } from '@/config/designTokens'
 
 interface MuiThemeProviderProps {
   children: ReactNode
@@ -16,60 +17,109 @@ export default function MuiThemeProvider({ children }: MuiThemeProviderProps) {
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
       primary: {
-        main: isDarkMode ? '#ffffff' : '#191f28', // 다크모드에서는 흰색, 라이트모드에서는 rgb(25, 31, 40)
-        dark: isDarkMode ? '#e5e7eb' : '#0f1419',
-        contrastText: isDarkMode ? '#191f28' : '#ffffff',
+        main: isDarkMode ? designTokens.colors.dark.text.primary : designTokens.colors.brand.primary,
+        dark: isDarkMode ? designTokens.colors.secondary[200] : designTokens.colors.dark.background.primary,
+        contrastText: isDarkMode ? designTokens.colors.brand.primary : designTokens.colors.dark.text.primary,
       },
       secondary: {
-        main: '#6b7280',
+        main: designTokens.colors.brand.secondary,
+        light: designTokens.colors.secondary[400],
+        dark: designTokens.colors.secondary[600],
       },
       background: {
-        default: isDarkMode ? '#0f1419' : '#ffffff',
-        paper: isDarkMode ? '#1a1f2e' : '#ffffff',
+        default: isDarkMode ? designTokens.colors.dark.background.primary : designTokens.colors.light.background.primary,
+        paper: isDarkMode ? designTokens.colors.dark.background.secondary : designTokens.colors.light.background.primary,
       },
       text: {
-        primary: isDarkMode ? '#ffffff' : '#191f28',
-        secondary: isDarkMode ? '#9ca3af' : '#6b7280',
+        primary: isDarkMode ? designTokens.colors.dark.text.primary : designTokens.colors.light.text.primary,
+        secondary: isDarkMode ? designTokens.colors.dark.text.secondary : designTokens.colors.light.text.secondary,
+      },
+      success: {
+        main: designTokens.colors.success[500],
+        light: designTokens.colors.success[300],
+        dark: designTokens.colors.success[700],
+      },
+      warning: {
+        main: designTokens.colors.warning[500],
+        light: designTokens.colors.warning[300],
+        dark: designTokens.colors.warning[700],
+      },
+      error: {
+        main: designTokens.colors.error[500],
+        light: designTokens.colors.error[300],
+        dark: designTokens.colors.error[700],
       },
     },
     typography: {
-      fontFamily: [
-        'var(--font-inter)',
-        'var(--font-noto-sans-kr)',
-        '-apple-system',
-        'BlinkMacSystemFont',
-        '"Segoe UI"',
-        'Roboto',
-        '"Helvetica Neue"',
-        'Arial',
-        'sans-serif',
-      ].join(','),
+      fontFamily: designTokens.typography.fontFamily.primary,
       h1: {
-        fontSize: '2.5rem',
-        fontWeight: 600,
-        lineHeight: 1.2,
+        fontSize: designTokens.typography.fontSize['5xl'],
+        fontWeight: designTokens.typography.fontWeight.semibold,
+        lineHeight: designTokens.typography.lineHeight.tight,
       },
       h2: {
-        fontSize: '2rem',
-        fontWeight: 600,
-        lineHeight: 1.3,
+        fontSize: designTokens.typography.fontSize['4xl'],
+        fontWeight: designTokens.typography.fontWeight.semibold,
+        lineHeight: designTokens.typography.lineHeight.snug,
+      },
+      h3: {
+        fontSize: designTokens.typography.fontSize['3xl'],
+        fontWeight: designTokens.typography.fontWeight.semibold,
+        lineHeight: designTokens.typography.lineHeight.snug,
+      },
+      h4: {
+        fontSize: designTokens.typography.fontSize['2xl'],
+        fontWeight: designTokens.typography.fontWeight.semibold,
+        lineHeight: designTokens.typography.lineHeight.snug,
+      },
+      h5: {
+        fontSize: designTokens.typography.fontSize.xl,
+        fontWeight: designTokens.typography.fontWeight.semibold,
+        lineHeight: designTokens.typography.lineHeight.snug,
+      },
+      h6: {
+        fontSize: designTokens.typography.fontSize.lg,
+        fontWeight: designTokens.typography.fontWeight.semibold,
+        lineHeight: designTokens.typography.lineHeight.snug,
       },
       body1: {
-        fontSize: '1rem',
-        lineHeight: 1.6,
+        fontSize: designTokens.typography.fontSize.base,
+        lineHeight: designTokens.typography.lineHeight.relaxed,
       },
       body2: {
-        fontSize: '0.75rem',
-        lineHeight: 1.5,
+        fontSize: designTokens.typography.fontSize.sm,
+        lineHeight: designTokens.typography.lineHeight.normal,
       },
+      caption: {
+        fontSize: designTokens.typography.fontSize.xs,
+        lineHeight: designTokens.typography.lineHeight.normal,
+      },
+    },
+    spacing: [
+      designTokens.spacing[0],
+      designTokens.spacing[1],
+      designTokens.spacing[2],
+      designTokens.spacing[3],
+      designTokens.spacing[4],
+      designTokens.spacing[5],
+      designTokens.spacing[6],
+      designTokens.spacing[7],
+      designTokens.spacing[8],
+      designTokens.spacing[9],
+      designTokens.spacing[10],
+      designTokens.spacing[11],
+      designTokens.spacing[12],
+    ],
+    shape: {
+      borderRadius: parseInt(designTokens.borderRadius.md.replace('rem', '')) * 16,
     },
     components: {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            backgroundColor: isDarkMode ? '#1a1f2e' : '#ffffff',
-            color: isDarkMode ? '#ffffff' : '#191f28',
-            boxShadow: 'none',
+            backgroundColor: isDarkMode ? designTokens.colors.dark.background.secondary : designTokens.colors.light.background.primary,
+            color: isDarkMode ? designTokens.colors.dark.text.primary : designTokens.colors.light.text.primary,
+            boxShadow: designTokens.shadow.none,
             borderBottom: 'none',
           },
         },
@@ -78,18 +128,52 @@ export default function MuiThemeProvider({ children }: MuiThemeProviderProps) {
         styleOverrides: {
           root: {
             textTransform: 'none',
-            borderRadius: '6px',
-            fontWeight: 500,
+            borderRadius: designTokens.borderRadius.md,
+            fontWeight: designTokens.typography.fontWeight.medium,
+            fontSize: designTokens.typography.fontSize.sm,
+          },
+          contained: {
+            boxShadow: designTokens.shadow.sm,
+            '&:hover': {
+              boxShadow: designTokens.shadow.md,
+            },
           },
         },
       },
       MuiIconButton: {
         styleOverrides: {
           root: {
-            color: isDarkMode ? '#9ca3af' : '#6b7280',
+            color: isDarkMode ? designTokens.colors.dark.text.secondary : designTokens.colors.light.text.secondary,
             '&:hover': {
-              color: isDarkMode ? '#ffffff' : '#191f28',
+              color: isDarkMode ? designTokens.colors.dark.text.primary : designTokens.colors.light.text.primary,
+              backgroundColor: isDarkMode ? designTokens.colors.dark.background.tertiary : designTokens.colors.light.background.secondary,
             },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            backgroundColor: isDarkMode ? designTokens.colors.dark.background.secondary : designTokens.colors.light.background.primary,
+            borderRadius: designTokens.borderRadius.lg,
+            boxShadow: isDarkMode ? designTokens.shadow.none : designTokens.shadow.sm,
+            border: `${designTokens.borderWidth.DEFAULT} solid ${isDarkMode ? designTokens.colors.dark.border.primary : designTokens.colors.light.border.primary}`,
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: designTokens.borderRadius.full,
+            fontSize: designTokens.typography.fontSize.xs,
+            fontWeight: designTokens.typography.fontWeight.medium,
+          },
+        },
+      },
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            color: 'inherit',
           },
         },
       },

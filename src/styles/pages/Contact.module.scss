@@ -1,54 +1,130 @@
 // Contact Page Styles
 .container {
-  @apply min-h-screen bg-white dark:bg-gray-950 transition-colors;
+  min-height: 100vh;
+  background-color: white;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  
+  :global(.dark) & {
+    background-color: rgb(3, 7, 18);
+  }
 }
 
 .main {
-  @apply max-w-[1400px] mx-auto px-4 md:px-6 py-12;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 3rem 1.5rem;
+  }
 }
 
 .content {
-  @apply max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-8;
+  max-width: 64rem;
+  margin: 0 auto;
+  background-color: white;
+  border: 1px solid rgb(229, 231, 235);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding: 2rem;
+  
+  :global(.dark) & {
+    background-color: rgb(17, 24, 39);
+    border-color: rgb(31, 41, 55);
+  }
 }
 
 .title {
-  @apply text-4xl font-bold text-gray-900 dark:text-white mb-8;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: rgb(17, 24, 39);
+  margin-bottom: 2rem;
+  
+  :global(.dark) & {
+    color: white;
+  }
 }
 
 .grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-8;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .contactInfo {
   .sectionTitle {
-    @apply text-xl font-bold text-gray-900 dark:text-white mb-4;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgb(17, 24, 39);
+    margin-bottom: 1rem;
+    
+    :global(.dark) & {
+      color: white;
+    }
   }
   
   .description {
-    @apply text-gray-600 dark:text-gray-300 mb-6;
+    color: rgb(75, 85, 99);
+    margin-bottom: 1.5rem;
+    
+    :global(.dark) & {
+      color: rgb(209, 213, 219);
+    }
   }
   
   .contactList {
-    @apply space-y-4;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     
     .contactItem {
-      @apply flex items-center gap-3;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       
       .icon {
-        @apply w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center;
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: rgb(219, 234, 254);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        :global(.dark) & {
+          background-color: rgb(30, 58, 138, 0.3);
+        }
         
         span {
-          @apply text-blue-600 dark:text-blue-400 text-sm;
+          color: rgb(37, 99, 235);
+          font-size: 0.875rem;
+          
+          :global(.dark) & {
+            color: rgb(96, 165, 250);
+          }
         }
       }
       
       .info {
         .label {
-          @apply font-medium text-gray-900 dark:text-white;
+          font-weight: 500;
+          color: rgb(17, 24, 39);
+          
+          :global(.dark) & {
+            color: white;
+          }
         }
         
         .value {
-          @apply text-gray-600 dark:text-gray-300;
+          color: rgb(75, 85, 99);
+          
+          :global(.dark) & {
+            color: rgb(209, 213, 219);
+          }
         }
       }
     }
@@ -57,28 +133,88 @@
 
 .contactForm {
   .sectionTitle {
-    @apply text-xl font-bold text-gray-900 dark:text-white mb-4;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgb(17, 24, 39);
+    margin-bottom: 1rem;
+    
+    :global(.dark) & {
+      color: white;
+    }
   }
   
   .form {
-    @apply space-y-4;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     
     .formGroup {
       .label {
-        @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgb(55, 65, 81);
+        margin-bottom: 0.5rem;
+        
+        :global(.dark) & {
+          color: rgb(209, 213, 219);
+        }
       }
       
       .input {
-        @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid rgb(209, 213, 219);
+        border-radius: 0.375rem;
+        background-color: white;
+        color: rgb(17, 24, 39);
+        
+        &:focus {
+          outline: 2px solid rgb(59, 130, 246);
+          outline-offset: 2px;
+          border-color: transparent;
+        }
+        
+        :global(.dark) & {
+          border-color: rgb(55, 65, 81);
+          background-color: rgb(31, 41, 55);
+          color: white;
+        }
       }
       
       .textarea {
-        @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid rgb(209, 213, 219);
+        border-radius: 0.375rem;
+        background-color: white;
+        color: rgb(17, 24, 39);
+        
+        &:focus {
+          outline: 2px solid rgb(59, 130, 246);
+          outline-offset: 2px;
+          border-color: transparent;
+        }
+        
+        :global(.dark) & {
+          border-color: rgb(55, 65, 81);
+          background-color: rgb(31, 41, 55);
+          color: white;
+        }
       }
     }
     
     .submitButton {
-      @apply w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors;
+      width: 100%;
+      background-color: rgb(37, 99, 235);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: rgb(29, 78, 216);
+      }
     }
   }
 }

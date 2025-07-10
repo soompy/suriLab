@@ -1,60 +1,152 @@
 // About Page Styles
 .container {
-  @apply min-h-screen bg-white dark:bg-gray-950 transition-colors;
+  min-height: 100vh;
+  background-color: white;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  
+  :global(.dark) & {
+    background-color: rgb(3, 7, 18);
+  }
 }
 
 .main {
-  @apply max-w-[1400px] mx-auto px-4 md:px-6 py-12;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 3rem 1.5rem;
+  }
 }
 
 .content {
-  @apply max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-8;
+  max-width: 64rem;
+  margin: 0 auto;
+  background-color: white;
+  border: 1px solid rgb(229, 231, 235);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding: 2rem;
+  
+  :global(.dark) & {
+    background-color: rgb(17, 24, 39);
+    border-color: rgb(31, 41, 55);
+  }
 }
 
 .title {
-  @apply text-4xl font-bold text-gray-900 dark:text-white mb-8;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: rgb(17, 24, 39);
+  margin-bottom: 2rem;
+  
+  :global(.dark) & {
+    color: white;
+  }
 }
 
 .profileSection {
-  @apply flex items-start gap-8 mb-8;
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
   
   .avatar {
-    @apply w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold;
+    width: 8rem;
+    height: 8rem;
+    background: linear-gradient(to bottom right, rgb(59, 130, 246), rgb(147, 51, 234));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.25rem;
+    font-weight: 700;
   }
   
   .info {
     .name {
-      @apply text-2xl font-bold text-gray-900 dark:text-white mb-4;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: rgb(17, 24, 39);
+      margin-bottom: 1rem;
+      
+      :global(.dark) & {
+        color: white;
+      }
     }
     
     .bio {
-      @apply text-gray-600 dark:text-gray-300 mb-4;
+      color: rgb(75, 85, 99);
+      margin-bottom: 1rem;
+      
+      :global(.dark) & {
+        color: rgb(209, 213, 219);
+      }
     }
     
     .details {
-      @apply flex gap-4 text-sm text-gray-500 dark:text-gray-400;
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: rgb(107, 114, 128);
+      
+      :global(.dark) & {
+        color: rgb(156, 163, 175);
+      }
     }
   }
 }
 
 .skillsSection {
   .skillsTitle {
-    @apply text-xl font-bold text-gray-900 dark:text-white mb-4;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgb(17, 24, 39);
+    margin-bottom: 1rem;
+    
+    :global(.dark) & {
+      color: white;
+    }
   }
   
   .skillsGrid {
-    @apply grid grid-cols-2 md:grid-cols-4 gap-4 mb-8;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
     
     .skillItem {
-      @apply bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center;
+      background-color: rgb(243, 244, 246);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      text-align: center;
+      
+      :global(.dark) & {
+        background-color: rgb(31, 41, 55);
+      }
       
       .skillName {
-        @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgb(55, 65, 81);
+        
+        :global(.dark) & {
+          color: rgb(209, 213, 219);
+        }
       }
     }
   }
 }
 
 .description {
-  @apply text-gray-600 dark:text-gray-300;
+  color: rgb(75, 85, 99);
+  
+  :global(.dark) & {
+    color: rgb(209, 213, 219);
+  }
 }

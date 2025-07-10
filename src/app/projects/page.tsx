@@ -20,7 +20,6 @@ import {
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { ProjectImage } from '@/components/image'
 import SkillTag from '@/components/SkillTag'
 
 interface Project {

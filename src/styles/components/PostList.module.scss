@@ -1,84 +1,195 @@
 // PostList Component Styles
 .container {
-  @apply w-full;
+  width: 100%;
 }
 
 .emptyState {
-  @apply text-center py-16;
+  text-align: center;
+  padding: 4rem 0;
   
   .emptyIcon {
-    @apply text-gray-400 dark:text-gray-600 text-6xl mb-4;
+    color: rgb(156, 163, 175);
+    font-size: 3.75rem;
+    margin-bottom: 1rem;
+    
+    :global(.dark) & {
+      color: rgb(75, 85, 99);
+    }
   }
   
   .emptyTitle {
-    @apply text-xl font-medium text-gray-900 dark:text-white mb-2;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: rgb(17, 24, 39);
+    margin-bottom: 0.5rem;
+    
+    :global(.dark) & {
+      color: white;
+    }
   }
   
   .emptyDescription {
-    @apply text-gray-600 dark:text-gray-400;
+    color: rgb(75, 85, 99);
+    
+    :global(.dark) & {
+      color: rgb(156, 163, 175);
+    }
   }
 }
 
 .grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .list {
-  @apply space-y-6;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   
   .listItem {
-    @apply max-w-4xl mx-auto;
+    max-width: 64rem;
+    margin: 0 auto;
   }
 }
 
 .loadMoreSection {
-  @apply text-center mt-12;
+  text-align: center;
+  margin-top: 3rem;
   
   .loadMoreButton {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+    background-color: rgb(37, 99, 235);
+    color: white;
+    font-weight: 500;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    
+    &:hover {
+      background-color: rgb(29, 78, 216);
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
   }
 }
 
 .pagination {
-  @apply flex items-center justify-center mt-12 space-x-2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3rem;
+  gap: 0.5rem;
   
   .paginationButton {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: color 0.2s ease, background-color 0.2s ease;
     
     &.active {
-      @apply bg-blue-600 text-white;
+      background-color: rgb(37, 99, 235);
+      color: white;
     }
     
     &.inactive {
-      @apply bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800;
+      background-color: white;
+      color: rgb(55, 65, 81);
+      border: 1px solid rgb(209, 213, 219);
+      
+      &:hover {
+        background-color: rgb(249, 250, 251);
+      }
+      
+      :global(.dark) & {
+        background-color: rgb(17, 24, 39);
+        color: rgb(209, 213, 219);
+        border-color: rgb(55, 65, 81);
+        
+        &:hover {
+          background-color: rgb(31, 41, 55);
+        }
+      }
     }
     
     &.disabled {
-      @apply bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600;
+      background-color: rgb(243, 244, 246);
+      color: rgb(156, 163, 175);
+      cursor: not-allowed;
+      
+      :global(.dark) & {
+        background-color: rgb(31, 41, 55);
+        color: rgb(75, 85, 99);
+      }
     }
   }
   
   .pageNumbers {
-    @apply flex space-x-1;
+    display: flex;
+    gap: 0.25rem;
   }
   
   .pageNumber {
-    @apply w-10 h-10 rounded-lg font-medium transition-colors;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
     &.current {
-      @apply bg-blue-600 text-white;
+      background-color: rgb(37, 99, 235);
+      color: white;
     }
     
     &.ellipsis {
-      @apply text-gray-400 cursor-default dark:text-gray-600;
+      color: rgb(156, 163, 175);
+      cursor: default;
+      
+      :global(.dark) & {
+        color: rgb(75, 85, 99);
+      }
     }
     
     &.normal {
-      @apply bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800;
+      background-color: white;
+      color: rgb(55, 65, 81);
+      border: 1px solid rgb(209, 213, 219);
+      
+      &:hover {
+        background-color: rgb(249, 250, 251);
+      }
+      
+      :global(.dark) & {
+        background-color: rgb(17, 24, 39);
+        color: rgb(209, 213, 219);
+        border-color: rgb(55, 65, 81);
+        
+        &:hover {
+          background-color: rgb(31, 41, 55);
+        }
+      }
     }
   }
 }
 
 .paginationInfo {
-  @apply text-center mt-6 text-sm text-gray-600 dark:text-gray-400;
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: rgb(75, 85, 99);
+  
+  :global(.dark) & {
+    color: rgb(156, 163, 175);
+  }
 }

@@ -1,24 +1,42 @@
 // BlogMainPage Component Styles
 .container {
-  @apply w-full;
+  width: 100%;
 }
 
 .heroSection {
-  @apply py-16 mb-12;
+  padding: 4rem 0 3rem;
   
   .heroContent {
-    @apply text-center;
+    text-align: center;
     
     .title {
-      @apply text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6;
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: rgb(17, 24, 39);
+      margin-bottom: 1.5rem;
+      
+      @media (min-width: 768px) {
+        font-size: 3rem;
+      }
+      
+      :global(.dark) & {
+        color: white;
+      }
     }
     
     .subtitle {
-      @apply text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto;
+      font-size: 1.125rem;
+      color: rgb(75, 85, 99);
+      max-width: 32rem;
+      margin: 0 auto;
+      
+      :global(.dark) & {
+        color: rgb(156, 163, 175);
+      }
     }
   }
 }
 
 .searchSection {
-  @apply mb-8;
+  margin-bottom: 2rem;
 }

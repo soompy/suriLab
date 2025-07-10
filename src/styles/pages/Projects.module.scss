@@ -1,48 +1,146 @@
 // Projects Page Styles
 .container {
-  @apply min-h-screen bg-white dark:bg-gray-950 transition-colors;
+  min-height: 100vh;
+  background-color: white;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  
+  :global(.dark) & {
+    background-color: rgb(3, 7, 18);
+  }
 }
 
 .main {
-  @apply max-w-[1400px] mx-auto px-4 md:px-6 py-12;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 3rem 1.5rem;
+  }
 }
 
 .title {
-  @apply text-4xl font-bold text-gray-900 dark:text-white mb-8;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: rgb(17, 24, 39);
+  margin-bottom: 2rem;
+  
+  :global(.dark) & {
+    color: white;
+  }
 }
 
 .grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .projectCard {
-  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow;
+  background-color: white;
+  border: 1px solid rgb(229, 231, 235);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  :global(.dark) & {
+    background-color: rgb(17, 24, 39);
+    border-color: rgb(31, 41, 55);
+  }
   
   .projectTitle {
-    @apply text-xl font-bold text-gray-900 dark:text-white mb-3;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgb(17, 24, 39);
+    margin-bottom: 0.75rem;
+    
+    :global(.dark) & {
+      color: white;
+    }
   }
   
   .projectDescription {
-    @apply text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed;
+    color: rgb(75, 85, 99);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.625;
+    
+    :global(.dark) & {
+      color: rgb(209, 213, 219);
+    }
   }
   
   .techStack {
-    @apply flex flex-wrap gap-2 mb-4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
     
     .techTag {
-      @apply px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full;
+      padding: 0.25rem 0.5rem;
+      background-color: rgb(219, 234, 254);
+      color: rgb(37, 99, 235);
+      font-size: 0.75rem;
+      border-radius: 9999px;
+      
+      :global(.dark) & {
+        background-color: rgb(30, 58, 138, 0.3);
+        color: rgb(96, 165, 250);
+      }
     }
   }
   
   .projectLinks {
-    @apply flex gap-3;
+    display: flex;
+    gap: 0.75rem;
     
     .githubLink {
-      @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 text-sm;
+      color: rgb(75, 85, 99);
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+      
+      &:hover {
+        color: rgb(17, 24, 39);
+      }
+      
+      :global(.dark) & {
+        color: rgb(156, 163, 175);
+        
+        &:hover {
+          color: rgb(229, 231, 235);
+        }
+      }
     }
     
     .demoLink {
-      @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm;
+      color: rgb(37, 99, 235);
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+      
+      &:hover {
+        color: rgb(30, 64, 175);
+      }
+      
+      :global(.dark) & {
+        color: rgb(96, 165, 250);
+        
+        &:hover {
+          color: rgb(147, 197, 253);
+        }
+      }
     }
   }
 }
