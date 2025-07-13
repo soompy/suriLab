@@ -5,18 +5,14 @@ import {
   Typography, 
   Container, 
   Paper, 
-  Chip, 
   Divider,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Card,
-  CardContent,
   Link
 } from '@mui/material'
 import { 
-  Code, 
   Work, 
   Timeline, 
   GitHub, 
@@ -98,28 +94,6 @@ export default function AboutPage() {
       },
   ];
 
-  const projects = [
-    {
-      name: 'artBox',
-      tech: 'React',
-      description: '인터렉티브 효과를 활용한 아트 전시 플랫폼 (진행중)'
-    },
-    {
-      name: 'Nyom Nyom Ground',
-      tech: 'Nuxt',
-      description: 'Mobile responsive website with modern UI/UX'
-    },
-    {
-      name: 'Chunsik Fan Page',
-      tech: 'Vite',
-      description: 'Interactive fan page with responsive design'
-    },
-    {
-      name: 'SuriBlog',
-      tech: 'Next.js',
-      description: '개인 기술 블로그 (현재 프로젝트)'
-    }
-  ]
 
   return (
     <MuiThemeProvider>
@@ -239,10 +213,10 @@ export default function AboutPage() {
                         }
                         secondary={
                           <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }} component="span">
                               {exp.period}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" color="text.secondary" component="div">
                               {exp.description}
                             </Typography>
                           </Box>
@@ -255,57 +229,6 @@ export default function AboutPage() {
               </List>
             </Paper>
 
-            {/* Projects Section */}
-            <Paper sx={{ 
-              p: 4,
-              border: '1px solid rgba(0, 29, 58, 0.18)',
-              borderRadius: '10px',
-              boxShadow: 'none'
-            }}>
-              <Typography variant="h5" component="h3" sx={{ mb: 3, fontWeight: 600 }}>
-                <Code sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Featured Projects
-              </Typography>
-              <Box sx={{ 
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                gap: 3
-              }}>
-                {projects.map((project, index) => (
-                  <Card variant="outlined" sx={{ height: '100%' }} key={index}>
-                    <CardContent>
-                      <Typography variant="h6" component="h4" sx={{ mb: 1, fontWeight: 600 }}>
-                        {project.name}
-                      </Typography>
-                      <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                        <Chip 
-                          label={project.tech} 
-                          size="small" 
-                          color="primary" 
-                        />
-                        {project.name === 'artBox' && (
-                          <Chip
-                            label="진행중"
-                            size="small"
-                            sx={{
-                              backgroundColor: '#ffebee',
-                              color: '#c62828',
-                              fontWeight: 'bold',
-                              '& .MuiChip-label': {
-                                fontSize: '0.75rem'
-                              }
-                            }}
-                          />
-                        )}
-                      </Box>
-                      <Typography variant="body2" color="text.secondary">
-                        {project.description.replace(' (진행중)', '')}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Box>
-            </Paper>
           </Box>
 
           {/* Right Column */}
