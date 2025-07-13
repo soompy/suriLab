@@ -43,6 +43,17 @@ export default function Projects() {
   // GitHub 실제 저장소 데이터 (최신 커밋 순으로 정렬)
   const allProjects: Project[] = [
     {
+      id: 6,
+      title: 'safepay',
+      description: '안전한 결제 시스템을 구현한 프로젝트입니다. 보안성과 사용자 경험을 최우선으로 고려하여 개발된 결제 솔루션입니다.',
+      technologies: ['React', 'TypeScript', 'Next.js', 'Payment API'],
+      github: 'https://github.com/soompy/safepay',
+      demo: 'https://safepay-rho.vercel.app/',
+      date: '2025-07-10',
+      category: '웹 개발',
+      status: '진행중'
+    },
+    {
       id: 5,
       title: 'artBox',
       description: '인터렉티브 효과를 활용한 아트 전시 플랫폼입니다. React와 현대적인 UI/UX 라이브러리를 통해 몰입감 있는 작품 감상 경험을 제공합니다.',
