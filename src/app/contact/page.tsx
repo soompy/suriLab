@@ -13,8 +13,14 @@ import {
   Snackbar,
   Alert,
   TextField,
-  Button
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material'
+import emailjs from '@emailjs/browser'
 import {
   Email as EmailIcon,
   GitHub as GitHubIcon,
@@ -22,7 +28,9 @@ import {
   Launch as LaunchIcon,
   ContentCopy as CopyIcon,
   Code as CodeIcon,
-  Send as SendIcon
+  Send as SendIcon,
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon
 } from '@mui/icons-material'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
@@ -31,7 +39,11 @@ import Footer from '@/components/Footer'
 export default function Contact() {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
-  const [snackbarSeverity] = useState<'success' | 'error'>('success')
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogType, setDialogType] = useState<'success' | 'error'>('success')
+  const [dialogMessage, setDialogMessage] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -39,7 +51,7 @@ export default function Contact() {
     message: ''
   })
 
-  const email = 'yzsumin@naver.com'
+  const email = 'sooper1137@gmail.com'
 
   const handleEmailCopy = async () => {
     try {
@@ -62,6 +74,118 @@ export default function Contact() {
       ...prev,
       [name]: value
     }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // 기본 유효성 검사
+    if (!formData.name || !formData.email || !formData.message) {
+      setSnackbarMessage('모든 필수 항목을 입력해주세요.')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+
+    // 이메일 형식 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setSnackbarMessage('올바른 이메일 형식을 입력해주세요.')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // EmailJS 환경변수 확인
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+      console.log('EmailJS 설정 확인:', {
+        serviceId: serviceId || 'MISSING',
+        templateId: templateId || 'MISSING',
+        publicKey: publicKey ? publicKey.substring(0, 5) + '...' : 'MISSING'
+      })
+
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error(`EmailJS 설정이 완료되지 않았습니다. 누락된 값: ${!serviceId ? 'SERVICE_ID ' : ''}${!templateId ? 'TEMPLATE_ID ' : ''}${!publicKey ? 'PUBLIC_KEY' : ''}`)
+      }
+
+      if (templateId === 'your_template_id') {
+        throw new Error('Template ID를 실제 값으로 변경해주세요.')
+      }
+
+      // EmailJS로 이메일 전송
+      console.log('EmailJS 전송 시작...')
+      console.log('전송 데이터:', {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject || '제목 없음',
+        message: formData.message.substring(0, 50) + '...'
+      })
+
+      const result = await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject || '제목 없음',
+          message: formData.message,
+          to_email: 'sooper1137@gmail.com'
+        },
+        publicKey
+      )
+
+      console.log('EmailJS 응답:', result)
+
+      // 성공 메시지 - Dialog로 표시
+      setDialogType('success')
+      setDialogMessage('메시지가 성공적으로 전송되었습니다! 24시간 이내에 답변드리겠습니다.')
+      setDialogOpen(true)
+
+      // 폼 초기화
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      })
+
+    } catch (error) {
+      console.error('이메일 전송 오류 상세:', error)
+      
+      let errorMessage = '메시지 전송에 실패했습니다.'
+      
+      if (error instanceof Error) {
+        console.log('Error message:', error.message)
+        
+        // EmailJS 특정 오류 메시지 처리
+        if (error.message.includes('404')) {
+          errorMessage = 'EmailJS 서비스나 템플릿을 찾을 수 없습니다. 설정을 확인해주세요.'
+        } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+          errorMessage = 'EmailJS 권한이 없습니다. Public Key를 확인해주세요.'
+        } else if (error.message.includes('400')) {
+          errorMessage = 'EmailJS 요청 형식이 잘못되었습니다.'
+        } else if (error.message.includes('Network')) {
+          errorMessage = '네트워크 오류입니다. 인터넷 연결을 확인해주세요.'
+        } else if (error.message.includes('Template ID')) {
+          errorMessage = error.message
+        } else {
+          errorMessage = `전송 실패: ${error.message}`
+        }
+      }
+      
+      // 오류 메시지 - Dialog로 표시
+      setDialogType('error')
+      setDialogMessage(errorMessage)
+      setDialogOpen(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const socialLinks = [
@@ -111,95 +235,81 @@ export default function Contact() {
             <Box>
               <Paper sx={{ p: 4, height: '100%', boxShadow: 'none', width: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                  <SendIcon sx={{ mr: 2, fontSize: 32, color: 'text.disabled' }} />
-                  <Typography variant="h5" component="h2" color="text.disabled">
-                    메시지 보내기 (준비 중)
+                  <SendIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
+                  <Typography variant="h5" component="h2" color="primary.main">
+                    메시지 보내기
                   </Typography>
                 </Box>
                 
-                <Box sx={{ position: 'relative' }}>
-                  <Box 
-                    sx={{ 
-                      position: 'absolute', 
-                      top: 0, 
-                      left: 0, 
-                      right: 0, 
-                      bottom: 0, 
-                      backgroundColor: 'rgba(0, 0, 0, 0.05)', 
-                      backdropFilter: 'blur(2px)', 
-                      zIndex: 1, 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      borderRadius: 1
+                <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
+                  <TextField
+                    fullWidth
+                    label="이름"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    variant="outlined"
+                    disabled={isSubmitting}
+                    placeholder="이름을 입력해주세요"
+                    InputLabelProps={{
+                      shrink: true,
                     }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="이메일"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    variant="outlined"
+                    disabled={isSubmitting}
+                    placeholder="이메일 주소를 입력해주세요"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="제목"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    variant="outlined"
+                    disabled={isSubmitting}
+                    placeholder="메시지 제목을 입력해주세요 (선택사항)"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="메시지"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    multiline
+                    rows={6}
+                    variant="outlined"
+                    placeholder="궁금한 점이나 협업 제안, 피드백 등 무엇이든 자유롭게 작성해주세요."
+                    disabled={isSubmitting}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    disabled={isSubmitting}
+                    startIcon={isSubmitting ? <CircularProgress size={20} /> : <SendIcon />}
+                    sx={{ alignSelf: 'flex-start', minWidth: 150 }}
                   >
-                    <Box sx={{ textAlign: 'center', p: 3 }}>
-                      <Typography variant="h6" gutterBottom color="primary">
-                        🚧 기능 준비 중
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        더 안정적인 메시지 전송 서비스를 준비하고 있습니다.
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        현재는 이메일로 직접 연락해 주세요.
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%', filter: 'blur(1px)', opacity: 0.6 }}>
-                    <TextField
-                      fullWidth
-                      label="이름"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      variant="outlined"
-                      disabled
-                    />
-                    <TextField
-                      fullWidth
-                      label="이메일"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      variant="outlined"
-                      disabled
-                    />
-                    <TextField
-                      fullWidth
-                      label="제목"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      variant="outlined"
-                      disabled
-                    />
-                    <TextField
-                      fullWidth
-                      label="메시지"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      required
-                      multiline
-                      rows={6}
-                      variant="outlined"
-                      placeholder="궁금한 점이나 협업 제안, 피드백 등 무엇이든 자유롭게 작성해주세요."
-                      disabled
-                    />
-                    <Button
-                      variant="contained"
-                      size="large"
-                      disabled
-                      startIcon={<SendIcon />}
-                      sx={{ alignSelf: 'flex-start', minWidth: 150 }}
-                    >
-                      메시지 전송
-                    </Button>
-                  </Box>
+                    {isSubmitting ? '전송 중...' : '메시지 전송'}
+                  </Button>
                 </Box>
               </Paper>
             </Box>
@@ -308,6 +418,83 @@ export default function Contact() {
         
         <Footer />
       </Box>
+
+      {/* 전송 상태 Dialog */}
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            p: 1
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 2,
+          pb: 2
+        }}>
+          {dialogType === 'success' ? (
+            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 32 }} />
+          ) : (
+            <ErrorIcon sx={{ color: 'error.main', fontSize: 32 }} />
+          )}
+          <Typography variant="h6" component="div">
+            {dialogType === 'success' ? '전송 완료!' : '전송 실패'}
+          </Typography>
+        </DialogTitle>
+        
+        <DialogContent sx={{ pb: 2 }}>
+          <Typography variant="body1" color="text.secondary">
+            {dialogMessage}
+          </Typography>
+          
+          {dialogType === 'success' && (
+            <Box sx={{ 
+              mt: 2, 
+              p: 2, 
+              bgcolor: 'success.50', 
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: 'success.200'
+            }}>
+              <Typography variant="body2" color="success.dark">
+                📧 메시지가 sooper1137@gmail.com으로 전송되었습니다.
+              </Typography>
+            </Box>
+          )}
+          
+          {dialogType === 'error' && (
+            <Box sx={{ 
+              mt: 2, 
+              p: 2, 
+              bgcolor: 'error.50', 
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: 'error.200'
+            }}>
+              <Typography variant="body2" color="error.dark">
+                💡 문제가 지속되면 sooper1137@gmail.com으로 직접 연락해주세요.
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button 
+            onClick={() => setDialogOpen(false)} 
+            variant="contained"
+            color={dialogType === 'success' ? 'success' : 'primary'}
+            sx={{ minWidth: 100 }}
+          >
+            확인
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbarOpen}
