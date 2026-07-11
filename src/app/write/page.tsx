@@ -91,6 +91,8 @@ function WriteContent() {
   const [formData, setFormData] = useState({
     title: '',
     summary: '',
+    series: '',
+    thumbnail: '',
     content: '',
     category: '',
     status: 'draft'
@@ -160,7 +162,9 @@ function WriteContent() {
         const status = post.isPublished ? 'published' : 'draft'
         setFormData({
           title: post.title,
-          summary: post.excerpt,
+          summary: post.description || post.excerpt,
+          series: post.series || '',
+          thumbnail: post.thumbnail || '',
           content: post.content,
           category: post.category,
           status: status
@@ -235,7 +239,9 @@ function WriteContent() {
     const status = draft.isPublished ? 'published' : 'draft'
     setFormData({
       title: draft.title,
-      summary: draft.excerpt || '',
+      summary: draft.description || draft.excerpt || '',
+      series: draft.series || '',
+      thumbnail: draft.thumbnail || '',
       content: draft.content,
       category: draft.category,
       status: status
@@ -307,9 +313,13 @@ function WriteContent() {
         title: formData.title || '제목 없음',
         content: formData.content,
         excerpt: excerpt,
+        description: excerpt,
+        series: formData.series || undefined,
+        thumbnail: formData.thumbnail || undefined,
         category: formData.category,
         tags: tags,
         isPublished: shouldBePublished,
+        draft: !shouldBePublished,
         isFeatured: false
       }
 
@@ -831,12 +841,16 @@ function WriteContent() {
         title: formData.title,
         content: formData.content,
         excerpt: excerpt,
+        description: excerpt,
+        series: formData.series || undefined,
+        thumbnail: formData.thumbnail || undefined,
         slug: generateSlug(formData.title),
         tags,
         category: formData.category,
         authorId: BLOG_CONFIG.owner.id,
         featured: false,
-        isPublished: isPublished
+        isPublished: isPublished,
+        draft: !isPublished
       }
 
       const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
@@ -930,12 +944,16 @@ function WriteContent() {
         title: formData.title,
         content: formData.content,
         excerpt: excerpt,
+        description: excerpt,
+        series: formData.series || undefined,
+        thumbnail: formData.thumbnail || undefined,
         slug: generateSlug(formData.title),
         tags,
         category: formData.category,
         authorId: BLOG_CONFIG.owner.id,
         featured: false,
-        isPublished: true
+        isPublished: true,
+        draft: false
       }
 
       const url = isEditing ? `/api/posts/${editId}` : '/api/posts'
@@ -989,6 +1007,8 @@ function WriteContent() {
         setFormData({
           title: '',
           summary: '',
+          series: '',
+          thumbnail: '',
           content: '',
           category: '',
           status: 'draft'
@@ -1686,6 +1706,42 @@ function WriteContent() {
                         }
                       </Typography>
                     </Box>
+                  </Box>
+
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
+                    <TextField
+                      fullWidth
+                      label={isFocused === 'series' ? '' : '시리즈'}
+                      value={formData.series}
+                      onChange={handleInputChange('series')}
+                      onFocus={handleFocus('series')}
+                      onBlur={handleBlur}
+                      placeholder={isFocused === 'series' || formData.series ? '예: MomentTune 14주 제작기' : ''}
+                      variant="outlined"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1.5,
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper'
+                        }
+                      }}
+                    />
+
+                    <TextField
+                      fullWidth
+                      label={isFocused === 'thumbnail' ? '' : '썸네일 URL'}
+                      value={formData.thumbnail}
+                      onChange={handleInputChange('thumbnail')}
+                      onFocus={handleFocus('thumbnail')}
+                      onBlur={handleBlur}
+                      placeholder={isFocused === 'thumbnail' || formData.thumbnail ? 'https://...' : ''}
+                      variant="outlined"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1.5,
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper'
+                        }
+                      }}
+                    />
                   </Box>
                 </Box>
 

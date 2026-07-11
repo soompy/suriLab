@@ -3,6 +3,9 @@ export interface PostEntity {
   title: string
   content: string
   excerpt: string
+  description?: string
+  series?: string | null
+  thumbnail?: string | null
   slug: string
   publishedAt: Date
   updatedAt: Date
@@ -13,18 +16,23 @@ export interface PostEntity {
   views?: number
   featured?: boolean
   isPublished: boolean
+  draft?: boolean
 }
 
 export interface CreatePostInput {
   title: string
   content: string
   excerpt: string
+  description?: string
+  series?: string | null
+  thumbnail?: string | null
   slug: string
   tags: string[]
   category: string
   authorId: string
   featured?: boolean
   isPublished?: boolean
+  draft?: boolean
 }
 
 export interface UpdatePostInput {
@@ -32,16 +40,21 @@ export interface UpdatePostInput {
   title?: string
   content?: string
   excerpt?: string
+  description?: string
+  series?: string | null
+  thumbnail?: string | null
   slug?: string
   tags?: string[]
   category?: string
   featured?: boolean
   isPublished?: boolean
+  draft?: boolean
 }
 
 export interface PostFilters {
   category?: string
   tags?: string[]
+  series?: string
   authorId?: string
   searchQuery?: string
   featured?: boolean

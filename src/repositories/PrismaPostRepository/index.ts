@@ -23,6 +23,9 @@ export class PrismaPostRepository implements PostRepository {
           }
         }
       }
+      if (filters.series) {
+        where.series = filters.series
+      }
       if (filters.authorId) {
         where.authorId = filters.authorId
       }
@@ -136,10 +139,12 @@ export class PrismaPostRepository implements PostRepository {
       data: {
         title: input.title,
         content: input.content,
-        excerpt: input.excerpt,
+        excerpt: input.description ?? input.excerpt,
+        series: input.series?.trim() || null,
+        thumbnail: input.thumbnail?.trim() || null,
         slug: finalSlug,
         featured: input.featured || false,
-        isPublished: input.isPublished || false,
+        isPublished: input.draft !== undefined ? !input.draft : input.isPublished || false,
         readTime: Math.ceil(input.content.split(' ').length / 200),
         categoryId: category.id,
         authorId: author.id,
@@ -169,6 +174,9 @@ export class PrismaPostRepository implements PostRepository {
       updateData.readTime = Math.ceil(input.content.split(' ').length / 200)
     }
     if (input.excerpt) updateData.excerpt = input.excerpt
+    if (input.description) updateData.excerpt = input.description
+    if (input.series !== undefined) updateData.series = input.series?.trim() || null
+    if (input.thumbnail !== undefined) updateData.thumbnail = input.thumbnail?.trim() || null
     if (input.slug) {
       // slug 중복 확인 및 처리
       const existingPost = await this.prisma.post.findUnique({ 
@@ -182,10 +190,11 @@ export class PrismaPostRepository implements PostRepository {
       }
     }
     if (input.featured !== undefined) updateData.featured = input.featured
-    if (input.isPublished !== undefined) {
-      updateData.isPublished = input.isPublished
+    const nextIsPublished = input.draft !== undefined ? !input.draft : input.isPublished
+    if (nextIsPublished !== undefined) {
+      updateData.isPublished = nextIsPublished
       // 처음 발행될 때 publishedAt 업데이트
-      if (input.isPublished === true) {
+      if (nextIsPublished === true) {
         const currentPost = await this.prisma.post.findUnique({ 
           where: { id: input.id },
           select: { isPublished: true }
@@ -305,6 +314,9 @@ export class PrismaPostRepository implements PostRepository {
       title: post.title,
       content: post.content,
       excerpt: post.excerpt,
+      description: post.excerpt,
+      series: post.series,
+      thumbnail: post.thumbnail,
       slug: post.slug,
       publishedAt: post.publishedAt,
       updatedAt: post.updatedAt,
@@ -314,7 +326,8 @@ export class PrismaPostRepository implements PostRepository {
       readTime: post.readTime,
       views: post.views,
       featured: post.featured,
-      isPublished: post.isPublished
+      isPublished: post.isPublished,
+      draft: !post.isPublished
     }
   }
 }

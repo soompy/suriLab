@@ -1,9 +1,10 @@
 import { MetadataRoute } from 'next'
+import { prisma } from '@/lib/prisma'
+import { getSiteUrl } from '@/lib/seo'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://localhost:3000'
-  
-  return [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = getSiteUrl()
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -34,7 +35,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
-    // 동적 포스트 페이지들은 실제 데이터에서 가져와야 함
-    // TODO: 실제 포스트 데이터를 가져와서 sitemap에 추가
+    {
+      url: `${baseUrl}/rss.xml`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.4,
+    },
   ]
+
+  try {
+    const posts = await prisma.post.findMany({
+      where: { isPublished: true },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    })
+
+    return [
+      ...staticRoutes,
+      ...posts.map((post) => ({
+        url: `${baseUrl}/posts/${post.slug}`,
+        lastModified: post.updatedAt,
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      })),
+    ]
+  } catch (error) {
+    console.warn('Failed to load posts for sitemap:', error)
+    return staticRoutes
+  }
 }

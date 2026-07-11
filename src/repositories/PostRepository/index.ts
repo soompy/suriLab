@@ -38,6 +38,7 @@ export class InMemoryPostRepository implements PostRepository {
       title: 'React Hooks로 시작하는 모던 React 개발',
       content: '# React Hooks로 시작하는 모던 React 개발\n\nReact Hooks는 함수형 컴포넌트에서 상태 관리와 생명주기 기능을 사용할 수 있게 해주는 강력한 기능입니다.',
       excerpt: 'React Hooks를 활용한 모던 컴포넌트 개발 방법과 실무 활용 팁',
+      description: 'React Hooks를 활용한 모던 컴포넌트 개발 방법과 실무 활용 팁',
       slug: 'react-hooks-modern-development',
       publishedAt: new Date('2024-01-15T10:00:00Z'),
       updatedAt: new Date('2024-01-15T10:00:00Z'),
@@ -54,6 +55,7 @@ export class InMemoryPostRepository implements PostRepository {
       title: 'TypeScript와 Next.js로 타입 안전한 웹 개발',
       content: '# TypeScript와 Next.js로 타입 안전한 웹 개발\n\nNext.js에서 TypeScript를 활용하여 타입 안전한 웹 애플리케이션을 개발하는 방법을 알아봅시다.',
       excerpt: 'Next.js에서 TypeScript를 활용한 타입 안전한 개발 환경 구축',
+      description: 'Next.js에서 TypeScript를 활용한 타입 안전한 개발 환경 구축',
       slug: 'typescript-nextjs-safe-development',
       publishedAt: new Date('2024-01-12T14:30:00Z'),
       updatedAt: new Date('2024-01-12T14:30:00Z'),
@@ -69,6 +71,7 @@ export class InMemoryPostRepository implements PostRepository {
       title: 'CSS Grid와 Flexbox: 모던 레이아웃 완벽 가이드',
       content: '# CSS Grid와 Flexbox: 모던 레이아웃 완벽 가이드\n\nCSS Grid와 Flexbox를 활용하여 현대적인 웹 레이아웃을 구현하는 방법을 상세히 설명합니다.',
       excerpt: 'CSS Grid와 Flexbox를 활용한 현대적인 웹 레이아웃 구현 방법',
+      description: 'CSS Grid와 Flexbox를 활용한 현대적인 웹 레이아웃 구현 방법',
       slug: 'css-grid-flexbox-layout-guide',
       publishedAt: new Date('2024-01-08T09:15:00Z'),
       updatedAt: new Date('2024-01-08T09:15:00Z'),
@@ -96,6 +99,9 @@ export class InMemoryPostRepository implements PostRepository {
         filteredPosts = filteredPosts.filter(post => 
           filters.tags!.some(tag => post.tags.includes(tag))
         )
+      }
+      if (filters.series) {
+        filteredPosts = filteredPosts.filter(post => post.series === filters.series)
       }
       if (filters.authorId) {
         filteredPosts = filteredPosts.filter(post => post.authorId === filters.authorId)
@@ -177,11 +183,14 @@ export class InMemoryPostRepository implements PostRepository {
     const newPost: PostEntity = {
       id: Date.now().toString(),
       ...input,
+      excerpt: input.description ?? input.excerpt,
+      description: input.description ?? input.excerpt,
       publishedAt: new Date(),
       updatedAt: new Date(),
       views: 0,
       readTime: Math.ceil(input.content.split(' ').length / 200),
-      isPublished: input.isPublished ?? true
+      isPublished: input.draft !== undefined ? !input.draft : input.isPublished ?? true,
+      draft: input.draft ?? input.isPublished === false
     }
 
     this.posts.push(newPost)
@@ -194,9 +203,12 @@ export class InMemoryPostRepository implements PostRepository {
       throw new Error('Post not found')
     }
 
+    const nextIsPublished = input.draft !== undefined ? !input.draft : input.isPublished
     const updatedPost = {
       ...this.posts[postIndex],
       ...input,
+      ...(input.description ? { excerpt: input.description } : {}),
+      ...(nextIsPublished !== undefined ? { isPublished: nextIsPublished, draft: !nextIsPublished } : {}),
       updatedAt: new Date()
     }
 

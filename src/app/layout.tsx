@@ -1,6 +1,16 @@
 import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono, Noto_Sans_KR } from 'next/font/google'
 import { CustomThemeProvider } from '@/components/ThemeContext'
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  absoluteUrl,
+  createPageMetadata,
+  getPersonJsonLd,
+  getSiteUrl,
+  getWebsiteJsonLd,
+} from '@/lib/seo'
 import './globals.css'
 import 'highlight.js/styles/github.css'
 
@@ -26,8 +36,30 @@ const notoSansKR = Noto_Sans_KR({
 })
 
 export const metadata: Metadata = {
-  title: 'Suri Blog',
-  description: 'A modern blog built with Clean Architecture',
+  metadataBase: new URL(getSiteUrl()),
+  applicationName: SITE_NAME,
+  generator: 'Next.js',
+  authors: [{ name: 'Suri', url: getSiteUrl() }],
+  creator: 'Suri',
+  publisher: SITE_NAME,
+  category: 'technology',
+  keywords: [
+    'MomentTune',
+    'AI Products',
+    'AI Automation',
+    'AI Agents',
+    'Vibe Coding',
+    'Solo Startup',
+    'Product Design',
+  ],
+  ...createPageMetadata({
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    path: '/',
+  }),
+  icons: {
+    icon: absoluteUrl('/images/profile.jpg'),
+  },
 }
 
 export default function RootLayout({
@@ -38,6 +70,16 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansKR.variable}`}>
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getWebsiteJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getPersonJsonLd()) }}
+        />
         <CustomThemeProvider>
           {children}
         </CustomThemeProvider>

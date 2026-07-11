@@ -95,11 +95,20 @@ export class PostsAPIHandler {
       
       const category = searchParams.get('category') || undefined
       const tags = searchParams.get('tags')?.split(',') || undefined
+      const series = searchParams.get('series') || undefined
       const authorId = searchParams.get('authorId') || undefined
       const searchQuery = searchParams.get('search') || undefined
       const featured = searchParams.get('featured') === 'true' ? true : undefined
       const isPublishedParam = searchParams.get('isPublished')
-      const isPublished = isPublishedParam === 'true' ? true : isPublishedParam === 'false' ? false : undefined
+      const authHeader = request.headers.get('authorization')
+      const isAuthorized = authHeader?.startsWith('Bearer ') ? verifyAdminPassword(request) : false
+      const isPublished = isAuthorized
+        ? isPublishedParam === 'true'
+          ? true
+          : isPublishedParam === 'false'
+            ? false
+            : undefined
+        : true
       
       const sortField = (searchParams.get('sortField') as PostSort['field']) || 'publishedAt'
       const sortOrder = (searchParams.get('sortOrder') as PostSort['order']) || 'desc'
@@ -110,6 +119,7 @@ export class PostsAPIHandler {
       const filters: PostFilters = {
         category,
         tags,
+        series,
         authorId,
         searchQuery,
         featured,
@@ -283,6 +293,57 @@ export class PostAPIHandler {
           details: error instanceof Error ? error.message : 'Unknown error' 
         },
         { status: 400 }
+      )
+    }
+  }
+}
+
+export class RelatedPostsAPIHandler {
+  static async GET(_request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+      const post = await getPostById(params.id)
+      if (!post || !post.isPublished) {
+        return NextResponse.json(
+          { error: 'Post not found' },
+          { status: 404 }
+        )
+      }
+
+      const result = await getPosts(
+        {
+          category: post.category,
+          isPublished: true
+        },
+        {
+          field: 'publishedAt',
+          order: 'desc'
+        },
+        {
+          page: 1,
+          limit: 12
+        }
+      )
+
+      const relatedPosts = result.posts
+        .filter(candidate => candidate.id !== post.id)
+        .map(candidate => {
+          const sharedTags = candidate.tags.filter(tag => post.tags.includes(tag)).length
+          const sameSeries = post.series && candidate.series === post.series ? 2 : 0
+
+          return {
+            post: candidate,
+            score: sharedTags + sameSeries
+          }
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(item => item.post)
+
+      return NextResponse.json({ posts: relatedPosts })
+    } catch {
+      return NextResponse.json(
+        { error: 'Failed to fetch related posts' },
+        { status: 500 }
       )
     }
   }
