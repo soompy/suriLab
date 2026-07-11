@@ -39,6 +39,8 @@ model Post {
   title       String
   content     String
   excerpt     String
+  series      String?
+  thumbnail   String?
   slug        String   @unique
   publishedAt DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -56,6 +58,7 @@ model Post {
 
   @@index([categoryId])
   @@index([authorId])
+  @@index([series])
   @@map("posts")
 }
 

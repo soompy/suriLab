@@ -46,6 +46,7 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<PostEntity | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [relatedPosts, setRelatedPosts] = useState<PostEntity[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const viewCountedRef = useRef(false)
@@ -62,6 +63,16 @@ export default function PostDetailPage() {
         
         const postData = await response.json()
         setPost(postData)
+
+        try {
+          const relatedResponse = await fetch(`/api/posts/${postData.id}/related`)
+          if (relatedResponse.ok) {
+            const relatedData = await relatedResponse.json()
+            setRelatedPosts(relatedData.posts || [])
+          }
+        } catch (relatedError) {
+          console.error('Failed to load related posts:', relatedError)
+        }
         
         // 조회수 증가 (한 번만 실행) - useRef + sessionStorage로 중복 방지
         const viewKey = `post_viewed_${postData.id}`
@@ -118,7 +129,7 @@ export default function PostDetailPage() {
       try {
         await navigator.share({
           title: post?.title,
-          text: post?.excerpt,
+          text: post?.description || post?.excerpt,
           url: window.location.href
         })
       } catch (error) {
@@ -263,7 +274,7 @@ export default function PostDetailPage() {
                 </Typography>
                 
                 <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
-                  {post.excerpt}
+                  {post.description || post.excerpt}
                 </Typography>
 
                 {/* Meta Information */}
@@ -281,6 +292,13 @@ export default function PostDetailPage() {
                         month: 'long',
                         day: 'numeric'
                       })}
+                      {new Date(post.updatedAt).getTime() !== new Date(post.publishedAt).getTime() && (
+                        <> · 수정 {new Date(post.updatedAt).toLocaleDateString('ko-KR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}</>
+                      )}
                     </Typography>
                   </Box>
                   
@@ -310,6 +328,14 @@ export default function PostDetailPage() {
                       border: '1px solid rgba(0, 0, 0, 0.1)'
                     }}
                   />
+                  {post.series && (
+                    <Chip
+                      label={post.series}
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                    />
+                  )}
                   {post.tags.map((tag) => (
                     <SkillTag 
                       key={tag} 
@@ -369,6 +395,51 @@ export default function PostDetailPage() {
               </Box>
 
               <Divider />
+
+              {relatedPosts.length > 0 && (
+                <>
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      관련 글
+                    </Typography>
+                    <Stack spacing={1.5}>
+                      {relatedPosts.map((relatedPost) => (
+                        <Box
+                          key={relatedPost.id}
+                          onClick={() => router.push(`/posts/${relatedPost.slug}`)}
+                          sx={{
+                            p: 2,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            cursor: 'pointer',
+                            transition: 'border-color 0.2s ease, background-color 0.2s ease',
+                            '&:hover': {
+                              borderColor: 'primary.main',
+                              bgcolor: 'action.hover'
+                            }
+                          }}
+                        >
+                          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                            {relatedPost.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                            {relatedPost.description || relatedPost.excerpt}
+                          </Typography>
+                          <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                            <Chip label={relatedPost.category} size="small" />
+                            {relatedPost.series && (
+                              <Chip label={relatedPost.series} size="small" variant="outlined" />
+                            )}
+                          </Stack>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Box>
+
+                  <Divider />
+                </>
+              )}
 
               {/* Author Information */}
               <Box>
