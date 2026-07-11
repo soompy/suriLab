@@ -34,6 +34,7 @@ import { AvatarImage } from '@/components/image'
 import OptimizedMarkdown from '@/components/OptimizedMarkdown'
 import CommentSection from '@/components/CommentSection'
 import LikeButton from '@/components/LikeButton'
+import TableOfContents from '@/components/TableOfContents'
 import { AuthService } from '@/lib/auth'
 import { CATEGORY_COLORS } from '@/shared/constants/categories'
 import SkillTag from '@/components/SkillTag'
@@ -265,13 +266,22 @@ export default function PostDetailPage() {
             </IconButton>
           </Box>
 
-          <Paper sx={{ p: { xs: 2, md: 4 }, boxShadow: 'none', maxWidth: '800px', mx: 'auto' }}>
-            <Stack spacing={4}>
-              {/* Header */}
-              <Box>
-                <Typography variant="h3" component="h1" gutterBottom>
-                  {post.title}
-                </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 800px) 280px' },
+              justifyContent: 'center',
+              alignItems: 'start',
+              gap: { xs: 3, lg: 4 }
+            }}
+          >
+            <Paper sx={{ p: { xs: 2, md: 4 }, boxShadow: 'none', width: '100%', minWidth: 0 }}>
+              <Stack spacing={4}>
+                {/* Header */}
+                <Box>
+                  <Typography variant="h3" component="h1" gutterBottom>
+                    {post.title}
+                  </Typography>
                 
                 <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
                   {post.description || post.excerpt}
@@ -387,12 +397,21 @@ export default function PostDetailPage() {
                 <Divider />
               </Box>
 
-              {/* Content */}
-              <Box>
-                <OptimizedMarkdown 
-                  content={post.content}
-                />
-              </Box>
+                <Box sx={{ display: { xs: 'block', lg: 'none' } }}>
+                  <TableOfContents
+                    content={post.content}
+                    sticky={false}
+                    collapsible
+                    id="post-table-of-contents-mobile"
+                  />
+                </Box>
+
+                {/* Content */}
+                <Box>
+                  <OptimizedMarkdown
+                    content={post.content}
+                  />
+                </Box>
 
               <Divider />
 
@@ -469,10 +488,20 @@ export default function PostDetailPage() {
                 </Stack>
               </Box>
 
-              {/* Comment Section */}
-              <CommentSection postId={post.id} />
-            </Stack>
-          </Paper>
+                {/* Comment Section */}
+                <CommentSection postId={post.id} />
+              </Stack>
+            </Paper>
+
+            <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+              <TableOfContents
+                content={post.content}
+                sticky
+                collapsible={false}
+                id="post-table-of-contents-desktop"
+              />
+            </Box>
+          </Box>
         </Container>
         
         <Footer />

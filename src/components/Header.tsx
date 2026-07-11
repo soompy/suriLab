@@ -51,10 +51,10 @@ export default function Header() {
   const [hasSearched, setHasSearched] = useState(false)
 
   const menuItems = [
-    { href: '/about', label: 'About' },
-    { href: '/projects', label: 'Projects' },
-    { href: '/archives', label: 'Archives' },
-    { href: '/contact', label: 'Contact' }
+    { href: '/momenttune', label: 'MomentTune' },
+    { href: '/articles', label: 'Articles' },
+    { href: '/build-log', label: 'Build Log' },
+    { href: '/about', label: 'About' }
   ]
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
