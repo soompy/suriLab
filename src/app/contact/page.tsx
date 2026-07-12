@@ -205,7 +205,7 @@ export default function Contact() {
 
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
         
         <Container maxWidth={false} sx={{ py: { xs: 4, md: 6 }, px: { xs: 2, sm: 3, md: 4 }, maxWidth: { xs: '100%', md: '1300px' }, mx: 'auto', overflow: 'hidden' }}>

@@ -1115,7 +1115,7 @@ function WriteContent() {
   if (!isAuthenticated) {
     return (
       <MuiThemeProvider>
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth="md" sx={{ py: 8 }}>
             <Box sx={{ textAlign: 'center' }}>
@@ -1149,7 +1149,7 @@ function WriteContent() {
 
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
         
         <Container maxWidth={false} sx={{ 

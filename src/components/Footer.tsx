@@ -1,8 +1,9 @@
 'use client'
 
-import { Box, Container, Link as MuiLink, Stack, Typography } from '@mui/material'
+import { Box, Container, Link as MuiLink, Stack } from '@mui/material'
 import Link from 'next/link'
 import { forwardRef } from 'react'
+import Logo from './Logo'
 
 const footerLinks = [
   { href: '/about', label: '소개' },
@@ -19,7 +20,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
       component="footer"
       ref={ref}
       sx={{
-        bgcolor: '#FAFAF8',
+        bgcolor: 'background.default',
+        borderTop: '1px solid',
+        borderColor: 'divider',
+        mt: 'auto',
         py: { xs: 3, md: 5 }
       }}
     >
@@ -30,9 +34,9 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           alignItems={{ xs: 'flex-start', md: 'center' }}
           spacing={{ xs: 1.5, md: 3 }}
         >
-          <Typography sx={{ fontSize: { xs: '1rem', md: '1.5rem' }, fontWeight: 850, color: '#111827' }}>
-            SuriBlog
-          </Typography>
+          <MuiLink component={Link} href="/" underline="none" sx={{ display: 'inline-flex' }}>
+            <Logo size="lg" />
+          </MuiLink>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             spacing={{ xs: 0.5, md: 3 }}
@@ -50,10 +54,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
                   rel={external && item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   underline="none"
                   sx={{
-                    color: '#6B7280',
+                    color: 'text.secondary',
                     fontSize: { xs: '0.75rem', md: '0.875rem' },
                     fontWeight: 700,
-                    '&:hover': { color: '#1D4ED8' }
+                    '&:hover': { color: 'primary.main' }
                   }}
                 >
                   {item.label}

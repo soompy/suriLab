@@ -27,7 +27,7 @@ export default function MuiThemeProvider({ children }: MuiThemeProviderProps) {
         dark: designTokens.colors.secondary[600],
       },
       background: {
-        default: isDarkMode ? designTokens.colors.dark.background.primary : designTokens.colors.light.background.primary,
+        default: isDarkMode ? designTokens.colors.dark.background.primary : '#FAFAF8',
         paper: isDarkMode ? designTokens.colors.dark.background.secondary : designTokens.colors.light.background.primary,
       },
       text: {

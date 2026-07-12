@@ -77,11 +77,11 @@ const experiences = [
 export default function AboutPage() {
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: '#FAFAF8' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
 
         <main>
-          <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: '#FAFAF8' }}>
+          <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.default' }}>
             <Container maxWidth="lg" sx={{ pt: { xs: 7, md: 10 }, pb: { xs: 5, md: 8 } }}>
               <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 4, md: 6 }} alignItems={{ xs: 'flex-start', md: 'center' }}>
                 <AvatarImage
@@ -97,7 +97,7 @@ export default function AboutPage() {
                     icon={<AutoAwesomeIcon />}
                     label="Building AI Products in Public"
                     variant="outlined"
-                    sx={{ mb: 3, bgcolor: '#FFFFFF' }}
+                    sx={{ mb: 3, bgcolor: 'background.paper' }}
                   />
                   <Typography
                     variant="h1"
@@ -107,7 +107,7 @@ export default function AboutPage() {
                       lineHeight: 1.25,
                       fontWeight: 850,
                       letterSpacing: 0,
-                      color: '#111827',
+                      color: 'text.primary',
                       mb: 3,
                       whiteSpace: { xs: 'normal', md: 'nowrap' }
                     }}
@@ -138,7 +138,7 @@ export default function AboutPage() {
                     borderColor: 'divider',
                     borderRadius: 2,
                     boxShadow: 'none',
-                    bgcolor: '#FFFFFF'
+                    bgcolor: 'background.paper'
                   }}
                 >
                   <Typography variant="overline" color="primary" sx={{ fontWeight: 800 }}>
@@ -210,7 +210,7 @@ export default function AboutPage() {
                   borderColor: 'divider',
                   borderRadius: 2,
                   boxShadow: 'none',
-                  bgcolor: '#FFFFFF'
+                  bgcolor: 'background.paper'
                 }}
               >
                 <Typography variant="overline" color="primary" sx={{ fontWeight: 800 }}>
@@ -240,7 +240,7 @@ export default function AboutPage() {
                         borderColor: 'divider',
                         borderRadius: 2,
                         boxShadow: 'none',
-                        bgcolor: '#FFFFFF'
+                        bgcolor: 'background.paper'
                       }}
                     >
                       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', sm: 'center' }}>
@@ -269,7 +269,7 @@ export default function AboutPage() {
                   borderColor: 'divider',
                   borderRadius: 2,
                   boxShadow: 'none',
-                  bgcolor: '#FFFFFF'
+                  bgcolor: 'background.paper'
                 }}
               >
                 <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2}>
