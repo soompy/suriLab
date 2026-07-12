@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono, Noto_Sans_KR } from 'next/font/google'
+import { Inter, JetBrains_Mono, Nanum_Gothic, Noto_Sans_KR } from 'next/font/google'
 import { CustomThemeProvider } from '@/components/ThemeContext'
 import {
   SITE_DESCRIPTION,
@@ -33,6 +33,14 @@ const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-noto-sans-kr',
+})
+
+// Nanum Gothic 폰트 설정 (홈/본문용)
+const nanumGothic = Nanum_Gothic({
+  subsets: ['latin'],
+  weight: ['400', '700', '800'],
+  display: 'swap',
+  variable: '--font-nanum-gothic',
 })
 
 export const metadata: Metadata = {
@@ -69,7 +77,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansKR.variable}`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansKR.variable} ${nanumGothic.variable}`}>
         <script
           type="application/ld+json"
           suppressHydrationWarning

@@ -109,6 +109,7 @@ export const designTokens = {
   typography: {
     fontFamily: {
       primary: [
+        'var(--font-nanum-gothic)',
         'var(--font-inter)',
         'var(--font-noto-sans-kr)',
         '-apple-system',

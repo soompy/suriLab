@@ -97,7 +97,7 @@ export default function MuiThemeProvider({ children }: MuiThemeProviderProps) {
     },
     spacing: 8,
     shape: {
-      borderRadius: parseInt(designTokens.borderRadius.md.replace('rem', '')) * 16,
+      borderRadius: parseFloat(designTokens.borderRadius.md.replace('rem', '')) * 16,
     },
     components: {
       MuiAppBar: {
