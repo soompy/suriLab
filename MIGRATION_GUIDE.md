@@ -21,7 +21,7 @@
 ### 1단계: 환경 변수 설정
 ```bash
 # .env 파일에서 DATABASE_URL 업데이트
-DATABASE_URL="postgresql://[username]:[password]@[hostname]/[database]?sslmode=require"
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
 ### 2단계: Prisma 클라이언트 재생성
@@ -50,10 +50,10 @@ npx prisma studio
 Vercel 대시보드 → Project → Settings → Environment Variables에서 추가:
 
 ```env
-DATABASE_URL=postgresql://[username]:[password]@[hostname]/[database]?sslmode=require
-BLOG_ADMIN_PASSWORD=Risesuri25!
-EMAIL_USER=yzsumin@naver.com
-EMAIL_PASS=[YOUR-NAVER-APP-PASSWORD]
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+BLOG_ADMIN_PASSWORD=your-secure-admin-password
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-email-app-password
 ```
 
 ### 2. 배포 트리거

@@ -2,7 +2,15 @@ import { NextRequest } from 'next/server'
 import jwt from 'jsonwebtoken'
 
 // JWT를 사용한 토큰 검증으로 변경 (인메모리 저장소 문제 해결)
-const JWT_SECRET = process.env.JWT_SECRET || process.env.BLOG_ADMIN_PASSWORD || 'default-secret-key'
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET || process.env.BLOG_ADMIN_PASSWORD
+
+  if (!secret) {
+    throw new Error('JWT_SECRET or BLOG_ADMIN_PASSWORD is required')
+  }
+
+  return secret
+}
 
 interface TokenPayload {
   admin: boolean
@@ -16,7 +24,7 @@ export function generateToken(): string {
       admin: true
     }
     
-    const token = jwt.sign(payload, JWT_SECRET, { 
+    const token = jwt.sign(payload, getJwtSecret(), {
       expiresIn: '24h',
       issuer: 'suri-blog'
     })
@@ -32,18 +40,12 @@ export function generateToken(): string {
 export function verifyAdminToken(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization')
   
-  console.log(`[AUTH] Verifying request to: ${request.nextUrl.pathname}`)
-  console.log(`[AUTH] Authorization header: ${authHeader ? `Bearer ${authHeader.substring(7, 15)}...` : 'None'}`)
-  console.log(`[AUTH] All headers:`, Object.fromEntries(request.headers.entries()))
-  
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     console.log('[AUTH] Missing or invalid authorization header format')
-    console.log('[AUTH] Expected format: Bearer <token>')
     return false
   }
   
   const token = authHeader.replace('Bearer ', '')
-  console.log(`[AUTH] Extracted token length: ${token.length}`)
   
   if (!token || token.length < 10) {
     console.log('[AUTH] Token is too short or empty')
@@ -51,7 +53,7 @@ export function verifyAdminToken(request: NextRequest): boolean {
   }
   
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload
+    const decoded = jwt.verify(token, getJwtSecret()) as TokenPayload
     console.log(`[AUTH] JWT payload decoded:`, { admin: decoded.admin, iat: decoded.iat, exp: decoded.exp })
     
     if (decoded.admin === true) {
@@ -76,7 +78,7 @@ export function verifyAdminToken(request: NextRequest): boolean {
 // 개발/디버깅용 함수
 export function getTokenStats() {
   return {
-    jwtSecret: JWT_SECRET ? 'Set' : 'Not set',
+    jwtSecret: process.env.JWT_SECRET || process.env.BLOG_ADMIN_PASSWORD ? 'Set' : 'Not set',
     authMethod: 'JWT-based authentication',
     tokenExpiry: '24 hours'
   }

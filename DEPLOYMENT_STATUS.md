@@ -65,10 +65,10 @@
 ## 🔧 환경 변수 현황
 
 ```env
-DATABASE_URL="file::memory:?"
-BLOG_ADMIN_PASSWORD="Risesuri25!"  
-EMAIL_USER="yzsumin@naver.com"
-EMAIL_PASS="PLEASE_SET_YOUR_NAVER_APP_PASSWORD_HERE"
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+BLOG_ADMIN_PASSWORD=your-secure-admin-password
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-email-app-password
 ```
 
 ## 📈 성능 지표

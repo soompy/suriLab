@@ -10,6 +10,8 @@ export default function robots(): MetadataRoute.Robots {
         '/posts/',
         '/about/',
         '/articles/',
+        '/categories/',
+        '/tags/',
         '/build-log/',
         '/momenttune/',
         '/projects/',

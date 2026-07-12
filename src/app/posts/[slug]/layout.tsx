@@ -7,6 +7,7 @@ import {
   absoluteUrl,
   createPageMetadata,
 } from '@/lib/seo'
+import { createTaxonomySlug } from '@/lib/taxonomy'
 
 type PostLayoutProps = {
   children: React.ReactNode
@@ -149,7 +150,7 @@ function getBreadcrumbJsonLd(post: NonNullable<Awaited<ReturnType<typeof getPost
         '@type': 'ListItem',
         position: 2,
         name: post.category.name,
-        item: absoluteUrl(`/archives?category=${encodeURIComponent(post.category.name)}`),
+        item: absoluteUrl(`/categories/${createTaxonomySlug(post.category.name)}`),
       },
       {
         '@type': 'ListItem',

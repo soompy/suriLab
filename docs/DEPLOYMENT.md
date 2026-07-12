@@ -39,14 +39,14 @@ Vercel 프로젝트 설정 → Environment Variables에 다음 추가:
 
 ```bash
 # 데이터베이스
-DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 
 # 관리자 인증
-BLOG_ADMIN_PASSWORD=your_secure_password_here
+BLOG_ADMIN_PASSWORD=your-secure-admin-password
 
 # 이메일 설정
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-email-app-password
 
 # 사이트 URL
 NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app

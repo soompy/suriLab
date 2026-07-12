@@ -95,7 +95,7 @@ vercel --prod
 #### 연결 오류
 ```bash
 # SSL 관련 오류 시
-DATABASE_URL="postgresql://...?sslmode=require"
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
 #### 마이그레이션 오류

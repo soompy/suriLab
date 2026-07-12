@@ -131,7 +131,7 @@ npm run restore backups/backup-YYYY-MM-DDTHH-mm-ss-sssZ.json
 ### GitHub Secrets 설정
 프로젝트 Settings > Secrets and variables > Actions에서 설정:
 ```
-DATABASE_URL=your_neon_postgresql_url
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
 ### Vercel 환경변수
