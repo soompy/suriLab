@@ -224,7 +224,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <MuiThemeProvider>
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth="md" sx={{ py: 4 }}>
             <Loading variant="default" message="포스트를 불러오는 중..." />
@@ -238,7 +238,7 @@ export default function PostDetailPage() {
   if (error || !post) {
     return (
       <MuiThemeProvider>
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth="md" sx={{ py: 4 }}>
             <Alert severity="error">
@@ -253,7 +253,7 @@ export default function PostDetailPage() {
 
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
         
         <Container maxWidth={false} sx={{ maxWidth: { xs: '100%', md: '1200px' }, mx: 'auto', px: { xs: 2, sm: 3, md: 2 }, py: { xs: 3, sm: 4, md: 4 } }}>

@@ -171,7 +171,7 @@ export default function Projects() {
 
   return (
       <MuiThemeProvider>
-          <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+          <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
               <Header />
 
               <Container

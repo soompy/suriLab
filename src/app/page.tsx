@@ -112,7 +112,15 @@ export default function HomePage() {
 
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: '#FAFAF8', color: '#111827' }}>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          bgcolor: 'background.default',
+          color: 'text.primary'
+        }}
+      >
         <Header />
 
         <Box component="main">
@@ -187,7 +195,7 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
             lineHeight: 1.4,
             fontWeight: 400,
             letterSpacing: 0,
-            color: '#111827',
+            color: 'text.primary',
             mb: { xs: 2, md: 3 }
           }}
         >
@@ -200,7 +208,7 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
         <Typography
           sx={{
             maxWidth: 690,
-            color: '#6B7280',
+            color: 'text.secondary',
             fontSize: { xs: '0.875rem', md: '1.35rem' },
             lineHeight: { xs: 1.55, md: 1.55 },
             fontWeight: 500,
@@ -234,12 +242,12 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
               px: 3,
               py: 1.2,
               borderRadius: 999,
-              bgcolor: '#FFFFFF',
-              borderColor: '#E5E7EB',
-              color: '#111827',
+              bgcolor: 'background.paper',
+              borderColor: 'divider',
+              color: 'text.primary',
               fontWeight: 800,
               textTransform: 'none',
-              '&:hover': { borderColor: '#D1D5DB', bgcolor: '#F9FAFB' }
+              '&:hover': { borderColor: 'text.secondary', bgcolor: 'action.hover' }
             }}
           >
             MomentTune 살펴보기
@@ -250,10 +258,11 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
       <Paper
         sx={{
           p: { xs: 3, md: 4 },
-          border: '1px solid #E5E7EB',
+          border: '1px solid',
+          borderColor: 'divider',
           borderRadius: 5,
           boxShadow: 'none',
-          bgcolor: '#FFFFFF'
+          bgcolor: 'background.paper'
         }}
       >
         <Chip
@@ -281,7 +290,7 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
               fontSize: { xs: '1.05rem', md: '1.35rem' },
               lineHeight: 1.2,
               fontWeight: 400,
-              color: '#111827',
+              color: 'text.primary',
               whiteSpace: 'normal'
             }}
           >
@@ -303,10 +312,11 @@ function MissionSection({ momentTuneWeek, progressValue }: { momentTuneWeek: num
       <Paper
         sx={{
           p: { xs: 2, md: 4 },
-          border: '1px solid #E5E7EB',
+          border: '1px solid',
+          borderColor: 'divider',
           borderRadius: { xs: 3, md: 4 },
           boxShadow: 'none',
-          bgcolor: '#FFFFFF'
+          bgcolor: 'background.paper'
         }}
       >
         <Box
@@ -347,13 +357,14 @@ function MissionSection({ momentTuneWeek, progressValue }: { momentTuneWeek: num
           <Paper
             sx={{
               p: { xs: 2, md: 2.5 },
-              border: '1px solid #E5E7EB',
+              border: '1px solid',
+              borderColor: 'divider',
               borderRadius: 3,
               boxShadow: 'none',
-              bgcolor: '#FAFAF8'
+              bgcolor: 'background.default'
             }}
           >
-            <Typography sx={{ color: '#6B7280', fontSize: '0.75rem', fontWeight: 800, mb: 1 }}>
+            <Typography sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 800, mb: 1 }}>
               진행률
             </Typography>
             <Typography sx={{ fontSize: { xs: '2rem', md: '2.25rem' }, lineHeight: 1, fontWeight: 900, mb: 2 }}>
@@ -365,7 +376,7 @@ function MissionSection({ momentTuneWeek, progressValue }: { momentTuneWeek: num
               sx={{
                 height: 8,
                 borderRadius: 999,
-                bgcolor: '#E5E7EB',
+                bgcolor: 'divider',
                 mb: 1.5,
                 '& .MuiLinearProgress-bar': {
                   borderRadius: 999,
@@ -373,7 +384,7 @@ function MissionSection({ momentTuneWeek, progressValue }: { momentTuneWeek: num
                 }
               }}
             />
-            <Typography sx={{ color: '#6B7280', fontSize: '0.75rem', lineHeight: 1.5 }}>
+            <Typography sx={{ color: 'text.secondary', fontSize: '0.75rem', lineHeight: 1.5 }}>
               현재 집중: 반복 가능한 첫 사용자 루틴 검증
             </Typography>
           </Paper>
@@ -386,7 +397,7 @@ function MissionSection({ momentTuneWeek, progressValue }: { momentTuneWeek: num
               {missionMilestones.map((milestone) => (
                 <Stack key={milestone} direction="row" spacing={1} alignItems="center">
                   <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#22C55E', flex: '0 0 auto' }} />
-                  <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#111827' }}>
+                  <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.primary' }}>
                     {milestone}
                   </Typography>
                 </Stack>
@@ -504,10 +515,11 @@ function CategoriesSection() {
               minHeight: { xs: 98, md: 110 },
               color: 'inherit',
               textDecoration: 'none',
-              border: '1px solid #E5E7EB',
+              border: '1px solid',
+              borderColor: 'divider',
               borderRadius: { xs: 2.5, md: 3 },
               boxShadow: 'none',
-              bgcolor: '#FFFFFF',
+              bgcolor: 'background.paper',
               transition: 'transform 0.2s ease, border-color 0.2s ease',
               '&:hover': {
                 transform: 'translateY(-2px)',
@@ -519,7 +531,7 @@ function CategoriesSection() {
             <Typography sx={{ fontSize: '1rem', fontWeight: 900, mb: 0.75 }}>
               {category.title}
             </Typography>
-            <Typography sx={{ color: '#6B7280', fontSize: '0.8rem', fontWeight: 600 }}>
+            <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', fontWeight: 600 }}>
               {category.description}
             </Typography>
           </Paper>
@@ -546,7 +558,7 @@ function SectionShell({
 }) {
   return (
     <Box id={id} sx={{ py: { xs: 3.5, md: 5.5 } }}>
-      <Box sx={{ borderTop: { xs: 'none', md: '1px solid #E5E7EB' }, pt: { xs: 0, md: 3 } }}>
+      <Box sx={{ borderTop: { xs: 'none', md: '1px solid' }, borderColor: 'divider', pt: { xs: 0, md: 3 } }}>
         <Typography
           sx={{
             color: '#2563EB',
@@ -565,7 +577,7 @@ function SectionShell({
             lineHeight: 1.08,
             fontWeight: 900,
             letterSpacing: 0,
-            color: '#111827',
+            color: 'text.primary',
             mb: description ? 1.25 : { xs: 2.25, md: 3.5 }
           }}
         >
@@ -582,7 +594,7 @@ function SectionShell({
           <Typography
             sx={{
               maxWidth: 760,
-              color: '#6B7280',
+              color: 'text.secondary',
               fontSize: { xs: '0.8125rem', md: '1rem' },
               lineHeight: 1.6,
               fontWeight: 500,
@@ -613,10 +625,11 @@ function ArticleCard({
       sx={{
         cursor: 'pointer',
         height: '100%',
-        border: '1px solid #E5E7EB',
+        border: '1px solid',
+        borderColor: 'divider',
         borderRadius: { xs: 3, md: 4 },
         boxShadow: 'none',
-        bgcolor: '#FFFFFF',
+        bgcolor: 'background.paper',
         overflow: 'hidden',
         transition: 'transform 0.2s ease, border-color 0.2s ease',
         '&:hover': {
@@ -644,7 +657,7 @@ function ArticleCard({
             lineHeight: 1.14,
             fontWeight: 900,
             letterSpacing: 0,
-            color: '#111827',
+            color: 'text.primary',
             mb: 1.25
           }}
         >
@@ -652,7 +665,7 @@ function ArticleCard({
         </Typography>
         <Typography
           sx={{
-            color: '#6B7280',
+            color: 'text.secondary',
             fontSize: { xs: '0.8125rem', md: '0.95rem' },
             lineHeight: 1.6,
             display: '-webkit-box',
@@ -706,14 +719,15 @@ function EmptyState() {
     <Paper
       sx={{
         p: 4,
-        border: '1px solid #E5E7EB',
+        border: '1px solid',
+        borderColor: 'divider',
         borderRadius: 3,
         boxShadow: 'none',
-        bgcolor: '#FFFFFF'
+        bgcolor: 'background.paper'
       }}
     >
       <Typography sx={{ fontWeight: 800, mb: 1 }}>아직 표시할 글이 없습니다.</Typography>
-      <Typography sx={{ color: '#6B7280' }}>첫 번째 글이 발행되면 이곳에 표시됩니다.</Typography>
+      <Typography sx={{ color: 'text.secondary' }}>첫 번째 글이 발행되면 이곳에 표시됩니다.</Typography>
     </Paper>
   )
 }

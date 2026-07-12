@@ -90,7 +90,7 @@ export default function AdminDashboardPage() {
   if (!isAuthenticated) {
     return (
       <MuiThemeProvider>
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth="md" sx={{ py: { xs: 8, md: 12 } }}>
             <Paper sx={{ p: { xs: 3, md: 5 }, textAlign: 'center', borderRadius: 3, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
@@ -119,7 +119,7 @@ export default function AdminDashboardPage() {
 
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
         <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
           <Stack spacing={4}>

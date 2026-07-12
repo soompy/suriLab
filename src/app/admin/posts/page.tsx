@@ -190,7 +190,7 @@ export default function AdminPostsPage() {
   if (loading) {
     return (
       <MuiThemeProvider>
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth="lg" sx={{ py: 4 }}>
             <Typography>로딩 중...</Typography>
@@ -204,7 +204,7 @@ export default function AdminPostsPage() {
   if (!isAuthenticated) {
     return (
       <MuiThemeProvider>
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
           <Header />
           <Container maxWidth="md" sx={{ py: 8 }}>
             <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 3, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
@@ -232,7 +232,7 @@ export default function AdminPostsPage() {
 
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
         
         <Container maxWidth="lg" sx={{ py: 4 }}>

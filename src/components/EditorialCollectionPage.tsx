@@ -118,7 +118,7 @@ export default function EditorialCollectionPage({
         borderRadius: 2,
         boxShadow: 'none',
         overflow: 'hidden',
-        bgcolor: '#FFFFFF',
+        bgcolor: 'background.paper',
         transition: 'transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
         '&:hover': {
           transform: 'translateY(-3px)',
@@ -205,17 +205,17 @@ export default function EditorialCollectionPage({
 
   return (
     <MuiThemeProvider>
-      <Box sx={{ minHeight: '100vh', bgcolor: '#FAFAF8' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
 
         <main>
-          <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: '#FAFAF8' }}>
+          <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.default' }}>
             <Container maxWidth="lg" sx={{ pt: { xs: 7, md: 10 }, pb: { xs: 5, md: 8 } }}>
               <Chip
                 icon={<AutoAwesomeIcon />}
                 label={heroLabel}
                 variant="outlined"
-                sx={{ mb: 3, bgcolor: '#FFFFFF' }}
+                sx={{ mb: 3, bgcolor: 'background.paper' }}
               />
               <Typography
                 variant="h1"
@@ -225,7 +225,7 @@ export default function EditorialCollectionPage({
                   lineHeight: 1,
                   fontWeight: 850,
                   letterSpacing: 0,
-                  color: '#111827',
+                  color: 'text.primary',
                   mb: 3
                 }}
               >
@@ -286,7 +286,7 @@ export default function EditorialCollectionPage({
                     borderColor: 'divider',
                     borderRadius: 2,
                     boxShadow: 'none',
-                    bgcolor: '#FFFFFF'
+                    bgcolor: 'background.paper'
                   }}
                 >
                   <Typography variant="overline" color="primary" sx={{ fontWeight: 800 }}>
@@ -348,13 +348,13 @@ function MetricCard({ label, value }: { label: string; value: string }) {
         borderColor: 'divider',
         borderRadius: 2,
         boxShadow: 'none',
-        bgcolor: '#FFFFFF'
+        bgcolor: 'background.paper'
       }}
     >
       <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800 }}>
         {label}
       </Typography>
-      <Typography variant="h4" sx={{ fontWeight: 850, color: '#111827' }}>
+      <Typography variant="h4" sx={{ fontWeight: 850, color: 'text.primary' }}>
         {value}
       </Typography>
     </Paper>
