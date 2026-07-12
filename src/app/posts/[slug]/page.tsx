@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
   Container,
@@ -11,7 +12,8 @@ import {
   Divider,
   Stack,
   IconButton,
-  Alert
+  Alert,
+  Breadcrumbs
 } from '@mui/material'
 import {
   Schedule as ScheduleIcon,
@@ -19,6 +21,7 @@ import {
   Share as ShareIcon,
   Bookmark as BookmarkIcon,
   ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
   CalendarToday as CalendarIcon,
   Edit as EditIcon,
   Delete as DeleteIcon
@@ -37,7 +40,7 @@ import LikeButton from '@/components/LikeButton'
 import TableOfContents from '@/components/TableOfContents'
 import { AuthService } from '@/lib/auth'
 import { CATEGORY_COLORS } from '@/shared/constants/categories'
-import SkillTag from '@/components/SkillTag'
+import { createTaxonomySlug } from '@/lib/taxonomy'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -48,6 +51,10 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [relatedPosts, setRelatedPosts] = useState<PostEntity[]>([])
+  const [adjacentPosts, setAdjacentPosts] = useState<{
+    previous: PostEntity | null
+    next: PostEntity | null
+  }>({ previous: null, next: null })
   const [isDeleting, setIsDeleting] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const viewCountedRef = useRef(false)
@@ -73,6 +80,19 @@ export default function PostDetailPage() {
           }
         } catch (relatedError) {
           console.error('Failed to load related posts:', relatedError)
+        }
+
+        try {
+          const navigationResponse = await fetch(`/api/posts/${postData.id}/navigation`)
+          if (navigationResponse.ok) {
+            const navigationData = await navigationResponse.json()
+            setAdjacentPosts({
+              previous: navigationData.previous || null,
+              next: navigationData.next || null,
+            })
+          }
+        } catch (navigationError) {
+          console.error('Failed to load adjacent posts:', navigationError)
         }
         
         // 조회수 증가 (한 번만 실행) - useRef + sessionStorage로 중복 방지
@@ -221,6 +241,9 @@ export default function PostDetailPage() {
     return colors[normalizedTag] || '#f5f5f5'
   }
 
+  const getCategoryHref = (category: string) => `/categories/${createTaxonomySlug(category)}`
+  const getTagHref = (tag: string) => `/tags/${createTaxonomySlug(tag)}`
+
   if (loading) {
     return (
       <MuiThemeProvider>
@@ -264,6 +287,35 @@ export default function PostDetailPage() {
             >
               <ArrowBackIcon />
             </IconButton>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ color: 'text.secondary' }}>
+              <Typography
+                component={Link}
+                href="/"
+                color="inherit"
+                sx={{ textDecoration: 'none', '&:hover': { color: 'primary.main' } }}
+              >
+                Home
+              </Typography>
+              <Typography
+                component={Link}
+                href="/articles"
+                color="inherit"
+                sx={{ textDecoration: 'none', '&:hover': { color: 'primary.main' } }}
+              >
+                Articles
+              </Typography>
+              <Typography
+                component={Link}
+                href={getCategoryHref(post.category)}
+                color="inherit"
+                sx={{ textDecoration: 'none', '&:hover': { color: 'primary.main' } }}
+              >
+                {post.category}
+              </Typography>
+              <Typography color="text.primary" sx={{ fontWeight: 700 }}>
+                {post.title}
+              </Typography>
+            </Breadcrumbs>
           </Box>
 
           <Box
@@ -331,6 +383,9 @@ export default function PostDetailPage() {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
                   <Chip 
                     label={post.category} 
+                    component={Link}
+                    href={getCategoryHref(post.category)}
+                    clickable
                     sx={{
                       background: CATEGORY_COLORS[post.category as keyof typeof CATEGORY_COLORS] || 'linear-gradient(135deg, #f0f0f0, #e0e0e0)',
                       color: '#000000',
@@ -347,10 +402,24 @@ export default function PostDetailPage() {
                     />
                   )}
                   {post.tags.map((tag) => (
-                    <SkillTag 
-                      key={tag} 
+                    <Chip
+                      key={tag}
                       label={tag}
-                      getColor={getTagColor}
+                      component={Link}
+                      href={getTagHref(tag)}
+                      clickable
+                      size="small"
+                      sx={{
+                        bgcolor: getTagColor(tag),
+                        color: 'text.primary',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                        },
+                      }}
                     />
                   ))}
                   {post.featured && (
@@ -412,6 +481,65 @@ export default function PostDetailPage() {
                     content={post.content}
                   />
                 </Box>
+
+              <Divider />
+
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  이어서 읽기
+                </Typography>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
+                    gap: 1.5,
+                  }}
+                >
+                  <AdjacentPostCard
+                    label="이전글"
+                    post={adjacentPosts.previous}
+                    direction="previous"
+                    onClick={(targetPost) => router.push(`/posts/${targetPost.slug}`)}
+                  />
+                  <AdjacentPostCard
+                    label="다음글"
+                    post={adjacentPosts.next}
+                    direction="next"
+                    onClick={(targetPost) => router.push(`/posts/${targetPost.slug}`)}
+                  />
+                </Box>
+              </Box>
+
+              <Divider />
+
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  내부 링크 추천
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
+                  이 글과 같은 주제의 글을 더 탐색할 수 있는 자동 추천 링크입니다.
+                </Typography>
+                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                  <Chip
+                    label={`${post.category} 글 더 보기`}
+                    component={Link}
+                    href={getCategoryHref(post.category)}
+                    clickable
+                    color="primary"
+                    variant="outlined"
+                  />
+                  {post.tags.slice(0, 5).map((tag) => (
+                    <Chip
+                      key={tag}
+                      label={`#${tag}`}
+                      component={Link}
+                      href={getTagHref(tag)}
+                      clickable
+                      variant="outlined"
+                    />
+                  ))}
+                </Stack>
+              </Box>
 
               <Divider />
 
@@ -512,5 +640,62 @@ export default function PostDetailPage() {
         <Footer />
       </Box>
     </MuiThemeProvider>
+  )
+}
+
+function AdjacentPostCard({
+  label,
+  post,
+  direction,
+  onClick,
+}: {
+  label: string
+  post: PostEntity | null
+  direction: 'previous' | 'next'
+  onClick: (post: PostEntity) => void
+}) {
+  return (
+    <Box
+      component={post ? 'button' : 'div'}
+      type={post ? 'button' : undefined}
+      onClick={post ? () => onClick(post) : undefined}
+      sx={{
+        p: 2,
+        width: '100%',
+        textAlign: 'left',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+        bgcolor: 'background.paper',
+        cursor: post ? 'pointer' : 'default',
+        color: 'text.primary',
+        font: 'inherit',
+        transition: 'border-color 0.2s ease, background-color 0.2s ease',
+        '&:hover': post
+          ? {
+              borderColor: 'primary.main',
+              bgcolor: 'action.hover',
+            }
+          : undefined,
+      }}
+    >
+      <Stack spacing={1}>
+        <Stack direction="row" spacing={1} alignItems="center" color="text.secondary">
+          {direction === 'previous' && <ArrowBackIcon sx={{ fontSize: 16 }} />}
+          <Typography variant="caption" sx={{ fontWeight: 800 }}>
+            {label}
+          </Typography>
+          {direction === 'next' && <ArrowForwardIcon sx={{ fontSize: 16 }} />}
+        </Stack>
+        <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.35 }}>
+          {post ? post.title : `${label}이 없습니다.`}
+        </Typography>
+        {post && (
+          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+            {post.description || post.excerpt}
+          </Typography>
+        )}
+      </Stack>
+    </Box>
   )
 }

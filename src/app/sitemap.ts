@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 import { getSiteUrl } from '@/lib/seo'
+import { createTaxonomySlug } from '@/lib/taxonomy'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl()
@@ -62,16 +63,50 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   try {
-    const posts = await prisma.post.findMany({
-      where: { isPublished: true },
-      select: {
-        slug: true,
-        updatedAt: true,
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    })
+    const [posts, categories, tags] = await Promise.all([
+      prisma.post.findMany({
+        where: { isPublished: true },
+        select: {
+          slug: true,
+          updatedAt: true,
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      }),
+      prisma.category.findMany({
+        where: {
+          posts: {
+            some: { isPublished: true },
+          },
+        },
+        select: {
+          name: true,
+          posts: {
+            where: { isPublished: true },
+            select: { updatedAt: true },
+            orderBy: { updatedAt: 'desc' },
+            take: 1,
+          },
+        },
+      }),
+      prisma.tag.findMany({
+        where: {
+          posts: {
+            some: { isPublished: true },
+          },
+        },
+        select: {
+          name: true,
+          posts: {
+            where: { isPublished: true },
+            select: { updatedAt: true },
+            orderBy: { updatedAt: 'desc' },
+            take: 1,
+          },
+        },
+      }),
+    ])
 
     return [
       ...staticRoutes,
@@ -80,6 +115,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: post.updatedAt,
         changeFrequency: 'monthly' as const,
         priority: 0.7,
+      })),
+      ...categories.map((category) => ({
+        url: `${baseUrl}/categories/${createTaxonomySlug(category.name)}`,
+        lastModified: category.posts[0]?.updatedAt || new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.65,
+      })),
+      ...tags.map((tag) => ({
+        url: `${baseUrl}/tags/${createTaxonomySlug(tag.name)}`,
+        lastModified: tag.posts[0]?.updatedAt || new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.55,
       })),
     ]
   } catch (error) {

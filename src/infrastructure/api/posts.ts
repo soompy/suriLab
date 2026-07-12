@@ -355,6 +355,86 @@ export class RelatedPostsAPIHandler {
   }
 }
 
+export class AdjacentPostsAPIHandler {
+  static async GET(_request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+      const currentPost = await prisma.post.findUnique({
+        where: { id: params.id },
+        select: {
+          id: true,
+          publishedAt: true,
+          isPublished: true,
+        },
+      })
+
+      if (!currentPost || !currentPost.isPublished) {
+        return NextResponse.json(
+          { error: 'Post not found' },
+          { status: 404 }
+        )
+      }
+
+      const includePostRelations = {
+        tags: true,
+        category: true,
+        author: true,
+      }
+
+      const [previous, next] = await Promise.all([
+        prisma.post.findFirst({
+          where: {
+            isPublished: true,
+            publishedAt: { lt: currentPost.publishedAt },
+          },
+          orderBy: { publishedAt: 'desc' },
+          include: includePostRelations,
+        }),
+        prisma.post.findFirst({
+          where: {
+            isPublished: true,
+            publishedAt: { gt: currentPost.publishedAt },
+          },
+          orderBy: { publishedAt: 'asc' },
+          include: includePostRelations,
+        }),
+      ])
+
+      const toSummary = (post: typeof previous) => post
+        ? {
+            id: post.id,
+            title: post.title,
+            content: '',
+            excerpt: post.excerpt,
+            description: post.excerpt,
+            series: post.series,
+            thumbnail: post.thumbnail,
+            slug: post.slug,
+            publishedAt: post.publishedAt,
+            updatedAt: post.updatedAt,
+            tags: post.tags.map((tag) => tag.name),
+            category: post.category.name,
+            authorId: post.authorId,
+            readTime: post.readTime,
+            views: post.views,
+            featured: post.featured,
+            isPublished: post.isPublished,
+            draft: !post.isPublished,
+          }
+        : null
+
+      return NextResponse.json({
+        previous: toSummary(previous),
+        next: toSummary(next),
+      })
+    } catch {
+      return NextResponse.json(
+        { error: 'Failed to fetch adjacent posts' },
+        { status: 500 }
+      )
+    }
+  }
+}
+
 export class BlogStatsAPIHandler {
   static async GET() {
     try {
