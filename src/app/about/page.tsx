@@ -27,17 +27,16 @@ import { AvatarImage } from '@/components/image'
 import { BLOG_CONFIG } from '@/config/blog'
 
 const principles = [
-  '실제 제품을 만들며 배운 것을 기록합니다.',
-  'AI 도구 사용법보다 실행 과정과 판단을 남깁니다.',
-  '작은 MVP와 콘텐츠 실험을 개인 브랜드 자산으로 축적합니다.'
+  'AI 에이전트와 함께 제품을 만드는 프로젝트 빌더',
+  'Claude Code, Codex 등을 활용한 작업 과정 기록',
+  'MomentTune 개발 일지',
+  'AI 자동화 워크플로우'
 ]
 
 const focusAreas = [
   'MomentTune 제작과 출시 준비',
   'Claude Code, Codex 기반 AI 코딩 워크플로우',
-  '1인 창업과 MVP 검증',
-  'UX/UI 기획과 서비스 구조 설계',
-  '검색 유입형 블로그 운영과 수익화 실험'
+  '1인 프로젝트 빌더로써 MVP 검증'
 ]
 
 const skills = ['HTML', 'CSS/SCSS', 'TypeScript', 'React', 'Next.js', 'Material UI', 'Figma', 'AI Coding', 'Product Planning']
@@ -56,10 +55,22 @@ const experiences = [
     description: 'Nuxt 기반 교육 플랫폼의 인터랙션과 화면 구현을 진행했습니다.'
   },
   {
-    company: 'KakaoVX / SmartScore / 엔라이튼',
-    period: '2018 - 2023',
+    company: '카카오VX',
+    period: '2021 - 2023',
     role: 'Web Publisher',
-    description: '스포츠, 골프, 태양광 금융 도메인의 웹 UI 구현과 운영을 경험했습니다.'
+    description: '골프와 스포츠 도메인 서비스의 웹 UI 구현과 운영을 경험했습니다.'
+  },
+  {
+    company: 'SmartScore',
+    period: '2020 - 2021',
+    role: 'Web Publisher',
+    description: '골프 앱 서비스의 웹 UI 구현과 운영을 경험했습니다.'
+  },
+  {
+    company: '엔라이튼',
+    period: '2018 - 2019',
+    role: 'Web Publisher',
+    description: '태양광 금융 도메인의 웹 UI 구현과 운영을 경험했습니다.'
   }
 ]
 
@@ -91,20 +102,20 @@ export default function AboutPage() {
                   <Typography
                     variant="h1"
                     sx={{
-                      maxWidth: 860,
-                      fontSize: { xs: '2.7rem', sm: '3.7rem', md: '5rem' },
-                      lineHeight: 1,
+                      maxWidth: { xs: 860, md: 'none' },
+                      fontSize: { xs: '2rem', sm: '2.5rem', md: '2.35rem' },
+                      lineHeight: 1.25,
                       fontWeight: 850,
                       letterSpacing: 0,
                       color: '#111827',
-                      mb: 3
+                      mb: 3,
+                      whiteSpace: { xs: 'normal', md: 'nowrap' }
                     }}
                   >
                     제품을 만들며 배우고, 배운 것을 기록합니다.
                   </Typography>
                   <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 760, lineHeight: 1.75, fontWeight: 400 }}>
-                    저는 Suri입니다. UI 구현 경험을 바탕으로 AI 도구와 함께 MomentTune을 만들고,
-                    1인 창업과 MVP 제작 과정을 공개 기록으로 축적하고 있습니다.
+                    Project Builder with a Dev & Sales Background
                   </Typography>
                 </Box>
               </Stack>
@@ -134,11 +145,7 @@ export default function AboutPage() {
                     Why this blog exists
                   </Typography>
                   <Typography variant="h4" component="h2" sx={{ fontWeight: 850, letterSpacing: 0, my: 1.5 }}>
-                    개인 일기보다 제품 제작 기록에 가까운 매거진
-                  </Typography>
-                  <Typography color="text.secondary" sx={{ lineHeight: 1.8, mb: 3 }}>
-                    SuriBlog는 완성된 결과만 보여주는 포트폴리오가 아니라, 제품을 만드는 중간의 판단과 시행착오를
-                    쌓는 공간입니다. MomentTune을 중심으로 AI 활용, 자동화, 기획, 콘텐츠 성장 실험을 연결합니다.
+                    제품 제작 기록 블로그
                   </Typography>
                   <Stack spacing={1.25}>
                     {principles.map((principle) => (

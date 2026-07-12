@@ -37,6 +37,8 @@ interface EditorialCollectionPageProps {
   emptyTitle: string
   emptyDescription: string
   focusItems: string[]
+  initialPosts?: PostEntity[]
+  initialError?: string | null
 }
 
 export default function EditorialCollectionPage({
@@ -47,21 +49,23 @@ export default function EditorialCollectionPage({
   heroLabel,
   emptyTitle,
   emptyDescription,
-  focusItems
+  focusItems,
+  initialPosts = [],
+  initialError = null
 }: EditorialCollectionPageProps) {
   const router = useRouter()
-  const [posts, setPosts] = useState<PostEntity[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [posts, setPosts] = useState<PostEntity[]>(initialPosts)
+  const [loading, setLoading] = useState(initialPosts.length === 0 && !initialError)
+  const [error, setError] = useState<string | null>(initialError)
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        setLoading(true)
+        setLoading(posts.length === 0)
         setError(null)
 
-        const response = await fetch('/api/posts?isPublished=true&sortField=publishedAt&sortOrder=desc&limit=100')
-        if (!response.ok) throw new Error('Failed to load posts')
+        const response = await fetch('/api/posts?isPublished=true&sortField=publishedAt&sortOrder=desc&limit=200')
+        if (!response.ok) throw new Error('데이터베이스에 연결하지 못해 글 목록을 불러올 수 없습니다.')
 
         const data = await response.json()
         setPosts(data.posts || [])
@@ -73,11 +77,11 @@ export default function EditorialCollectionPage({
     }
 
     fetchPosts()
-  }, [])
+  }, [posts.length])
 
   const visiblePosts = useMemo(() => {
     return posts
-      .filter((post) => post.isPublished && !post.draft)
+      .filter((post) => post.isPublished !== false && post.draft !== true)
       .filter((post) => !category || post.category === category)
   }, [category, posts])
 

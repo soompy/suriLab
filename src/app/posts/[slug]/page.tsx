@@ -493,7 +493,12 @@ export default function PostDetailPage() {
               </Stack>
             </Paper>
 
-            <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+            <Box
+              sx={{
+                display: { xs: 'none', lg: 'block' },
+                alignSelf: 'stretch'
+              }}
+            >
               <TableOfContents
                 content={post.content}
                 sticky

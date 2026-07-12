@@ -51,7 +51,6 @@ export default function Header() {
   const [hasSearched, setHasSearched] = useState(false)
 
   const menuItems = [
-    { href: '/momenttune', label: 'MomentTune' },
     { href: '/articles', label: 'Articles' },
     { href: '/build-log', label: 'Build Log' },
     { href: '/about', label: 'About' }
