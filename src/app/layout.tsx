@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono, Nanum_Gothic, Noto_Sans_KR } from 'next/font/google'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 import { CustomThemeProvider } from '@/components/ThemeContext'
 import {
   SITE_DESCRIPTION,
@@ -7,6 +8,7 @@ import {
   SITE_TITLE,
   absoluteUrl,
   createPageMetadata,
+  getOrganizationJsonLd,
   getPersonJsonLd,
   getSiteUrl,
   getWebsiteJsonLd,
@@ -65,6 +67,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     path: '/',
   }),
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
   icons: {
     icon: absoluteUrl('/images/profile.jpg'),
   },
@@ -88,9 +93,15 @@ export default function RootLayout({
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(getPersonJsonLd()) }}
         />
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getOrganizationJsonLd()) }}
+        />
         <CustomThemeProvider>
           {children}
         </CustomThemeProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   )

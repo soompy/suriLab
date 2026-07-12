@@ -50,6 +50,12 @@ EMAIL_PASS=your_app_password
 
 # 사이트 URL
 NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
+
+# Google Search Console
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=google-site-verification-token
+
+# Google Analytics 4
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
 
 ### 3.3 배포 실행
@@ -129,19 +135,16 @@ const securityHeaders = [
 3. 실시간 성능 모니터링
 
 ### 7.2 Google Analytics (선택사항)
-```javascript
-// pages/_app.js에 추가
-import { GoogleAnalytics } from '@next/third-parties/google'
+1. Google Analytics에서 GA4 Web Stream 생성
+2. 측정 ID 복사 (예: `G-XXXXXXXXXX`)
+3. Vercel Environment Variables에 `NEXT_PUBLIC_GA_ID` 추가
+4. 재배포 후 실시간 보고서에서 접속 이벤트 확인
 
-export default function App({ Component, pageProps }) {
-  return (
-    <>
-      <Component {...pageProps} />
-      <GoogleAnalytics gaId="G-XXXXXXXXXX" />
-    </>
-  )
-}
-```
+### 7.3 Google Search Console
+1. URL prefix 속성으로 `NEXT_PUBLIC_SITE_URL` 값 등록
+2. HTML tag 인증 토큰을 `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`에 추가
+3. 재배포 후 소유권 확인
+4. `https://your-domain.vercel.app/sitemap.xml` 제출
 
 ## 8. 배포 후 체크리스트
 

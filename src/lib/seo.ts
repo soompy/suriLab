@@ -77,6 +77,37 @@ export function getWebsiteJsonLd() {
     url: getSiteUrl(),
     description: SITE_DESCRIPTION,
     inLanguage: 'ko-KR',
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: getSiteUrl(),
+      logo: {
+        '@type': 'ImageObject',
+        url: absoluteUrl(DEFAULT_OG_IMAGE),
+      },
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${getSiteUrl()}/articles?search={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  }
+}
+
+export function getOrganizationJsonLd() {
+  const sameAs = [
+    BLOG_CONFIG.owner.social.github,
+    BLOG_CONFIG.owner.social.linkedin,
+    BLOG_CONFIG.owner.social.twitter,
+  ].filter((url) => url && !url.includes('yourusername'))
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: getSiteUrl(),
+    logo: absoluteUrl(DEFAULT_OG_IMAGE),
+    sameAs,
   }
 }
 
