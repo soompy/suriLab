@@ -23,7 +23,7 @@ export const BLOG_CONFIG = {
   
   // 인증 설정
   auth: {
-    adminPassword: process.env.BLOG_ADMIN_PASSWORD || 'admin123!',
+    adminPassword: process.env.BLOG_ADMIN_PASSWORD ?? '',
     sessionTimeout: 24 * 60 * 60 * 1000 // 24시간
   }
 } as const

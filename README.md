@@ -113,10 +113,10 @@ model Like {
 
 ### 환경 변수
 ```env
-DATABASE_URL=              # 데이터베이스 연결 문자열
-BLOG_ADMIN_PASSWORD=       # 관리자 비밀번호
-EMAIL_USER=               # 이메일 사용자
-EMAIL_PASS=               # 이메일 앱 비밀번호
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+BLOG_ADMIN_PASSWORD=your-secure-admin-password
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-email-app-password
 ```
 
 ## 📊 API 엔드포인트

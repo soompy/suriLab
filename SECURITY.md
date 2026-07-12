@@ -31,7 +31,7 @@ cp .env.example .env
 
 ```env
 # 강력한 비밀번호 설정 (8자 이상 권장)
-BLOG_ADMIN_PASSWORD="your_very_secure_password_123!"
+BLOG_ADMIN_PASSWORD=your-secure-admin-password
 ```
 
 ### 2. 비밀번호 보안 요구사항

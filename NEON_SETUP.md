@@ -70,7 +70,7 @@ vercel --prod
 ### 연결 오류 시:
 ```bash
 # SSL 설정 확인
-DATABASE_URL="postgresql://...?sslmode=require"
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
 ### 스키마 오류 시:

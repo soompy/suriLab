@@ -26,14 +26,14 @@
 ### 📦 Environment Variables (Vercel)
 ```bash
 # 데이터베이스
-DATABASE_URL=file:./database.db
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 
 # 인증 시스템
-BLOG_ADMIN_PASSWORD=[사용자 설정 비밀번호]
+BLOG_ADMIN_PASSWORD=your-secure-admin-password
 
 # 이메일 서비스
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-email-app-password
 ```
 
 ### 🔧 Build Configuration
