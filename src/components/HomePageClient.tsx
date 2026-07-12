@@ -288,6 +288,18 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
             quality={95}
           />
           <Typography
+            sx={{
+              mt: -1,
+              color: 'text.secondary',
+              fontSize: { xs: '0.75rem', md: '0.8125rem' },
+              fontWeight: 800,
+              letterSpacing: 0,
+              lineHeight: 1.4
+            }}
+          >
+            야생의 프로젝트 빌더
+          </Typography>
+          <Typography
             variant="h2"
             sx={{
               fontSize: { xs: '1.05rem', md: '1.35rem' },
