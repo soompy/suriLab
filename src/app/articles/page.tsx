@@ -2,7 +2,7 @@ import EditorialCollectionPage from '@/components/EditorialCollectionPage'
 import type { PostEntity } from '@/entities/Post'
 import { getPosts } from '@/infrastructure/api/posts'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export default async function ArticlesPage() {
   let initialPosts: PostEntity[] = []
