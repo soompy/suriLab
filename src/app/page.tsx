@@ -32,8 +32,7 @@ const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000
 const missionMilestones = [
   '문제 정의 정리',
   'MVP 흐름 설계',
-  '프로토타입 실험 진행',
-  '첫 사용자 피드백 루프'
+  '프로토타입 실험 진행'
 ]
 
 const categoryCards = [
@@ -281,12 +280,12 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
             sx={{
               fontSize: { xs: '1.05rem', md: '1.35rem' },
               lineHeight: 1.2,
-              fontWeight: 900,
+              fontWeight: 400,
               color: '#111827',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'normal'
             }}
           >
-            야생의 프로젝트 빌더 SM
+            AI와 함께 설계하고, 개발하고, 검증하는 프로젝트 빌더입니다.
           </Typography>
         </Stack>
       </Paper>
@@ -334,18 +333,14 @@ function MissionSection({ momentTuneWeek, progressValue }: { momentTuneWeek: num
             <Typography
               variant="h3"
               sx={{
-                fontSize: { xs: '1.85rem', md: '2.2rem' },
-                lineHeight: 1.05,
+                fontSize: { xs: '1.35rem', md: '1.65rem' },
+                lineHeight: 1.35,
                 fontWeight: 900,
                 letterSpacing: 0,
                 mb: 2
               }}
             >
-              감정의 순간을 위한 음악 저널링 제품
-            </Typography>
-            <Typography sx={{ color: '#6B7280', lineHeight: 1.65, fontSize: { xs: '0.875rem', md: '1rem' } }}>
-              흐릿한 감정을 더 선명한 음악 감상 루틴으로 바꾸는 것이 목표입니다.
-              동시에 모든 제품 의사결정을 공개 기록으로 남깁니다.
+              웨어러블 데이터를 분석해 개인 맞춤형 음악과 휴식 경험을 제안하는 AI 웰니스 서비스
             </Typography>
           </Box>
 

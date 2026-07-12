@@ -68,7 +68,7 @@ code:not([class*="language-"]) {
 }
 
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
 }
 

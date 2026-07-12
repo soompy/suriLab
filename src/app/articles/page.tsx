@@ -1,6 +1,28 @@
 import EditorialCollectionPage from '@/components/EditorialCollectionPage'
+import type { PostEntity } from '@/entities/Post'
+import { getPosts } from '@/infrastructure/api/posts'
 
-export default function ArticlesPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function ArticlesPage() {
+  let initialPosts: PostEntity[] = []
+  let initialError: string | null = null
+
+  try {
+    const result = await getPosts(
+      { isPublished: true },
+      { field: 'publishedAt', order: 'desc' },
+      { page: 1, limit: 200 }
+    )
+    initialPosts = result.posts.map((post) => ({
+      ...post,
+      content: ''
+    }))
+  } catch (error) {
+    console.error('Failed to load initial articles:', error)
+    initialError = '데이터베이스에 연결하지 못해 글 목록을 불러올 수 없습니다.'
+  }
+
   return (
     <EditorialCollectionPage
       eyebrow="Editorial Index"
@@ -14,6 +36,8 @@ export default function ArticlesPage() {
         '카테고리보다 읽는 흐름을 우선하는 매거진형 인덱스입니다.',
         '향후 뉴스레터, 리소스, 디지털 상품으로 확장할 수 있는 콘텐츠 허브입니다.'
       ]}
+      initialPosts={initialPosts}
+      initialError={initialError}
     />
   )
 }
