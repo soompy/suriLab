@@ -1,6 +1,6 @@
 # Branch Strategy
 
-This strategy is designed for the SuriBlog renewal work while keeping the live blog stable.
+This strategy is designed for the SuriBlog renewal, admin workflow, and performance work while keeping the live blog stable.
 
 ## Goals
 
@@ -8,7 +8,8 @@ This strategy is designed for the SuriBlog renewal work while keeping the live b
 - Make each change small enough to review and roll back.
 - Protect existing URLs, published content, and SEO-critical behavior.
 - Separate documentation, SEO, design, content migration, and implementation work.
-- Avoid mixing broad redesign work with security, database, or deployment changes.
+- Avoid mixing broad redesign work with security, database, performance, or deployment changes.
+- Keep rendering performance work isolated so it can be measured and rolled back independently.
 
 ## Branch Roles
 
@@ -41,6 +42,46 @@ Rules:
 - Rebase or merge from `main` regularly if production hotfixes happen.
 - Do not use it for unrelated experiments.
 
+### `admin`
+
+Private admin workflow branch.
+
+Purpose:
+
+- Develop and stabilize `/admin` writing, editing, and publishing workflows.
+- Keep admin-only UI and authentication changes separate from public redesign work.
+- Verify that public navigation does not expose admin entry points.
+
+Rules:
+
+- Never commit `BLOG_ADMIN_PASSWORD`, JWT secrets, database URLs, or local tokens.
+- Keep public routes and published post URLs unchanged.
+- Run build, lint, and type-check before pushing.
+- Merge to `main` only after admin auth and publishing flows are verified.
+
+### `perf/<topic>` or `codex/perf-<topic>`
+
+Rendering and infrastructure performance branch.
+
+Purpose:
+
+- Improve first render, API response time, bundle weight, and database request behavior.
+- Keep speed work separate from visual redesign so regressions are easy to isolate.
+
+Recommended work:
+
+- Remove duplicated client fetches after server-rendered data is available.
+- Add safe `revalidate` or response caching for public content.
+- Limit homepage and list queries to the data needed by the visible UI.
+- Reduce expensive request-time initialization and noisy query logging.
+
+Rules:
+
+- Do not change public URLs, post slugs, or content semantics.
+- Do not cache authenticated admin responses.
+- Do not introduce new performance libraries unless measurement shows they are needed.
+- Include before/after notes: changed fetch behavior, cache policy, and verification commands.
+
 ### Short-Lived Work Branches
 
 Create short-lived branches from `renew/blog-v2` for each clear task.
@@ -51,6 +92,7 @@ Recommended naming:
 - `seo/<topic>`
 - `content/<topic>`
 - `design/<topic>`
+- `perf/<topic>`
 - `feature/<topic>`
 - `fix/<topic>`
 - `chore/<topic>`
@@ -61,6 +103,7 @@ Examples:
 - `seo/sitemap-metadata`
 - `content/category-taxonomy`
 - `design/homepage-editorial`
+- `perf/homepage-render`
 - `feature/momenttune-page`
 - `fix/draft-post-exposure`
 - `chore/ignore-next-build-output`
@@ -131,6 +174,8 @@ Use the renewal plan phases as merge checkpoints.
 | SEO Foundation | `renew/blog-v2` | `seo/robots-sitemap`, `seo/post-metadata` |
 | Content Architecture | `renew/blog-v2` | `content/category-taxonomy`, `content/post-metadata-model` |
 | Editorial Redesign | `renew/blog-v2` | `design/homepage-editorial`, `design/article-detail`, `feature/momenttune-page` |
+| Rendering Performance | `main` through PR | `perf/homepage-render`, `perf/api-cache`, `perf/database-init` |
+| Admin Publishing | `main` through PR | `admin/post-editor`, `admin/private-dashboard`, `admin/auth-hardening` |
 | Growth Features | `renew/blog-v2` | `feature/newsletter`, `feature/rss`, `feature/related-posts` |
 | Production Hardening | `main` through PR | `fix/draft-exposure`, `chore/remove-next-tracking`, `fix/auth-logging` |
 
@@ -146,6 +191,7 @@ Recommended prefixes:
 - `design:` visual and layout changes
 - `feature:` new user-facing functionality
 - `fix:` bug or security-related fix
+- `perf:` rendering, caching, query, or bundle performance
 - `chore:` maintenance, config, cleanup
 - `test:` tests only
 
@@ -157,6 +203,7 @@ seo: add published posts to sitemap
 content: define renewed blog categories
 design: redesign homepage hero and mission section
 fix: hide unpublished posts from public API
+perf: improve homepage initial render
 chore: stop tracking next build output
 ```
 
@@ -179,6 +226,7 @@ Do not merge if:
 - Draft content becomes publicly visible.
 - Placeholder domains or secrets are introduced.
 - Mobile layout has obvious horizontal overflow.
+- Authenticated admin responses are cached publicly.
 
 ## Release Strategy
 
@@ -198,6 +246,18 @@ Recommended candidates:
 - Add post-specific metadata.
 - Remove tracked build output.
 - Remove insecure auth fallbacks.
+
+### Performance Releases
+
+Performance branches can merge directly toward `main` when they reduce production risk or improve visitor experience without changing content behavior.
+
+Recommended candidates:
+
+- Server-render homepage article data.
+- Remove duplicate client fetches on article indexes.
+- Add short public cache windows for published post APIs.
+- Memoize database initialization.
+- Reduce verbose Prisma query logging by default.
 
 ### Redesign Releases
 
@@ -245,16 +305,14 @@ git add AGENTS.md docs/BLOG_RENEWAL_PLAN.md docs/CONTENT_ARCHITECTURE.md docs/SE
 
 ## Current Recommendation
 
-The current branch `renew/blog-v2` is appropriate as the renewal integration branch.
+Use the following active branch roles:
 
-Recommended next commit:
+- `main`: production-ready source of truth.
+- `renew/blog-v2`: public redesign and content architecture integration.
+- `admin`: private admin publishing workflow.
+- `codex/perf-rendering-strategy`: current rendering speed and branch strategy update.
 
-```bash
-git add AGENTS.md docs/BLOG_RENEWAL_PLAN.md docs/CONTENT_ARCHITECTURE.md docs/SEO_CHECKLIST.md docs/BRANCH_STRATEGY.md
-git commit -m "docs: add blog renewal planning docs"
-```
-
-Before committing, verify:
+Before committing any branch, verify:
 
 ```bash
 git status --short

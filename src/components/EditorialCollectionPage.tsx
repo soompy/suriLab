@@ -59,9 +59,13 @@ export default function EditorialCollectionPage({
   const [error, setError] = useState<string | null>(initialError)
 
   useEffect(() => {
+    if (initialPosts.length > 0 || initialError) {
+      return
+    }
+
     const fetchPosts = async () => {
       try {
-        setLoading(posts.length === 0)
+        setLoading(true)
         setError(null)
 
         const response = await fetch('/api/posts?isPublished=true&sortField=publishedAt&sortOrder=desc&limit=200')
@@ -77,7 +81,7 @@ export default function EditorialCollectionPage({
     }
 
     fetchPosts()
-  }, [posts.length])
+  }, [initialError, initialPosts.length])
 
   const visiblePosts = useMemo(() => {
     return posts

@@ -1,18 +1,23 @@
 import { prisma } from './prisma'
 
+let initializationPromise: Promise<void> | null = null
+
 export async function initializeDatabase() {
+  if (initializationPromise) {
+    return initializationPromise
+  }
+
+  initializationPromise = runDatabaseInitialization()
+  return initializationPromise
+}
+
+async function runDatabaseInitialization() {
   try {
     // 데이터베이스 연결 테스트
     await prisma.$connect()
-    console.log('Database connected successfully')
-
-    // 데이터베이스 파일 경로 확인
-    const dbUrl = process.env.DATABASE_URL || ''
-    console.log(`Database URL: ${dbUrl.substring(0, 30)}...`)
 
     // Vercel 환경에서 Neon PostgreSQL 사용
     if (process.env.VERCEL) {
-      console.log('Vercel environment detected, using Neon PostgreSQL...')
       console.log('Checking database connection and initialization...')  
     }
 
@@ -23,6 +28,7 @@ export async function initializeDatabase() {
     console.error('Database initialization failed:', error)
     // 에러가 발생해도 계속 진행
     console.log('Continuing without database initialization...')
+    initializationPromise = null
   }
 }
 
