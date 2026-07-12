@@ -289,14 +289,16 @@ export default function HomePage() {
                     sx={{
                       maxWidth: 920,
                       fontSize: { xs: '2.7rem', sm: '3.8rem', md: '5.25rem' },
-                      lineHeight: 0.98,
+                      lineHeight: 1.4,
                       fontWeight: 850,
                       letterSpacing: 0,
                       color: '#111827',
                       mb: 3
                     }}
                   >
-                    AI와 함께 제품을 만들고, 창업을 실험하는 기록
+                    실험하고 만들고
+                    <br />
+                    기록합니다.
                   </Typography>
                   <Typography
                     variant="h6"
