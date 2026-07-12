@@ -30,8 +30,7 @@ import {
   Close as CloseIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
-  Search as SearchIcon,
-  Edit as EditIcon
+  Search as SearchIcon
 } from '@mui/icons-material'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -201,44 +200,6 @@ export default function Header() {
                 </Link>
               ))}
               
-              {/* Write Button - Special Styling */}
-              <Link href="/write" passHref style={{ textDecoration: 'none' }}>
-                <Button
-                  variant={pathname === '/write' ? 'contained' : 'outlined'}
-                  startIcon={<EditIcon />}
-                  sx={{
-                    ml: 2,
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    px: 2,
-                    py: 1,
-                    borderRadius: '8px',
-                    minWidth: 'auto',
-                    ...(pathname === '/write' 
-                      ? {
-                          backgroundColor: 'primary.main',
-                          color: 'primary.contrastText',
-                          '&:hover': {
-                            backgroundColor: 'primary.dark',
-                          }
-                        }
-                      : {
-                          borderColor: 'primary.main',
-                          color: 'primary.main',
-                          '&:hover': {
-                            backgroundColor: 'primary.main',
-                            color: 'primary.contrastText',
-                            borderColor: 'primary.main',
-                          }
-                        }
-                    )
-                  }}
-                >
-                  Write
-                </Button>
-              </Link>
-              
               {/* Search Button */}
               <IconButton
                 onClick={handleSearchOpen}
@@ -357,44 +318,6 @@ export default function Header() {
               </Link>
             ))}
             
-            {/* Write Button for Mobile - Special Item */}
-            <Box sx={{ px: 2, py: 1 }}>
-              <Link href="/write" passHref style={{ textDecoration: 'none' }}>
-                <Button
-                  variant={pathname === '/write' ? 'contained' : 'outlined'}
-                  startIcon={<EditIcon />}
-                  fullWidth
-                  onClick={handleMobileMenuClose}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.875rem',
-                    py: 1.5,
-                    borderRadius: '8px',
-                    ...(pathname === '/write' 
-                      ? {
-                          backgroundColor: 'primary.main',
-                          color: 'primary.contrastText',
-                          '&:hover': {
-                            backgroundColor: 'primary.dark',
-                          }
-                        }
-                      : {
-                          borderColor: 'primary.main',
-                          color: 'primary.main',
-                          '&:hover': {
-                            backgroundColor: 'primary.main',
-                            color: 'primary.contrastText',
-                            borderColor: 'primary.main',
-                          }
-                        }
-                    )
-                  }}
-                >
-                  Write New Post
-                </Button>
-              </Link>
-            </Box>
           </Menu>
 
           {/* Search Dialog */}

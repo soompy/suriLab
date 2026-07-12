@@ -36,12 +36,16 @@ import { useRouter } from 'next/navigation'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import LoginDialog from '@/components/LoginDialog'
 import { PostEntity } from '@/entities/Post'
+import { AuthService } from '@/lib/auth'
 
 export default function AdminPostsPage() {
   const router = useRouter()
   const [posts, setPosts] = useState<PostEntity[]>([])
   const [loading, setLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<{open: boolean, post: PostEntity | null}>({
     open: false,
@@ -52,6 +56,13 @@ export default function AdminPostsPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   const fetchPosts = async () => {
+    if (!AuthService.isAuthenticated()) {
+      setIsAuthenticated(false)
+      setShowLoginDialog(true)
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       const params = new URLSearchParams({
@@ -61,8 +72,15 @@ export default function AdminPostsPage() {
         search: searchQuery
       })
 
-      const response = await fetch(`/api/posts?${params.toString()}`)
+      const response = await fetch(`/api/posts?${params.toString()}`, {
+        headers: AuthService.getAuthHeaders()
+      })
       if (!response.ok) {
+        if (response.status === 401) {
+          AuthService.logout()
+          setIsAuthenticated(false)
+          setShowLoginDialog(true)
+        }
         throw new Error('Failed to fetch posts')
       }
 
@@ -77,16 +95,31 @@ export default function AdminPostsPage() {
   }
 
   useEffect(() => {
-    fetchPosts()
+    const authenticated = AuthService.isAuthenticated()
+    setIsAuthenticated(authenticated)
+
+    if (authenticated) {
+      fetchPosts()
+    } else {
+      setLoading(false)
+      setShowLoginDialog(true)
+    }
   }, [page, searchQuery])
 
   const handleDelete = async (post: PostEntity) => {
     try {
       const response = await fetch(`/api/posts/${post.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: AuthService.getAuthHeaders()
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          AuthService.logout()
+          setIsAuthenticated(false)
+          setShowLoginDialog(true)
+          return
+        }
         throw new Error('Failed to delete post')
       }
 
@@ -104,6 +137,7 @@ export default function AdminPostsPage() {
       const response = await fetch(`/api/posts/${post.id}`, {
         method: 'PUT',
         headers: {
+          ...AuthService.getAuthHeaders(),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -112,6 +146,12 @@ export default function AdminPostsPage() {
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          AuthService.logout()
+          setIsAuthenticated(false)
+          setShowLoginDialog(true)
+          return
+        }
         throw new Error('Failed to update post')
       }
 
@@ -128,7 +168,13 @@ export default function AdminPostsPage() {
   }
 
   const handleEdit = (post: PostEntity) => {
-    router.push(`/admin/posts/edit/${post.id}`)
+    router.push(`/admin/posts/${post.id}/edit`)
+  }
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+    setShowLoginDialog(false)
+    fetchPosts()
   }
 
   const formatDate = (date: Date) => {
@@ -155,6 +201,35 @@ export default function AdminPostsPage() {
     )
   }
 
+  if (!isAuthenticated) {
+    return (
+      <MuiThemeProvider>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+          <Header />
+          <Container maxWidth="md" sx={{ py: 8 }}>
+            <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 3, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="h4" component="h1" sx={{ fontWeight: 800, mb: 1 }}>
+                관리자 로그인이 필요합니다
+              </Typography>
+              <Typography color="text.secondary" sx={{ mb: 3 }}>
+                포스트 목록, 초안, 발행 상태는 관리자만 볼 수 있습니다.
+              </Typography>
+              <Button variant="contained" onClick={() => setShowLoginDialog(true)}>
+                로그인
+              </Button>
+            </Paper>
+          </Container>
+          <Footer />
+          <LoginDialog
+            open={showLoginDialog}
+            onClose={() => setShowLoginDialog(false)}
+            onSuccess={handleLoginSuccess}
+          />
+        </Box>
+      </MuiThemeProvider>
+    )
+  }
+
   return (
     <MuiThemeProvider>
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -168,7 +243,7 @@ export default function AdminPostsPage() {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => router.push('/write')}
+              onClick={() => router.push('/admin/posts/new')}
             >
               새 포스트 작성
             </Button>
