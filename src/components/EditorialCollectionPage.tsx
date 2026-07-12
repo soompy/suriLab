@@ -60,8 +60,8 @@ export default function EditorialCollectionPage({
         setLoading(true)
         setError(null)
 
-        const response = await fetch('/api/posts?isPublished=true&sortField=publishedAt&sortOrder=desc&limit=100')
-        if (!response.ok) throw new Error('Failed to load posts')
+        const response = await fetch('/api/posts?isPublished=true&sortField=publishedAt&sortOrder=desc&limit=200')
+        if (!response.ok) throw new Error('데이터베이스에 연결하지 못해 글 목록을 불러올 수 없습니다.')
 
         const data = await response.json()
         setPosts(data.posts || [])

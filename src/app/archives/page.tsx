@@ -59,7 +59,7 @@ export default function Archives() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch('/api/posts?isPublished=true&limit=100')
+        const response = await fetch('/api/posts?isPublished=true&sortField=publishedAt&sortOrder=desc&limit=200')
         if (response.ok) {
           const data = await response.json()
           const posts = data.posts || []

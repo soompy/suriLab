@@ -91,13 +91,14 @@ export default function AboutPage() {
                   <Typography
                     variant="h1"
                     sx={{
-                      maxWidth: 860,
-                      fontSize: { xs: '2.7rem', sm: '3.7rem', md: '5rem' },
-                      lineHeight: 1,
+                      maxWidth: { xs: 860, md: 'none' },
+                      fontSize: { xs: '2rem', sm: '2.5rem', md: '2.35rem' },
+                      lineHeight: 1.25,
                       fontWeight: 850,
                       letterSpacing: 0,
                       color: '#111827',
-                      mb: 3
+                      mb: 3,
+                      whiteSpace: { xs: 'normal', md: 'nowrap' }
                     }}
                   >
                     제품을 만들며 배우고, 배운 것을 기록합니다.

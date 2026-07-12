@@ -22,34 +22,18 @@ import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Loading from '@/components/Loading'
+import { AvatarImage } from '@/components/image'
 import { PostEntity } from '@/entities/Post'
 
 const MOMENT_TUNE_START_DATE = new Date('2026-06-29T00:00:00+09:00')
 const MOMENT_TUNE_TOTAL_WEEKS = 14
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000
 
-const fieldNotes = [
-  'MomentTune 창업 여정',
-  '일상 업무 속 AI 에이전트',
-  '제품 설계와 의사결정'
-]
-
 const missionMilestones = [
   '문제 정의 정리',
   'MVP 흐름 설계',
   '프로토타입 실험 진행',
   '첫 사용자 피드백 루프'
-]
-
-const timelineItems = [
-  { week: 1, label: '문제 정의' },
-  { week: 2, label: 'MVP 범위' },
-  { week: 3, label: '프로토타입 루프' },
-  { week: 4, label: '현재 집중' },
-  { week: 5, label: '다음 단계' },
-  { week: 6, label: '다음 단계' },
-  { week: 7, label: '다음 단계' },
-  { week: 8, label: '다음 단계' }
 ]
 
 const categoryCards = [
@@ -67,14 +51,20 @@ export default function HomePage() {
   const previousPostCountRef = useRef(0)
   const [posts, setPosts] = useState<PostEntity[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [newPostAdded, setNewPostAdded] = useState(false)
 
   const fetchPosts = useCallback(async (showNotification = false) => {
     try {
       if (!showNotification) setLoading(true)
+      setFetchError(null)
 
-      const response = await fetch('/api/posts?sortField=publishedAt&sortOrder=desc&limit=18&page=1')
-      if (!response.ok) return
+      const response = await fetch('/api/posts?isPublished=true&sortField=publishedAt&sortOrder=desc&limit=200&page=1')
+      if (!response.ok) {
+        setFetchError('글 목록을 불러오지 못했습니다.')
+        setPosts([])
+        return
+      }
 
       const data = await response.json()
       const nextPosts = data.posts || []
@@ -101,20 +91,7 @@ export default function HomePage() {
     return () => window.removeEventListener('focus', handleFocus)
   }, [fetchPosts])
 
-  const publishedPosts = useMemo(
-    () => posts.filter((post) => post.isPublished && !post.draft),
-    [posts]
-  )
-
-  const featuredPosts = useMemo(() => {
-    const momentTune = publishedPosts.find((post) => post.category === 'MomentTune' && post.featured)
-      || publishedPosts.find((post) => post.category === 'MomentTune')
-      || publishedPosts[0]
-
-    const rest = publishedPosts.filter((post) => post.id !== momentTune?.id)
-
-    return [momentTune, ...rest].filter(Boolean).slice(0, 3) as PostEntity[]
-  }, [publishedPosts])
+  const publishedPosts = useMemo(() => posts, [posts])
 
   const momentTuneWeek = useMemo(() => {
     const elapsedWeeks = Math.ceil(
@@ -152,14 +129,12 @@ export default function HomePage() {
             ) : (
               <>
                 <Box ref={latestSectionRef}>
-                  <FeaturedSection posts={featuredPosts} onPostClick={handlePostClick} />
+                  <FeaturedSection posts={publishedPosts} fetchError={fetchError} onPostClick={handlePostClick} />
                 </Box>
-                <TimelineSection activeWeek={momentTuneWeek} />
                 <CategoriesSection />
               </>
             )}
 
-            <NewsletterSection />
           </Container>
         </Box>
 
@@ -210,14 +185,18 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
           sx={{
             maxWidth: 740,
             fontSize: { xs: '2.35rem', sm: '3.6rem', md: '5.25rem' },
-            lineHeight: { xs: 0.98, md: 1.02 },
-            fontWeight: 900,
+            lineHeight: 1.4,
+            fontWeight: 400,
             letterSpacing: 0,
             color: '#111827',
             mb: { xs: 2, md: 3 }
           }}
         >
-          AI와 함께 제품을 만들고, 창업을 실험하는 기록
+          <Box component="span" sx={{ fontWeight: 900 }}>
+            실험하고 만들고
+          </Box>
+          <br />
+          기록합니다.
         </Typography>
         <Typography
           sx={{
@@ -229,8 +208,7 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
             mb: { xs: 2, md: 3 }
           }}
         >
-          MomentTune 제작 과정, AI 자동화, 에이전트 워크플로우, 1인 창업 실험,
-          그리고 실제 제품을 만드는 과정에서 배우는 것들을 공개적으로 기록합니다.
+          AI와 함께 아이디어를 제품으로 만들어가는 과정을 기록하는 기술 블로그입니다.
         </Typography>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} sx={{ maxWidth: { xs: '100%', sm: 'none' } }}>
           <Button
@@ -272,8 +250,7 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
 
       <Paper
         sx={{
-          display: { xs: 'none', md: 'block' },
-          p: 4,
+          p: { xs: 3, md: 4 },
           border: '1px solid #E5E7EB',
           borderRadius: 5,
           boxShadow: 'none',
@@ -281,32 +258,37 @@ function HeroSection({ onReadArticles }: { onReadArticles: () => void }) {
         }}
       >
         <Chip
-          label="지금 쓰는 중"
+          label="소개"
           size="small"
           sx={{
             mb: 3,
-            bgcolor: '#DCFCE7',
-            color: '#22C55E',
+            bgcolor: '#EFF6FF',
+            color: '#2563EB',
             borderRadius: 999,
             fontWeight: 800
           }}
         />
-        <Typography variant="h2" sx={{ fontSize: '2.35rem', lineHeight: 1.05, fontWeight: 900, mb: 3 }}>
-          제품을 만들며 남기는 현장 노트
-        </Typography>
-        <Typography sx={{ color: '#6B7280', lineHeight: 1.65, mb: 3 }}>
-          이 글들은 제품을 만드는 흔적입니다. 결정, 실패, 출시 노트, 자동화 레시피,
-          그리고 겉으로 잘 보이지 않는 배움까지 차분하게 남깁니다.
-        </Typography>
-        <Box sx={{ borderTop: '1px solid #E5E7EB', pt: 2 }}>
-          <Stack spacing={1.5}>
-            {fieldNotes.map((note) => (
-              <Typography key={note} sx={{ fontSize: '0.925rem', fontWeight: 800, color: '#111827' }}>
-                {note}
-              </Typography>
-            ))}
-          </Stack>
-        </Box>
+        <Stack spacing={3} alignItems="center" sx={{ textAlign: 'center' }}>
+          <AvatarImage
+            alt="SM"
+            size={112}
+            fallbackText="SM"
+            priority
+            quality={95}
+          />
+          <Typography
+            variant="h2"
+            sx={{
+              fontSize: { xs: '1.05rem', md: '1.35rem' },
+              lineHeight: 1.2,
+              fontWeight: 900,
+              color: '#111827',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            야생의 프로젝트 빌더 SM
+          </Typography>
+        </Stack>
       </Paper>
     </Box>
   )
@@ -424,104 +406,79 @@ function MissionSection({ momentTuneWeek, progressValue }: { momentTuneWeek: num
 
 function FeaturedSection({
   posts,
+  fetchError,
   onPostClick
 }: {
   posts: PostEntity[]
+  fetchError?: string | null
   onPostClick: (post: PostEntity) => void
 }) {
+  if (fetchError) {
+    return (
+      <SectionShell
+        eyebrow="추천 글"
+        title="최신 글"
+        desktopTitle="에디토리얼 글과 제작 노트"
+      >
+        <Paper
+          sx={{
+            p: 4,
+            border: '1px solid #FCA5A5',
+            borderRadius: 3,
+            boxShadow: 'none',
+            bgcolor: '#FEF2F2'
+          }}
+        >
+          <Typography sx={{ fontWeight: 800, mb: 1, color: '#991B1B' }}>{fetchError}</Typography>
+          <Typography sx={{ color: '#7F1D1D' }}>잠시 후 다시 시도해 주세요.</Typography>
+        </Paper>
+      </SectionShell>
+    )
+  }
+
   if (posts.length === 0) {
     return (
       <SectionShell
         eyebrow="추천 글"
         title="최신 글"
         desktopTitle="에디토리얼 글과 제작 노트"
-        description="큰 카드로 글 자체가 먼저 보이도록 구성했습니다. 카테고리, 읽는 시간, 발행일은 조용히 보조합니다."
       >
         <EmptyState />
       </SectionShell>
     )
   }
 
+  const [latestPost, ...previousPosts] = posts
+
   return (
     <SectionShell
       eyebrow="추천 글"
       title="최신 글"
       desktopTitle="에디토리얼 글과 제작 노트"
-      description="큰 카드로 글 자체가 먼저 보이도록 구성했습니다. 카테고리, 읽는 시간, 발행일은 조용히 보조합니다."
       id="articles"
     >
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: '1.05fr 0.65fr' },
-          gap: { xs: 2, md: 2.5 },
-          alignItems: 'start'
-        }}
-      >
-        <ArticleCard post={posts[0]} variant="large" onClick={onPostClick} index={0} />
-        <Stack spacing={{ xs: 2, md: 2.5 }}>
-          {posts.slice(1, 3).map((post, index) => (
-            <ArticleCard key={post.id} post={post} variant="compact" onClick={onPostClick} index={index + 1} />
-          ))}
-        </Stack>
-      </Box>
-    </SectionShell>
-  )
-}
+      <Stack spacing={{ xs: 3, md: 4 }}>
+        <ArticleCard post={latestPost} variant="large" onClick={onPostClick} />
 
-function TimelineSection({ activeWeek }: { activeWeek: number }) {
-  return (
-    <SectionShell
-      id="timeline"
-      eyebrow="여정 타임라인"
-      title="주차별 스타트업 진행 기록"
-      description="복잡한 프로젝트 대시보드가 아니라, 진행 흐름이 보이는 시각적 제작 로그입니다."
-    >
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(8, minmax(0, 1fr))' },
-          gap: { xs: 1.25, md: 1.5 }
-        }}
-      >
-        {timelineItems.map((item) => {
-          const completed = item.week < activeWeek
-          const active = item.week === activeWeek
-
-          return (
-            <Paper
-              key={item.week}
-              sx={{
-                p: { xs: 1.75, md: 2 },
-                minHeight: { xs: 82, md: 84 },
-                border: '1px solid',
-                borderColor: active ? '#2563EB' : '#E5E7EB',
-                borderRadius: { xs: 2.5, md: 3 },
-                boxShadow: 'none',
-                bgcolor: '#FFFFFF',
-                outline: active ? '1px solid #2563EB' : 'none',
-                opacity: item.week > activeWeek ? 0.58 : 1
-              }}
-            >
-              <Box
-                sx={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  bgcolor: completed ? '#22C55E' : active ? '#2563EB' : '#E5E7EB',
-                  mb: 1.5
-                }}
-              />
-              <Typography sx={{ fontSize: '0.875rem', fontWeight: 900, color: '#111827', mb: 0.5 }}>
-                {item.week}주차
-              </Typography>
-              <Typography sx={{ color: '#6B7280', fontSize: '0.75rem', fontWeight: 600 }}>
-                {item.label}
-              </Typography>
-            </Paper>
-          )
-        })}
-      </Box>
+        {previousPosts.length > 0 && (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: 'minmax(0, 1fr)',
+                sm: 'repeat(2, minmax(0, 1fr))',
+                lg: 'repeat(3, minmax(0, 1fr))'
+              },
+              gap: { xs: 2, md: 2.5 },
+              minWidth: 0
+            }}
+          >
+            {previousPosts.map((post) => (
+              <ArticleCard key={post.id} post={post} variant="compact" onClick={onPostClick} />
+            ))}
+          </Box>
+        )}
+      </Stack>
     </SectionShell>
   )
 }
@@ -577,73 +534,6 @@ function CategoriesSection() {
   )
 }
 
-function NewsletterSection() {
-  return (
-    <Paper
-      sx={{
-        mt: { xs: 5, md: 9 },
-        mb: { xs: 2, md: 4 },
-        p: { xs: 2.5, md: 5 },
-        border: '1px solid #E5E7EB',
-        borderRadius: { xs: 3, md: 4 },
-        boxShadow: 'none',
-        bgcolor: '#FFFFFF'
-      }}
-    >
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', md: 'center' }}
-        spacing={2.5}
-      >
-        <Box>
-          <Typography
-            sx={{
-              fontSize: { xs: '1.45rem', md: '2rem' },
-              lineHeight: 1.15,
-              fontWeight: 900,
-              mb: 1
-            }}
-          >
-            <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
-              제품을 만들며 얻은 조용한 현장 노트를 받아보세요
-            </Box>
-            <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>
-              조용한 제작 노트
-            </Box>
-          </Typography>
-          <Typography sx={{ color: '#6B7280', fontSize: { xs: '0.8125rem', md: '1rem' }, lineHeight: 1.6 }}>
-            MomentTune, AI 워크플로우, 제품 제작에서 배운 점을 월 1회 가볍게 정리합니다.
-            과장된 성장 공식보다 실제 기록에 집중합니다.
-          </Typography>
-        </Box>
-        <Button
-          variant="outlined"
-          disabled
-          sx={{
-            alignSelf: { xs: 'stretch', md: 'center' },
-            px: 3,
-            py: 1,
-            borderRadius: 999,
-            borderColor: '#E5E7EB',
-            color: '#111827',
-            bgcolor: '#FFFFFF',
-            fontWeight: 800,
-            textTransform: 'none',
-            '&.Mui-disabled': {
-              color: '#111827',
-              borderColor: '#E5E7EB',
-              bgcolor: '#FFFFFF'
-            }
-          }}
-        >
-          구독하기
-        </Button>
-      </Stack>
-    </Paper>
-  )
-}
-
 function SectionShell({
   id,
   eyebrow,
@@ -656,7 +546,7 @@ function SectionShell({
   eyebrow: string
   title: string
   desktopTitle?: string
-  description: string
+  description?: string
   children: ReactNode
 }) {
   return (
@@ -681,7 +571,7 @@ function SectionShell({
             fontWeight: 900,
             letterSpacing: 0,
             color: '#111827',
-            mb: 1.25
+            mb: description ? 1.25 : { xs: 2.25, md: 3.5 }
           }}
         >
           <Box component="span" sx={{ display: { xs: 'inline', md: desktopTitle ? 'none' : 'inline' } }}>
@@ -693,18 +583,20 @@ function SectionShell({
             </Box>
           )}
         </Typography>
-        <Typography
-          sx={{
-            maxWidth: 760,
-            color: '#6B7280',
-            fontSize: { xs: '0.8125rem', md: '1rem' },
-            lineHeight: 1.6,
-            fontWeight: 500,
-            mb: { xs: 2.25, md: 3.5 }
-          }}
-        >
-          {description}
-        </Typography>
+        {description && (
+          <Typography
+            sx={{
+              maxWidth: 760,
+              color: '#6B7280',
+              fontSize: { xs: '0.8125rem', md: '1rem' },
+              lineHeight: 1.6,
+              fontWeight: 500,
+              mb: { xs: 2.25, md: 3.5 }
+            }}
+          >
+            {description}
+          </Typography>
+        )}
         {children}
       </Box>
     </Box>
@@ -714,19 +606,16 @@ function SectionShell({
 function ArticleCard({
   post,
   variant,
-  index,
   onClick
 }: {
   post: PostEntity
   variant: 'large' | 'compact'
-  index: number
   onClick: (post: PostEntity) => void
 }) {
   return (
     <Card
       onClick={() => onClick(post)}
       sx={{
-        display: { xs: index > 1 ? 'none' : 'block', md: 'block' },
         cursor: 'pointer',
         height: '100%',
         border: '1px solid #E5E7EB',
