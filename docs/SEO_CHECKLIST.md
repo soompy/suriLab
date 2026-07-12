@@ -7,6 +7,8 @@ This checklist is based on the current Next.js App Router, Prisma, and database-
 ### Site Identity
 
 - Set the production site URL in configuration and environment variables.
+- Set `NEXT_PUBLIC_SITE_URL` in Vercel Production and Preview environments.
+- Set `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` after creating the Google Search Console property.
 - Remove placeholder domains such as `https://your-domain.com` and `https://yourdomain.com`.
 - Ensure `metadataBase` is configured in `src/app/layout.tsx`.
 - Keep `<html lang="ko">` unless the site language strategy changes.
@@ -43,7 +45,7 @@ This checklist is based on the current Next.js App Router, Prisma, and database-
 
 ### Robots
 
-- Update `public/robots.txt`.
+- Update `src/app/robots.ts`.
 - Point `Sitemap:` to the real sitemap URL.
 - Keep admin, API, and write routes disallowed.
 - Confirm public routes such as `/posts`, `/about`, `/archives`, category pages, and MomentTune pages are crawlable.
@@ -69,11 +71,20 @@ This checklist is based on the current Next.js App Router, Prisma, and database-
 ### JSON-LD
 
 - Add `WebSite` structured data for the site.
+- Add `Organization` structured data for the site publisher.
 - Add `Person` structured data for the author and personal brand.
 - Add `BlogPosting` structured data for article pages.
 - Add `BreadcrumbList` structured data for posts and category pages.
+- Add `SearchAction` to `WebSite` structured data when a public search URL is available.
 - Add project-oriented structured data for the MomentTune page when the page exists.
 - Use published and modified dates from post data.
+
+### Analytics
+
+- Set `NEXT_PUBLIC_GA_ID` only after creating a Google Analytics 4 web stream.
+- Confirm the GA script is not rendered when `NEXT_PUBLIC_GA_ID` is empty.
+- Confirm admin-only pages are not used as success metrics for public growth analysis.
+- Track public growth KPIs first: organic landing pages, article engagement, newsletter clicks, and outbound CTA clicks.
 
 ### URL and Indexing Hygiene
 
@@ -188,6 +199,7 @@ This checklist is based on the current Next.js App Router, Prisma, and database-
 - Add product or service CTAs only where relevant.
 - Avoid ad placements that interrupt article comprehension.
 - Track which topics lead to subscribers, product interest, or conversions.
+- Connect Search Console and Google Analytics before evaluating AdSense, affiliate, or product funnel experiments.
 
 ## Pre-Publish Checklist
 
