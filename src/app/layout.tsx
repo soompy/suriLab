@@ -82,6 +82,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        <GoogleAnalytics />
+      </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansKR.variable} ${nanumGothic.variable}`}>
         <script
           type="application/ld+json"
@@ -101,7 +104,6 @@ export default function RootLayout({
         <CustomThemeProvider>
           {children}
         </CustomThemeProvider>
-        <GoogleAnalytics />
       </body>
     </html>
   )
