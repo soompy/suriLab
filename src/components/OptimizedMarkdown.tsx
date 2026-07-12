@@ -10,6 +10,7 @@ import { ContentImage } from './image/ContentImage'
 import { Box, Typography } from '@mui/material'
 import type { Components } from 'react-markdown'
 import { memo, useMemo, Suspense } from 'react'
+import { extractMarkdownHeadings, getPlainHeadingText, createHeadingSlug } from '@/lib/markdownHeadings'
 
 interface OptimizedMarkdownProps {
   content: string
@@ -93,8 +94,23 @@ const OptimizedMarkdown = memo(function OptimizedMarkdown({
   className = '', 
   style = {} 
 }: OptimizedMarkdownProps) {
-  // Memoize custom components to prevent re-creation on every render
-  const customComponents: Components = useMemo(() => ({
+  const markdownHeadings = useMemo(() => extractMarkdownHeadings(content), [content])
+
+  const getHeadingId = (children: React.ReactNode, level: 2 | 3, node?: unknown) => {
+    const line = typeof node === 'object'
+      && node !== null
+      && 'position' in node
+      && typeof (node as { position?: { start?: { line?: unknown } } }).position?.start?.line === 'number'
+      ? (node as { position: { start: { line: number } } }).position.start.line
+      : null
+    const text = getPlainHeadingText(children)
+
+    return markdownHeadings.find((heading) => heading.level === level && heading.line === line)?.id
+      || markdownHeadings.find((heading) => heading.level === level && heading.text === text)?.id
+      || createHeadingSlug(text)
+  }
+
+  const customComponents: Components = {
     img: ({ src, alt, title }) => {
       if (!src || typeof src !== 'string') return null
       
@@ -126,8 +142,9 @@ const OptimizedMarkdown = memo(function OptimizedMarkdown({
       </Typography>
     ),
     
-    h2: ({ children }) => (
+    h2: ({ children, node }) => (
       <Typography 
+        id={getHeadingId(children, 2, node)}
         variant="h4" 
         component="h2" 
         sx={{ 
@@ -140,8 +157,9 @@ const OptimizedMarkdown = memo(function OptimizedMarkdown({
       </Typography>
     ),
     
-    h3: ({ children }) => (
+    h3: ({ children, node }) => (
       <Typography 
+        id={getHeadingId(children, 3, node)}
         variant="h5" 
         component="h3" 
         sx={{ 
@@ -435,7 +453,7 @@ const OptimizedMarkdown = memo(function OptimizedMarkdown({
         />
       )
     },
-  }), []) // Empty dependency array since components don't depend on props
+  }
 
   // Memoize the markdown content processing
   const memoizedContent = useMemo(() => content, [content])
