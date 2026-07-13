@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   IconButton,
   Typography,
@@ -27,7 +27,7 @@ export default function LikeButton({ postId }: LikeButtonProps) {
   const [loading, setLoading] = useState(true)
   const [animating, setAnimating] = useState(false)
 
-  const fetchLikes = async () => {
+  const fetchLikes = useCallback(async () => {
     try {
       const response = await fetch(`/api/posts/${postId}/likes`)
       if (response.ok) {
@@ -39,11 +39,11 @@ export default function LikeButton({ postId }: LikeButtonProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [postId])
 
   useEffect(() => {
     fetchLikes()
-  }, [postId])
+  }, [fetchLikes])
 
   const handleLikeToggle = async () => {
     if (loading || animating) return

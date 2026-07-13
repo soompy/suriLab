@@ -12,6 +12,8 @@ import type { Components } from 'react-markdown'
 import { memo, useMemo, Suspense } from 'react'
 import { extractMarkdownHeadings, getPlainHeadingText, createHeadingSlug } from '@/lib/markdownHeadings'
 
+type SyntaxStyle = Record<string, React.CSSProperties>
+
 interface OptimizedMarkdownProps {
   content: string
   className?: string
@@ -71,7 +73,7 @@ const CodeBlock = memo(({ children, className }: { children: string; className?:
       </Box>
     }>
       <SyntaxHighlighter
-        style={vscDarkPlus as any}
+        style={vscDarkPlus as SyntaxStyle}
         language={language}
         PreTag="div"
         customStyle={{

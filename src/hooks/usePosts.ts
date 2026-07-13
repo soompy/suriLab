@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { PostEntity, PostFilters, PostSort, PaginationOptions, PostListResponse } from '../entities/Post'
 
 export interface UsePostsOptions {
@@ -14,8 +14,9 @@ export function usePosts(options: UsePostsOptions = {}) {
   const [error, setError] = useState<string | null>(null)
 
   const { filters, sort, pagination, enabled = true } = options
+  const tagKey = useMemo(() => filters?.tags?.join(',') || '', [filters?.tags])
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     if (!enabled) return
 
     try {
@@ -49,13 +50,25 @@ export function usePosts(options: UsePostsOptions = {}) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [
+    enabled,
+    filters?.authorId,
+    filters?.category,
+    filters?.featured,
+    filters?.searchQuery,
+    filters?.tags,
+    pagination?.limit,
+    pagination?.page,
+    sort?.field,
+    sort?.order,
+  ])
 
   useEffect(() => {
     fetchPosts()
   }, [
+    fetchPosts,
     filters?.category,
-    filters?.tags?.join(','),
+    tagKey,
     filters?.authorId,
     filters?.searchQuery,
     filters?.featured,
@@ -79,7 +92,7 @@ export function usePost(id: string) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     if (!id) return
 
     try {
@@ -99,11 +112,11 @@ export function usePost(id: string) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id])
 
   useEffect(() => {
     fetchPost()
-  }, [id])
+  }, [fetchPost])
 
   return {
     post,
@@ -118,7 +131,7 @@ export function usePostBySlug(slug: string) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     if (!slug) return
 
     try {
@@ -138,11 +151,11 @@ export function usePostBySlug(slug: string) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [slug])
 
   useEffect(() => {
     fetchPost()
-  }, [slug])
+  }, [fetchPost])
 
   return {
     post,

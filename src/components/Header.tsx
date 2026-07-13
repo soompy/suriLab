@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -37,6 +37,18 @@ import { usePathname } from 'next/navigation'
 import { useTheme as useCustomTheme } from './ThemeContext'
 import Logo from './Logo'
 
+type SearchTag = string | { name?: string }
+
+interface SearchPost {
+  id?: string
+  title?: string
+  excerpt?: string
+  category?: string
+  slug?: string
+  publishedAt?: string
+  tags?: SearchTag[]
+}
+
 export default function Header() {
   const pathname = usePathname()
   const theme = useTheme()
@@ -45,7 +57,7 @@ export default function Header() {
   const [mobileMenuAnchor, setMobileMenuAnchor] = useState<null | HTMLElement>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searchResults, setSearchResults] = useState<SearchPost[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
 
@@ -76,7 +88,7 @@ export default function Header() {
   }
 
   // 실시간 검색 함수
-  const performSearch = async (query: string) => {
+  const performSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults([])
       setHasSearched(false)
@@ -90,10 +102,10 @@ export default function Header() {
       const response = await fetch(`/api/posts?isPublished=true&limit=50`)
       if (response.ok) {
         const data = await response.json()
-        const posts = data.posts || []
+        const posts = (data.posts || []) as SearchPost[]
         
         // 검색 필터링
-        const filteredPosts = posts.filter((post: any) => {
+        const filteredPosts = posts.filter((post) => {
           const searchTerm = query.toLowerCase().trim()
           const title = (post.title || '').toLowerCase()
           const excerpt = (post.excerpt || '').toLowerCase()
@@ -103,7 +115,7 @@ export default function Header() {
           return title.includes(searchTerm) ||
                  excerpt.includes(searchTerm) ||
                  category.includes(searchTerm) ||
-                 tags.some((tag: any) => (typeof tag === 'string' ? tag : tag.name || '').toLowerCase().includes(searchTerm))
+                 tags.some((tag) => (typeof tag === 'string' ? tag : tag.name || '').toLowerCase().includes(searchTerm))
         })
 
         setSearchResults(filteredPosts.slice(0, 10)) // 최대 10개 결과
@@ -114,7 +126,7 @@ export default function Header() {
     } finally {
       setIsSearching(false)
     }
-  }
+  }, [])
 
   // 디바운스된 검색
   useEffect(() => {
@@ -128,7 +140,7 @@ export default function Header() {
     }, 300)
 
     return () => clearTimeout(timeoutId)
-  }, [searchQuery])
+  }, [performSearch, searchQuery])
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -137,8 +149,8 @@ export default function Header() {
     }
   }
 
-  const handlePostClick = (post: any) => {
-    const slug = post.slug || post.title.toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/(^-|-$)/g, '')
+  const handlePostClick = (post: SearchPost) => {
+    const slug = post.slug || (post.title || '').toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/(^-|-$)/g, '')
     window.location.href = `/posts/${slug}`
     handleSearchClose()
   }
@@ -503,7 +515,7 @@ export default function Header() {
                                     </Typography>
                                     {post.tags && post.tags.length > 0 && (
                                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {post.tags.slice(0, 3).map((tag: any, tagIndex: number) => (
+                                        {post.tags.slice(0, 3).map((tag, tagIndex) => (
                                           <Chip
                                             key={tagIndex}
                                             label={typeof tag === 'string' ? tag : tag.name}

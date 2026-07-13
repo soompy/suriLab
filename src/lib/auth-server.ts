@@ -65,7 +65,7 @@ export function verifyAdminToken(request: NextRequest): boolean {
     }
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      console.log(`[AUTH] JWT token expired at:`, (error as any).expiredAt)
+      console.log(`[AUTH] JWT token expired at:`, error.expiredAt)
     } else if (error instanceof jwt.JsonWebTokenError) {
       console.log(`[AUTH] JWT token invalid:`, error.message)
     } else {

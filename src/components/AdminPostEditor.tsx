@@ -71,6 +71,20 @@ import {
   AccessTime as TimeIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material'
+
+interface DraftPost {
+  id: string
+  title: string
+  description?: string | null
+  excerpt?: string | null
+  series?: string | null
+  thumbnail?: string | null
+  content: string
+  category: string
+  tags?: string[]
+  isPublished?: boolean
+  updatedAt?: string
+}
 import MuiThemeProvider from '@/components/MuiThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -107,7 +121,7 @@ function WriteContent() {
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const [history, setHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
-  const [drafts, setDrafts] = useState<any[]>([])
+  const [drafts, setDrafts] = useState<DraftPost[]>([])
   const [showDrafts, setShowDrafts] = useState(false)
   const [isDraftLoading, setIsDraftLoading] = useState(false)
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
@@ -218,7 +232,7 @@ function WriteContent() {
       
       if (response.ok) {
         const data = await response.json()
-        setDrafts(data.posts || [])
+        setDrafts((data.posts || []) as DraftPost[])
       }
     } catch (error) {
       console.error('Error loading drafts:', error)
@@ -235,7 +249,7 @@ function WriteContent() {
   }, [isAuthenticated, loadDrafts])
 
   // Draft 선택 시 편집 모드로 전환
-  const handleDraftSelect = useCallback((draft: any) => {
+  const handleDraftSelect = useCallback((draft: DraftPost) => {
     const status = draft.isPublished ? 'published' : 'draft'
     setFormData({
       title: draft.title,
@@ -465,7 +479,7 @@ function WriteContent() {
         setShowRecoverDialog(true)
       }
     }
-  }, [])
+  }, [editId, formData.content, formData.title, loadFromLocalStorage])
 
   // 폼 데이터 변경 시 localStorage에 저장 및 변경 사항 추적
   useEffect(() => {
@@ -1328,7 +1342,7 @@ function WriteContent() {
                                   <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
                                     <TimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
                                     <Typography variant="caption">
-                                      {new Date(draft.updatedAt).toLocaleDateString('ko-KR', {
+                                      {new Date(draft.updatedAt || Date.now()).toLocaleDateString('ko-KR', {
                                         month: 'short',
                                         day: 'numeric',
                                         hour: '2-digit',
@@ -1923,14 +1937,14 @@ function WriteContent() {
                           rehypePlugins={[rehypeHighlight]}
                           components={{
                             // 커스텀 컴포넌트로 체크박스 지원
-                            input: ({ type, checked, ...props }: any) => {
+                            input: ({ type, checked, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => {
                               if (type === 'checkbox') {
                                 return <input type="checkbox" checked={checked} readOnly style={{ marginRight: '8px' }} {...props} />
                               }
                               return <input type={type} {...props} />
                             },
                             // 문단 스타일 개선 (줄바꿈 처리)
-                            p: ({ children, ...props }: any) => {
+                            p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => {
                               return (
                                 <p style={{ 
                                   marginBottom: '1.5em', 
@@ -1949,14 +1963,14 @@ function WriteContent() {
                               }} />
                             ),
                             // 코드 블록 개선
-                            code: ({ className, children, ...props }: any) => {
+                            code: ({ className, children, ...props }: React.HTMLAttributes<HTMLElement>) => {
                               return (
                                 <code className={className} {...props}>
                                   {children}
                                 </code>
                               )
                             },
-                            pre: ({ className, children, ...props }: any) => {
+                            pre: ({ className, children, ...props }: React.HTMLAttributes<HTMLPreElement>) => {
                               return (
                                 <pre className={className} {...props}>
                                   {children}

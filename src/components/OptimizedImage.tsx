@@ -3,6 +3,7 @@
 import { useState, forwardRef, memo } from 'react'
 import Image from 'next/image'
 import { Box, Skeleton, useTheme } from '@mui/material'
+import type { BoxProps } from '@mui/material'
 import { PhotoIcon } from '@heroicons/react/24/outline'
 
 interface OptimizedImageProps {
@@ -28,7 +29,7 @@ interface OptimizedImageProps {
   showSkeleton?: boolean
   borderRadius?: string | number
   overlay?: React.ReactNode
-  containerProps?: any
+  containerProps?: BoxProps
 }
 
 const OptimizedImage = memo(forwardRef<HTMLDivElement, OptimizedImageProps>(({
@@ -88,7 +89,6 @@ const OptimizedImage = memo(forwardRef<HTMLDivElement, OptimizedImageProps>(({
   }
 
   const imageProps = {
-    alt,
     priority,
     quality,
     placeholder,
@@ -150,6 +150,7 @@ const OptimizedImage = memo(forwardRef<HTMLDivElement, OptimizedImageProps>(({
             <Image
               src={src}
               fill
+              alt={alt}
               {...imageProps}
             />
           ) : (
@@ -157,6 +158,7 @@ const OptimizedImage = memo(forwardRef<HTMLDivElement, OptimizedImageProps>(({
               src={src}
               width={width}
               height={height}
+              alt={alt}
               {...imageProps}
             />
           )}

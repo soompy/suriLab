@@ -50,7 +50,7 @@ export default function PostList({
       return posts.slice(0, displayedItems)
     }
     return posts.slice(startIndex, endIndex)
-  }, [posts, currentPage, displayedItems, startIndex, endIndex, enableInfiniteScroll])
+  }, [posts, displayedItems, startIndex, endIndex, enableInfiniteScroll])
 
   // Pagination handlers
   const handlePageChange = (page: number) => {
