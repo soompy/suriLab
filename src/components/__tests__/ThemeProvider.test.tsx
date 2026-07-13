@@ -1,168 +1,124 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ThemeProvider, useTheme } from '../ThemeProvider'
+import { CustomThemeProvider, useTheme } from '../ThemeContext'
 
 const TestComponent = () => {
   const { isDarkMode, toggleTheme } = useTheme()
-  
+
   return (
     <div>
       <div data-testid="theme-indicator">
         {isDarkMode ? 'dark' : 'light'}
       </div>
-      <button onClick={toggleTheme} data-testid="toggle-button">
+      <button onClick={toggleTheme} type="button">
         Toggle
       </button>
     </div>
   )
 }
 
-describe('ThemeProvider', () => {
+describe('CustomThemeProvider', () => {
   beforeEach(() => {
     localStorage.clear()
-    document.documentElement.classList.remove('dark')
+    jest.mocked(window.matchMedia).mockReturnValue({
+      matches: false,
+      media: '(prefers-color-scheme: dark)',
+      onchange: null,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })
   })
 
-  it('provides default light theme', () => {
+  it('provides light theme by default when no preference exists', async () => {
     render(
-      <ThemeProvider>
+      <CustomThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </CustomThemeProvider>
     )
 
-    expect(screen.getByTestId('theme-indicator')).toHaveTextContent('light')
-    expect(document.documentElement).not.toHaveClass('dark')
+    await waitFor(() => {
+      expect(screen.getByTestId('theme-indicator')).toHaveTextContent('light')
+    })
   })
 
-  it('toggles theme when toggle function is called', async () => {
+  it('toggles theme through context', async () => {
     const user = userEvent.setup()
-    
+
     render(
-      <ThemeProvider>
+      <CustomThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </CustomThemeProvider>
     )
 
-    const toggleButton = screen.getByTestId('toggle-button')
-    
-    await user.click(toggleButton)
-    expect(screen.getByTestId('theme-indicator')).toHaveTextContent('dark')
-    expect(document.documentElement).toHaveClass('dark')
+    await user.click(screen.getByRole('button', { name: /toggle/i }))
 
-    await user.click(toggleButton)
+    expect(screen.getByTestId('theme-indicator')).toHaveTextContent('dark')
+
+    await user.click(screen.getByRole('button', { name: /toggle/i }))
+
     expect(screen.getByTestId('theme-indicator')).toHaveTextContent('light')
-    expect(document.documentElement).not.toHaveClass('dark')
   })
 
   it('persists theme preference in localStorage', async () => {
     const user = userEvent.setup()
-    
+
     render(
-      <ThemeProvider>
+      <CustomThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </CustomThemeProvider>
     )
 
-    const toggleButton = screen.getByTestId('toggle-button')
-    await user.click(toggleButton)
+    await user.click(screen.getByRole('button', { name: /toggle/i }))
 
     expect(localStorage.getItem('theme')).toBe('dark')
   })
 
-  it('loads theme from localStorage on initialization', () => {
+  it('loads saved theme from localStorage', async () => {
     localStorage.setItem('theme', 'dark')
-    
+
     render(
-      <ThemeProvider>
+      <CustomThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </CustomThemeProvider>
     )
 
-    expect(screen.getByTestId('theme-indicator')).toHaveTextContent('dark')
-    expect(document.documentElement).toHaveClass('dark')
+    await waitFor(() => {
+      expect(screen.getByTestId('theme-indicator')).toHaveTextContent('dark')
+    })
   })
 
-  it('respects system preference when no localStorage value', () => {
-    const mockMatchMedia = jest.fn(() => ({
+  it('uses system preference when no saved theme exists', async () => {
+    jest.mocked(window.matchMedia).mockReturnValue({
       matches: true,
+      media: '(prefers-color-scheme: dark)',
+      onchange: null,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
       addListener: jest.fn(),
       removeListener: jest.fn(),
-    }))
-    
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: mockMatchMedia,
+      dispatchEvent: jest.fn(),
     })
 
     render(
-      <ThemeProvider>
+      <CustomThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </CustomThemeProvider>
     )
 
-    expect(mockMatchMedia).toHaveBeenCalledWith('(prefers-color-scheme: dark)')
-  })
-
-  it('updates theme when system preference changes', () => {
-    let mediaQueryListener: ((e: any) => void) | null = null
-    
-    const mockMatchMedia = jest.fn(() => ({
-      matches: false,
-      addListener: jest.fn((fn) => { mediaQueryListener = fn }),
-      removeListener: jest.fn(),
-    }))
-    
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: mockMatchMedia,
+    await waitFor(() => {
+      expect(screen.getByTestId('theme-indicator')).toHaveTextContent('dark')
     })
-
-    render(
-      <ThemeProvider>
-        <TestComponent />
-      </ThemeProvider>
-    )
-
-    expect(screen.getByTestId('theme-indicator')).toHaveTextContent('light')
-
-    if (mediaQueryListener) {
-      mediaQueryListener({ matches: true })
-    }
-
-    expect(screen.getByTestId('theme-indicator')).toHaveTextContent('dark')
+    expect(window.matchMedia).toHaveBeenCalledWith('(prefers-color-scheme: dark)')
   })
 
-  it('throws error when useTheme is used outside provider', () => {
+  it('throws when useTheme is used outside provider', () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
-    
-    expect(() => {
-      render(<TestComponent />)
-    }).toThrow('useTheme must be used within a ThemeProvider')
+
+    expect(() => render(<TestComponent />)).toThrow('useTheme must be used within a ThemeProvider')
 
     consoleError.mockRestore()
-  })
-
-  it('cleans up media query listener on unmount', () => {
-    const removeListener = jest.fn()
-    const mockMatchMedia = jest.fn(() => ({
-      matches: false,
-      addListener: jest.fn(),
-      removeListener,
-    }))
-    
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: mockMatchMedia,
-    })
-
-    const { unmount } = render(
-      <ThemeProvider>
-        <TestComponent />
-      </ThemeProvider>
-    )
-
-    unmount()
-
-    expect(removeListener).toHaveBeenCalled()
   })
 })

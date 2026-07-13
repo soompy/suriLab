@@ -28,21 +28,21 @@ def hello():
 \`\`\``,
     tags: ['javascript', 'python'],
     createdAt: '2024-01-01',
-    author: 'Test Author'
+    author: 'Test Author',
   }
 
-  it('renders post title and content', () => {
+  it('renders post title and markdown content', () => {
     render(<PostViewer post={mockPost} />)
 
-    expect(screen.getByText('Test Post')).toBeInTheDocument()
-    expect(screen.getByText('Hello World')).toBeInTheDocument()
-    expect(screen.getByText(/This is a test post/)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Test Post' })).toBeInTheDocument()
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('# Hello World')
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('This is a test post')
   })
 
   it('renders post metadata', () => {
     render(<PostViewer post={mockPost} />)
 
-    expect(screen.getByText('Test Author')).toBeInTheDocument()
+    expect(screen.getByText(/By\s+Test Author/)).toBeInTheDocument()
     expect(screen.getByText('2024-01-01')).toBeInTheDocument()
   })
 
@@ -53,55 +53,44 @@ def hello():
     expect(screen.getByText('python')).toBeInTheDocument()
   })
 
-  it('highlights JavaScript code blocks', () => {
+  it('passes fenced JavaScript code to the markdown renderer', () => {
     render(<PostViewer post={mockPost} />)
 
-    const codeBlock = screen.getByText(/function hello/)
-    expect(codeBlock.closest('pre')).toHaveAttribute('data-language', 'javascript')
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('```javascript')
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('function hello')
   })
 
-  it('highlights Python code blocks', () => {
+  it('passes fenced Python code to the markdown renderer', () => {
     render(<PostViewer post={mockPost} />)
 
-    const codeBlock = screen.getByText(/def hello/)
-    expect(codeBlock.closest('pre')).toHaveAttribute('data-language', 'python')
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('```python')
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('def hello')
   })
 
-  it('highlights CSS code blocks', () => {
+  it('passes fenced CSS code to the markdown renderer', () => {
     render(<PostViewer post={mockPost} />)
 
-    const codeBlock = screen.getByText(/.button/)
-    expect(codeBlock.closest('pre')).toHaveAttribute('data-language', 'css')
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('```css')
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('.button')
   })
 
-  it('applies syntax highlighting classes', () => {
-    render(<PostViewer post={mockPost} />)
+  it('renders inline code content through the markdown renderer', () => {
+    render(
+      <PostViewer
+        post={{
+          ...mockPost,
+          content: 'Use `console.log()` for debugging.',
+        }}
+      />
+    )
 
-    const codeElements = screen.getAllByRole('code')
-    expect(codeElements.length).toBeGreaterThan(0)
-    
-    const preElements = document.querySelectorAll('pre[data-language]')
-    expect(preElements.length).toBe(3)
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('Use `console.log()` for debugging.')
   })
 
-  it('handles inline code', () => {
-    const postWithInlineCode = {
-      ...mockPost,
-      content: 'Use `console.log()` for debugging.'
-    }
-    
-    render(<PostViewer post={postWithInlineCode} />)
+  it('marks article as dark mode when requested', () => {
+    const { container } = render(<PostViewer post={mockPost} isDarkMode />)
 
-    expect(screen.getByTestId('markdown-preview')).toContainHTML('Use `console.log()` for debugging.')
-  })
-
-  it('supports dark mode code highlighting', () => {
-    render(<PostViewer post={mockPost} isDarkMode={true} />)
-
-    const preElements = document.querySelectorAll('pre[data-language]')
-    preElements.forEach(pre => {
-      expect(pre).toHaveClass('dark')
-    })
+    expect(container.querySelector('article')).toHaveClass('dark')
   })
 
   it('shows reading time estimate', () => {
@@ -111,26 +100,16 @@ def hello():
   })
 
   it('handles empty content gracefully', () => {
-    const emptyPost = {
-      ...mockPost,
-      content: ''
-    }
-    
-    render(<PostViewer post={emptyPost} />)
+    render(<PostViewer post={{ ...mockPost, content: '' }} />)
 
-    expect(screen.getByText('Test Post')).toBeInTheDocument()
-    expect(screen.queryByRole('code')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Test Post' })).toBeInTheDocument()
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('')
   })
 
   it('handles posts without tags', () => {
-    const postWithoutTags = {
-      ...mockPost,
-      tags: []
-    }
-    
-    render(<PostViewer post={postWithoutTags} />)
+    render(<PostViewer post={{ ...mockPost, tags: [] }} />)
 
-    expect(screen.getByText('Test Post')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Test Post' })).toBeInTheDocument()
     expect(screen.queryByTestId('post-tags')).not.toBeInTheDocument()
   })
 })

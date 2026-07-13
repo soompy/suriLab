@@ -164,7 +164,10 @@ export default function TagSystem({
             <button
               key={suggestion}
               type="button"
-              onClick={() => handleSuggestionClick(suggestion)}
+              onMouseDown={(event) => {
+                event.preventDefault()
+                handleSuggestionClick(suggestion)
+              }}
               className="w-full px-3 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
             >
               {suggestion}
