@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   Container,
   Typography,
@@ -55,7 +55,7 @@ export default function AdminPostsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     if (!AuthService.isAuthenticated()) {
       setIsAuthenticated(false)
       setShowLoginDialog(true)
@@ -92,7 +92,7 @@ export default function AdminPostsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, searchQuery])
 
   useEffect(() => {
     const authenticated = AuthService.isAuthenticated()
@@ -104,7 +104,7 @@ export default function AdminPostsPage() {
       setLoading(false)
       setShowLoginDialog(true)
     }
-  }, [page, searchQuery])
+  }, [fetchPosts])
 
   const handleDelete = async (post: PostEntity) => {
     try {

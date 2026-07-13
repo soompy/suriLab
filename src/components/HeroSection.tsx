@@ -16,6 +16,11 @@ interface BlogStats {
   totalTags: number
 }
 
+interface StatsPost {
+  category?: string
+  isPublished?: boolean
+}
+
 export default function HeroSection() {
   const theme = useTheme()
   const [categoryStats, setCategoryStats] = useState<CategoryStats>({})
@@ -33,12 +38,12 @@ export default function HeroSection() {
         
         if (postsResponse.ok) {
           const data = await postsResponse.json()
-          const posts = data.posts || []
+          const posts = (data.posts || []) as StatsPost[]
           
           // 카테고리별 게시글 수 계산
           const stats: CategoryStats = {}
           BLOG_CATEGORIES.forEach(category => {
-            stats[category] = posts.filter((post: any) => 
+            stats[category] = posts.filter((post) =>
               post.category === category && post.isPublished
             ).length
           })

@@ -1,5 +1,6 @@
 node_modules
 .next
+*.tsbuildinfo
 
 /generated/prisma
 
@@ -13,6 +14,7 @@ node_modules
 # Database
 *.db
 *.db-journal
+backups/
 
 # Uploads
 /public/uploads/

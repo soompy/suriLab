@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
 import { BLOG_CONFIG } from '@/config/blog'
 import {
   SITE_NAME,
@@ -8,58 +7,26 @@ import {
   createPageMetadata,
 } from '@/lib/seo'
 import { createTaxonomySlug } from '@/lib/taxonomy'
+import { getPostDescription, getPublishedPostBySlug } from '@/lib/post-detail'
+import type { PostEntity } from '@/entities/Post'
 
 type PostLayoutProps = {
   children: React.ReactNode
   params: Promise<{ slug: string }>
 }
 
-async function getPost(slug: string) {
-  return prisma.post.findUnique({
-    where: { slug },
-    select: {
-      title: true,
-      slug: true,
-      excerpt: true,
-      content: true,
-      series: true,
-      thumbnail: true,
-      publishedAt: true,
-      updatedAt: true,
-      isPublished: true,
-      category: {
-        select: { name: true },
-      },
-      tags: {
-        select: { name: true },
-      },
-      author: {
-        select: { name: true, email: true },
-      },
-    },
-  })
-}
-
-function getDescription(post: Awaited<ReturnType<typeof getPost>>) {
-  if (!post) return ''
-
-  return post.excerpt || post.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 160)
-}
-
-function getAuthor(post: NonNullable<Awaited<ReturnType<typeof getPost>>>) {
-  const isPlaceholderAuthor = post.author?.email === 'author@example.com'
-
+function getAuthor() {
   return {
-    name: isPlaceholderAuthor ? BLOG_CONFIG.owner.name : post.author?.name || BLOG_CONFIG.owner.name,
-    email: isPlaceholderAuthor ? BLOG_CONFIG.owner.email : post.author?.email || BLOG_CONFIG.owner.email,
+    name: BLOG_CONFIG.owner.name,
+    email: BLOG_CONFIG.owner.email,
   }
 }
 
 export async function generateMetadata({ params }: PostLayoutProps): Promise<Metadata> {
   const { slug } = await params
-  const post = await getPost(slug)
+  const post = await getPublishedPostBySlug(slug)
 
-  if (!post || !post.isPublished) {
+  if (!post) {
     return {
       title: 'Post Not Found | SuriBlog',
       robots: {
@@ -69,7 +36,7 @@ export async function generateMetadata({ params }: PostLayoutProps): Promise<Met
     }
   }
 
-  const description = getDescription(post)
+  const description = getPostDescription(post)
   const metadata = createPageMetadata({
     title: `${post.title} | SuriBlog`,
     description,
@@ -81,31 +48,31 @@ export async function generateMetadata({ params }: PostLayoutProps): Promise<Met
   return {
     ...metadata,
     keywords: [
-      post.category.name,
+      post.category,
       post.series,
-      ...post.tags.map(tag => tag.name),
+      ...post.tags,
     ].filter(Boolean) as string[],
     openGraph: {
       ...metadata.openGraph,
       type: 'article',
       publishedTime: post.publishedAt.toISOString(),
       modifiedTime: post.updatedAt.toISOString(),
-      authors: [getAuthor(post).name],
-      tags: post.tags.map(tag => tag.name),
-      section: post.category.name,
+      authors: [getAuthor().name],
+      tags: post.tags,
+      section: post.category,
     },
   }
 }
 
-function getBlogPostingJsonLd(post: NonNullable<Awaited<ReturnType<typeof getPost>>>) {
-  const description = getDescription(post)
+function getBlogPostingJsonLd(post: PostEntity) {
+  const description = getPostDescription(post)
   const postUrl = absoluteUrl(`/posts/${post.slug}`)
   const image = absoluteUrl(post.thumbnail || BLOG_CONFIG.owner.avatar)
-  const author = getAuthor(post)
+  const author = getAuthor()
 
   return {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
+    '@type': ['BlogPosting', 'Article'],
     headline: post.title,
     description,
     image,
@@ -129,13 +96,13 @@ function getBlogPostingJsonLd(post: NonNullable<Awaited<ReturnType<typeof getPos
         url: absoluteUrl(BLOG_CONFIG.owner.avatar),
       },
     },
-    articleSection: post.category.name,
-    keywords: [post.category.name, post.series, ...post.tags.map(tag => tag.name)].filter(Boolean),
+    articleSection: post.category,
+    keywords: [post.category, post.series, ...post.tags].filter(Boolean),
     inLanguage: 'ko-KR',
   }
 }
 
-function getBreadcrumbJsonLd(post: NonNullable<Awaited<ReturnType<typeof getPost>>>) {
+function getBreadcrumbJsonLd(post: PostEntity) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -149,8 +116,8 @@ function getBreadcrumbJsonLd(post: NonNullable<Awaited<ReturnType<typeof getPost
       {
         '@type': 'ListItem',
         position: 2,
-        name: post.category.name,
-        item: absoluteUrl(`/categories/${createTaxonomySlug(post.category.name)}`),
+        name: post.category,
+        item: absoluteUrl(`/categories/${createTaxonomySlug(post.category)}`),
       },
       {
         '@type': 'ListItem',
@@ -164,9 +131,9 @@ function getBreadcrumbJsonLd(post: NonNullable<Awaited<ReturnType<typeof getPost
 
 export default async function PostLayout({ children, params }: PostLayoutProps) {
   const { slug } = await params
-  const post = await getPost(slug)
+  const post = await getPublishedPostBySlug(slug)
 
-  if (!post || !post.isPublished) {
+  if (!post) {
     notFound()
   }
 

@@ -1,6 +1,8 @@
 import React from 'react'
 
-export const Prism = ({ children, ...props }: any) => (
+type PrismProps = React.HTMLAttributes<HTMLPreElement>
+
+export const Prism = ({ children, ...props }: PrismProps) => (
   <pre {...props} role="code">
     <code>{children}</code>
   </pre>

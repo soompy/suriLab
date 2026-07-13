@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -58,7 +58,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   })
   const [error, setError] = useState<string | null>(null)
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const response = await fetch(`/api/posts/${postId}/comments`)
       if (response.ok) {
@@ -70,11 +70,11 @@ export default function CommentSection({ postId }: CommentSectionProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [postId])
 
   useEffect(() => {
     fetchComments()
-  }, [postId])
+  }, [fetchComments])
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()

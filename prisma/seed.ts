@@ -33,7 +33,7 @@ async function main() {
 
   // 태그 생성
   const tagNames = ['React', 'JavaScript', 'TypeScript', 'Next.js', 'CSS', 'Frontend', 'WebDev', 'Tutorial']
-  const tags = await Promise.all(
+  await Promise.all(
     tagNames.map(tagName =>
       prisma.tag.upsert({
         where: { name: tagName },

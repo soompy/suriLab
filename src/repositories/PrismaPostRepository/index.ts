@@ -1,6 +1,14 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { PostEntity, CreatePostInput, UpdatePostInput, PostFilters, PostSort, PaginationOptions, PostListResponse } from '../../entities/Post'
 import { PostRepository } from '../PostRepository'
+
+const postInclude = {
+  tags: true,
+  category: true,
+  author: true
+} satisfies Prisma.PostInclude
+
+type PostWithRelations = Prisma.PostGetPayload<{ include: typeof postInclude }>
 
 export class PrismaPostRepository implements PostRepository {
   constructor(private prisma: PrismaClient) {}
@@ -10,7 +18,7 @@ export class PrismaPostRepository implements PostRepository {
     sort?: PostSort,
     pagination?: PaginationOptions
   ): Promise<PostListResponse> {
-    const where: any = {}
+    const where: Prisma.PostWhereInput = {}
 
     if (filters) {
       if (filters.category) {
@@ -46,7 +54,7 @@ export class PrismaPostRepository implements PostRepository {
       }
     }
 
-    const orderBy: any = {}
+    const orderBy: Prisma.PostOrderByWithRelationInput = {}
     if (sort) {
       orderBy[sort.field] = sort.order
     } else {
@@ -63,11 +71,7 @@ export class PrismaPostRepository implements PostRepository {
         orderBy,
         skip,
         take: limit,
-        include: {
-          tags: true,
-          category: true,
-          author: true
-        }
+        include: postInclude
       }),
       this.prisma.post.count({ where })
     ])
@@ -83,11 +87,7 @@ export class PrismaPostRepository implements PostRepository {
   async findById(id: string): Promise<PostEntity | null> {
     const post = await this.prisma.post.findUnique({
       where: { id },
-      include: {
-        tags: true,
-        category: true,
-        author: true
-      }
+      include: postInclude
     })
 
     return post ? this.mapToEntity(post) : null
@@ -96,11 +96,7 @@ export class PrismaPostRepository implements PostRepository {
   async findBySlug(slug: string): Promise<PostEntity | null> {
     const post = await this.prisma.post.findUnique({
       where: { slug },
-      include: {
-        tags: true,
-        category: true,
-        author: true
-      }
+      include: postInclude
     })
 
     return post ? this.mapToEntity(post) : null
@@ -155,18 +151,14 @@ export class PrismaPostRepository implements PostRepository {
           }))
         }
       },
-      include: {
-        tags: true,
-        category: true,
-        author: true
-      }
+      include: postInclude
     })
 
     return this.mapToEntity(post)
   }
 
   async update(input: UpdatePostInput): Promise<PostEntity> {
-    const updateData: any = {}
+    const updateData: Prisma.PostUpdateInput = {}
     
     if (input.title) updateData.title = input.title
     if (input.content) {
@@ -211,7 +203,9 @@ export class PrismaPostRepository implements PostRepository {
         update: {},
         create: { name: input.category }
       })
-      updateData.categoryId = category.id
+      updateData.category = {
+        connect: { id: category.id }
+      }
     }
 
     if (input.tags) {
@@ -227,11 +221,7 @@ export class PrismaPostRepository implements PostRepository {
     const post = await this.prisma.post.update({
       where: { id: input.id },
       data: updateData,
-      include: {
-        tags: true,
-        category: true,
-        author: true
-      }
+      include: postInclude
     })
 
     return this.mapToEntity(post)
@@ -308,7 +298,7 @@ export class PrismaPostRepository implements PostRepository {
     }
   }
 
-  private mapToEntity(post: any): PostEntity {
+  private mapToEntity(post: PostWithRelations): PostEntity {
     return {
       id: post.id,
       title: post.title,
@@ -320,10 +310,10 @@ export class PrismaPostRepository implements PostRepository {
       slug: post.slug,
       publishedAt: post.publishedAt,
       updatedAt: post.updatedAt,
-      tags: post.tags.map((tag: any) => tag.name),
+      tags: post.tags.map((tag) => tag.name),
       category: post.category.name,
       authorId: post.authorId,
-      readTime: post.readTime,
+      readTime: post.readTime ?? undefined,
       views: post.views,
       featured: post.featured,
       isPublished: post.isPublished,

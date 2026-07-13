@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useDebounce } from '@/hooks/useDebounce'
 
 interface Post {
@@ -20,6 +20,7 @@ interface SearchFilterProps {
 type SortOption = 'newest' | 'oldest' | 'alphabetical'
 
 export default function SearchFilter({ posts, onFilter }: SearchFilterProps) {
+  const onFilterRef = useRef(onFilter)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTag, setSelectedTag] = useState('all')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
@@ -68,7 +69,11 @@ export default function SearchFilter({ posts, onFilter }: SearchFilterProps) {
   }, [posts, debouncedSearchTerm, selectedTag, sortBy])
 
   useEffect(() => {
-    onFilter(filteredAndSortedPosts)
+    onFilterRef.current = onFilter
+  }, [onFilter])
+
+  useEffect(() => {
+    onFilterRef.current(filteredAndSortedPosts)
   }, [filteredAndSortedPosts]) // Remove onFilter from dependencies to prevent infinite loop
 
   const clearSearch = () => {
@@ -84,6 +89,7 @@ export default function SearchFilter({ posts, onFilter }: SearchFilterProps) {
         <div className="relative">
           <input
             type="text"
+            aria-label="Search posts"
             placeholder="Search posts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -130,6 +136,7 @@ export default function SearchFilter({ posts, onFilter }: SearchFilterProps) {
         {/* Tag Filter */}
         <div>
           <select
+            aria-label="Filter by tag"
             value={selectedTag}
             onChange={(e) => setSelectedTag(e.target.value)}
             className="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -146,6 +153,7 @@ export default function SearchFilter({ posts, onFilter }: SearchFilterProps) {
         {/* Sort Options */}
         <div>
           <select
+            aria-label="Sort posts"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
             className="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"

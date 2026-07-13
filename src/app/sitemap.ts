@@ -2,9 +2,31 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 import { getSiteUrl } from '@/lib/seo'
 import { createTaxonomySlug } from '@/lib/taxonomy'
+import { getPublishedContentPosts } from '@/lib/content'
+
+function uniqueRoutes(routes: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+  const routeMap = new Map<string, MetadataRoute.Sitemap[number]>()
+
+  for (const route of routes) {
+    const previousRoute = routeMap.get(route.url)
+    const previousLastModified = previousRoute?.lastModified
+      ? new Date(previousRoute.lastModified).getTime()
+      : 0
+    const nextLastModified = route.lastModified
+      ? new Date(route.lastModified).getTime()
+      : 0
+
+    if (!previousRoute || nextLastModified >= previousLastModified) {
+      routeMap.set(route.url, route)
+    }
+  }
+
+  return Array.from(routeMap.values())
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl()
+  const contentPosts = getPublishedContentPosts()
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -108,9 +130,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     ])
 
-    return [
+    return uniqueRoutes([
       ...staticRoutes,
       ...posts.map((post) => ({
+        url: `${baseUrl}/posts/${post.slug}`,
+        lastModified: post.updatedAt,
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      })),
+      ...contentPosts.map((post) => ({
         url: `${baseUrl}/posts/${post.slug}`,
         lastModified: post.updatedAt,
         changeFrequency: 'monthly' as const,
@@ -122,13 +150,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'weekly' as const,
         priority: 0.65,
       })),
+      ...Array.from(new Set(contentPosts.map((post) => post.category))).map((category) => ({
+        url: `${baseUrl}/categories/${createTaxonomySlug(category)}`,
+        lastModified: contentPosts
+          .filter((post) => post.category === category)
+          .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())[0]?.updatedAt || new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.65,
+      })),
       ...tags.map((tag) => ({
         url: `${baseUrl}/tags/${createTaxonomySlug(tag.name)}`,
         lastModified: tag.posts[0]?.updatedAt || new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.55,
       })),
-    ]
+      ...Array.from(new Set(contentPosts.flatMap((post) => post.tags))).map((tag) => ({
+        url: `${baseUrl}/tags/${createTaxonomySlug(tag)}`,
+        lastModified: contentPosts
+          .filter((post) => post.tags.includes(tag))
+          .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())[0]?.updatedAt || new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.55,
+      })),
+    ])
   } catch (error) {
     console.warn('Failed to load posts for sitemap:', error)
     return staticRoutes

@@ -25,27 +25,53 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   experimental: {
     mdxRs: true,
+    optimizePackageImports: ['@mui/material', '@mui/icons-material', 'react-syntax-highlighter'],
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   transpilePackages: ['@mui/material', '@mui/icons-material'],
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      }
+    }
+
+    config.module.rules.push({
+      test: /react-syntax-highlighter/,
+      sideEffects: false,
+    })
+
+    return config
+  },
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ]
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: [
-      'image.thum.io',
-      'pf-2024-magazine.vercel.app',
-      'soompy.github.io',
-      'localhost',
-    ],
+    qualities: [75, 90],
     remotePatterns: [
       {
         protocol: 'https',

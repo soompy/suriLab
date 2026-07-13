@@ -17,6 +17,9 @@ export interface PostEntity {
   featured?: boolean
   isPublished: boolean
   draft?: boolean
+  source?: 'database' | 'content'
+  status?: 'idea' | 'draft' | 'review' | 'published'
+  relatedPosts?: string[]
 }
 
 export interface CreatePostInput {

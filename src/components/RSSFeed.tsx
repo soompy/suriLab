@@ -134,6 +134,7 @@ export default function RSSFeed({ posts, siteTitle, siteDescription, siteUrl }: 
 
       <div className="space-y-3">
         <button
+          type="button"
           onClick={downloadRSSFeed}
           disabled={isGenerating}
           aria-label="Subscribe to RSS feed"
@@ -177,6 +178,7 @@ export default function RSSFeed({ posts, siteTitle, siteDescription, siteUrl }: 
         </button>
 
         <button
+          type="button"
           onClick={copyRSSUrl}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors duration-200 font-medium"
         >
