@@ -4,6 +4,7 @@ import type { PostEntity } from '@/entities/Post'
 import { getPosts } from '@/infrastructure/api/posts'
 import { prisma } from '@/lib/prisma'
 import { findNameBySlug } from '@/lib/taxonomy'
+import { getPublishedContentPosts } from '@/lib/content'
 
 export const revalidate = 300
 
@@ -16,8 +17,12 @@ async function getCategoryName(slug: string) {
     select: { name: true },
     orderBy: { name: 'asc' },
   })
+  const contentCategories = getPublishedContentPosts().map((post) => post.category)
 
-  return findNameBySlug(categories.map((category) => category.name), slug)
+  return findNameBySlug([
+    ...categories.map((category) => category.name),
+    ...contentCategories,
+  ], slug)
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {

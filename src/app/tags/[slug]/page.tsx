@@ -4,6 +4,7 @@ import type { PostEntity } from '@/entities/Post'
 import { getPosts } from '@/infrastructure/api/posts'
 import { prisma } from '@/lib/prisma'
 import { findNameBySlug } from '@/lib/taxonomy'
+import { getPublishedContentPosts } from '@/lib/content'
 
 export const revalidate = 300
 
@@ -16,8 +17,12 @@ async function getTagName(slug: string) {
     select: { name: true },
     orderBy: { name: 'asc' },
   })
+  const contentTags = getPublishedContentPosts().flatMap((post) => post.tags)
 
-  return findNameBySlug(tags.map((tag) => tag.name), slug)
+  return findNameBySlug([
+    ...tags.map((tag) => tag.name),
+    ...contentTags,
+  ], slug)
 }
 
 export default async function TagPage({ params }: TagPageProps) {

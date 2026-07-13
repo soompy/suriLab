@@ -8,6 +8,14 @@ import { DeletePostUseCaseImpl } from '../../usecases/DeletePost'
 import { prisma } from '../../lib/prisma'
 import { initializeDatabase } from '../../lib/database-init'
 import { verifyAdminPassword, createAuthResponse } from '../../lib/auth-server'
+import {
+  getPublishedContentPosts,
+} from '../../lib/content'
+import {
+  getAdjacentPosts as getAdjacentPostsForDetail,
+  getPublishedPostById,
+  getRelatedPosts as getRelatedPostsForDetail,
+} from '../../lib/post-detail'
 
 const postRepository = new PrismaPostRepository(prisma)
 const getPostsUseCase = new GetPostsUseCaseImpl(postRepository)
@@ -24,7 +32,66 @@ export async function getPosts(
   pagination?: PaginationOptions
 ) {
   try {
-    return await getPostsUseCase.execute(filters, sort, pagination)
+    const shouldIncludeContentPosts = filters?.isPublished === true
+
+    if (!shouldIncludeContentPosts) {
+      return await getPostsUseCase.execute(filters, sort, pagination)
+    }
+
+    const requestedPage = pagination?.page || 1
+    const requestedLimit = pagination?.limit || 10
+    const databasePosts = await getPostsUseCase.execute(
+      filters,
+      sort,
+      { page: 1, limit: 1000 }
+    )
+    const contentPosts = getPublishedContentPosts()
+      .filter((post) => !filters?.category || post.category === filters.category)
+      .filter((post) => !filters?.tags?.length || filters.tags.every((tag) => post.tags.includes(tag)))
+      .filter((post) => !filters?.series || post.series === filters.series)
+      .filter((post) => filters?.featured === undefined || post.featured === filters.featured)
+      .filter((post) => {
+        if (!filters?.searchQuery) return true
+
+        const query = filters.searchQuery.toLowerCase()
+        return [
+          post.title,
+          post.description,
+          post.excerpt,
+          post.content,
+          post.category,
+          ...post.tags,
+        ].some((value) => value?.toLowerCase().includes(query))
+      })
+
+    const sortField = sort?.field || 'publishedAt'
+    const sortOrder = sort?.order || 'desc'
+    const sortedPosts = [...databasePosts.posts, ...contentPosts].sort((a, b) => {
+      const firstValue = a[sortField]
+      const secondValue = b[sortField]
+      const direction = sortOrder === 'asc' ? 1 : -1
+
+      if (firstValue instanceof Date && secondValue instanceof Date) {
+        return (firstValue.getTime() - secondValue.getTime()) * direction
+      }
+
+      if (typeof firstValue === 'number' && typeof secondValue === 'number') {
+        return (firstValue - secondValue) * direction
+      }
+
+      return String(firstValue || '').localeCompare(String(secondValue || '')) * direction
+    })
+
+    const start = (requestedPage - 1) * requestedLimit
+    const posts = sortedPosts.slice(start, start + requestedLimit)
+    const total = sortedPosts.length
+
+    return {
+      posts,
+      total,
+      page: requestedPage,
+      totalPages: Math.ceil(total / requestedLimit),
+    }
   } catch (error) {
     console.error('Error getting posts:', error)
     throw error
@@ -42,7 +109,8 @@ export async function getPostById(id: string) {
 
 export async function getPostBySlug(slug: string) {
   try {
-    return await getPostBySlugUseCase.execute(slug)
+    const databasePost = await getPostBySlugUseCase.execute(slug)
+    return databasePost || getPublishedContentPosts().find((post) => post.slug === slug) || null
   } catch (error) {
     console.error('Error getting post by slug:', error)
     throw error
@@ -307,45 +375,19 @@ export class PostAPIHandler {
 export class RelatedPostsAPIHandler {
   static async GET(_request: NextRequest, { params }: { params: { id: string } }) {
     try {
-      const post = await getPostById(params.id)
-      if (!post || !post.isPublished) {
+      const post = await getPublishedPostById(params.id)
+      if (!post) {
         return NextResponse.json(
           { error: 'Post not found' },
           { status: 404 }
         )
       }
 
-      const result = await getPosts(
-        {
-          category: post.category,
-          isPublished: true
-        },
-        {
-          field: 'publishedAt',
-          order: 'desc'
-        },
-        {
-          page: 1,
-          limit: 12
-        }
-      )
+      const relatedPosts = await getRelatedPostsForDetail(post)
 
-      const relatedPosts = result.posts
-        .filter(candidate => candidate.id !== post.id)
-        .map(candidate => {
-          const sharedTags = candidate.tags.filter(tag => post.tags.includes(tag)).length
-          const sameSeries = post.series && candidate.series === post.series ? 2 : 0
-
-          return {
-            post: candidate,
-            score: sharedTags + sameSeries
-          }
-        })
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3)
-        .map(item => item.post)
-
-      return NextResponse.json({ posts: relatedPosts })
+      const response = NextResponse.json({ posts: relatedPosts })
+      response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+      return response
     } catch {
       return NextResponse.json(
         { error: 'Failed to fetch related posts' },
@@ -358,74 +400,20 @@ export class RelatedPostsAPIHandler {
 export class AdjacentPostsAPIHandler {
   static async GET(_request: NextRequest, { params }: { params: { id: string } }) {
     try {
-      const currentPost = await prisma.post.findUnique({
-        where: { id: params.id },
-        select: {
-          id: true,
-          publishedAt: true,
-          isPublished: true,
-        },
-      })
+      const currentPost = await getPublishedPostById(params.id)
 
-      if (!currentPost || !currentPost.isPublished) {
+      if (!currentPost) {
         return NextResponse.json(
           { error: 'Post not found' },
           { status: 404 }
         )
       }
 
-      const includePostRelations = {
-        tags: true,
-        category: true,
-        author: true,
-      }
+      const adjacentPosts = await getAdjacentPostsForDetail(currentPost)
 
-      const [previous, next] = await Promise.all([
-        prisma.post.findFirst({
-          where: {
-            isPublished: true,
-            publishedAt: { lt: currentPost.publishedAt },
-          },
-          orderBy: { publishedAt: 'desc' },
-          include: includePostRelations,
-        }),
-        prisma.post.findFirst({
-          where: {
-            isPublished: true,
-            publishedAt: { gt: currentPost.publishedAt },
-          },
-          orderBy: { publishedAt: 'asc' },
-          include: includePostRelations,
-        }),
-      ])
-
-      const toSummary = (post: typeof previous) => post
-        ? {
-            id: post.id,
-            title: post.title,
-            content: '',
-            excerpt: post.excerpt,
-            description: post.excerpt,
-            series: post.series,
-            thumbnail: post.thumbnail,
-            slug: post.slug,
-            publishedAt: post.publishedAt,
-            updatedAt: post.updatedAt,
-            tags: post.tags.map((tag) => tag.name),
-            category: post.category.name,
-            authorId: post.authorId,
-            readTime: post.readTime,
-            views: post.views,
-            featured: post.featured,
-            isPublished: post.isPublished,
-            draft: !post.isPublished,
-          }
-        : null
-
-      return NextResponse.json({
-        previous: toSummary(previous),
-        next: toSummary(next),
-      })
+      const response = NextResponse.json(adjacentPosts)
+      response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+      return response
     } catch {
       return NextResponse.json(
         { error: 'Failed to fetch adjacent posts' },

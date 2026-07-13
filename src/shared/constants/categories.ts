@@ -1,7 +1,9 @@
 export const BLOG_CATEGORIES = [
   'MomentTune',
   'Startup',
+  'AI Workflow',
   'AI Automation',
+  'Career',
   'Product & UX',
   'Build Log',
   'Blog Growth',
@@ -15,7 +17,9 @@ export type BlogCategory = typeof BLOG_CATEGORIES[number]
 export const CATEGORY_DESCRIPTIONS = {
   'MomentTune': 'MomentTune 제작 과정, 의사결정, 출시 준비를 기록합니다.',
   'Startup': '1인 창업, MVP 제작, 실험과 검증 과정을 다룹니다.',
+  'AI Workflow': 'Claude Code, Codex 등 AI 도구를 활용한 작업 흐름을 기록합니다.',
   'AI Automation': 'AI 에이전트와 업무 자동화 실험을 정리합니다.',
+  'Career': '커리어 전환, 경험 정리, 개인 성장 기록을 다룹니다.',
   'Product & UX': '서비스 기획, UX/UI, 제품 사고를 다룹니다.',
   'Build Log': 'AI 코딩 도구와 실제 빌드 과정을 기록합니다.',
   'Blog Growth': '블로그 운영, SEO, 수익화 실험을 공유합니다.',
@@ -27,7 +31,9 @@ export const CATEGORY_DESCRIPTIONS = {
 export const CATEGORY_COLORS = {
   'MomentTune': 'linear-gradient(135deg, #DBEAFE, #BFDBFE)',
   'Startup': 'linear-gradient(135deg, #DCFCE7, #BBF7D0)',
+  'AI Workflow': 'linear-gradient(135deg, #E0E7FF, #C7D2FE)',
   'AI Automation': 'linear-gradient(135deg, #E0F2FE, #BAE6FD)',
+  'Career': 'linear-gradient(135deg, #FCE7F3, #FBCFE8)',
   'Product & UX': 'linear-gradient(135deg, #FCE7F3, #FBCFE8)',
   'Build Log': 'linear-gradient(135deg, #FEF3C7, #FDE68A)',
   'Blog Growth': 'linear-gradient(135deg, #EDE9FE, #DDD6FE)',

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { SITE_DESCRIPTION, SITE_NAME, absoluteUrl, getSiteUrl } from '@/lib/seo'
 import { BLOG_CONFIG } from '@/config/blog'
+import { getPublishedContentPosts } from '@/lib/content'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,7 @@ function escapeCdata(value: string) {
 
 export async function GET() {
   const siteUrl = getSiteUrl()
-  const posts = await prisma.post.findMany({
+  const databasePosts = await prisma.post.findMany({
     where: { isPublished: true },
     select: {
       title: true,
@@ -43,6 +44,21 @@ export async function GET() {
     orderBy: { publishedAt: 'desc' },
     take: 50,
   })
+  const contentPosts = getPublishedContentPosts().map((post) => ({
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    content: post.content,
+    publishedAt: post.publishedAt,
+    updatedAt: post.updatedAt,
+    category: {
+      name: post.category,
+    },
+    tags: post.tags.map((name) => ({ name })),
+  }))
+  const posts = [...databasePosts, ...contentPosts]
+    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
+    .slice(0, 50)
 
   const items = posts.map((post) => {
     const postUrl = absoluteUrl(`/posts/${post.slug}`)
