@@ -1,0 +1,8 @@
+queue/ideas/*.json
+queue/research/*
+queue/drafts/*.md
+queue/reviewed/*.md
+queue/rejected/*
+reports/*.json
+reports/*.md
+!**/.gitkeep

@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "topics": [
+    {
+      "id": "ai-agent-build-log",
+      "name": "AI Agent 구축기",
+      "description": "AI 에이전트를 실제 업무와 제품 제작 과정에 적용하며 얻은 설계, 실패, 운영 기록",
+      "priority": 1,
+      "targetAudience": "AI 에이전트로 개인 업무와 제품 제작을 자동화하려는 1인 창업자와 프로젝트 빌더",
+      "monetizationPotential": "high",
+      "relatedCategories": ["AI Workflow", "Startup"],
+      "seedKeywords": ["AI Agent", "업무 자동화", "AI 직원", "agent workflow"]
+    },
+    {
+      "id": "claude-code-workflow",
+      "name": "Claude Code 활용",
+      "description": "Claude Code를 사용해 기능 구현, 리팩터링, 문서화, 검수 흐름을 만드는 방법",
+      "priority": 1,
+      "targetAudience": "AI 코딩 도구를 실무형 프로젝트에 적용하려는 개발자와 비개발 출신 빌더",
+      "monetizationPotential": "high",
+      "relatedCategories": ["AI Workflow", "Startup"],
+      "seedKeywords": ["Claude Code", "AI coding", "vibe coding", "MVP 개발"]
+    },
+    {
+      "id": "codex-workflow",
+      "name": "Codex 활용",
+      "description": "Codex를 활용한 코드 분석, 기능 구현, 테스트, 배포 준비 과정",
+      "priority": 1,
+      "targetAudience": "Codex로 블로그, 앱, 자동화 도구를 만들고 싶은 개인 제작자",
+      "monetizationPotential": "high",
+      "relatedCategories": ["AI Workflow", "Startup"],
+      "seedKeywords": ["Codex", "AI coding agent", "코드 자동화", "Next.js"]
+    },
+    {
+      "id": "claude-cowork",
+      "name": "Claude Cowork",
+      "description": "Claude를 동료처럼 활용해 기획, 글쓰기, 검토, 의사결정을 함께 진행하는 방식",
+      "priority": 2,
+      "targetAudience": "AI를 업무 파트너로 쓰고 싶은 기획자, 창업 준비자, 프로젝트 빌더",
+      "monetizationPotential": "medium",
+      "relatedCategories": ["AI Workflow", "Career"],
+      "seedKeywords": ["Claude", "AI coworker", "AI 협업", "기획 자동화"]
+    },
+    {
+      "id": "vibe-coding",
+      "name": "바이브코딩",
+      "description": "AI와 대화하며 제품을 빠르게 만들되 품질과 판단을 잃지 않는 제작 방식",
+      "priority": 1,
+      "targetAudience": "비개발 배경이지만 AI 도구로 제품을 직접 만들고 싶은 사람",
+      "monetizationPotential": "high",
+      "relatedCategories": ["AI Workflow", "Startup"],
+      "seedKeywords": ["바이브코딩", "vibe coding", "AI MVP", "프로토타입"]
+    },
+    {
+      "id": "solo-startup",
+      "name": "1인 창업",
+      "description": "혼자 제품을 만들고 검증하는 과정에서 필요한 우선순위, 운영, 비용, 리스크 관리",
+      "priority": 1,
+      "targetAudience": "1인 창업을 준비하거나 사이드 프로젝트를 사업화하려는 사람",
+      "monetizationPotential": "high",
+      "relatedCategories": ["Startup", "MomentTune"],
+      "seedKeywords": ["1인 창업", "solo founder", "MVP 검증", "부트스트래핑"]
+    },
+    {
+      "id": "project-builder",
+      "name": "프로젝트 빌더",
+      "description": "개발, 세일즈, 기획 경험을 연결해 실제 제품을 만드는 프로젝트 빌더 관점",
+      "priority": 2,
+      "targetAudience": "직무 전환과 개인 브랜드를 함께 키우려는 실무자",
+      "monetizationPotential": "medium",
+      "relatedCategories": ["Career", "Startup"],
+      "seedKeywords": ["프로젝트 빌더", "개인 브랜드", "커리어 전환", "product builder"]
+    },
+    {
+      "id": "momenttune-build-log",
+      "name": "MomentTune 개발기",
+      "description": "MomentTune 제품 설계, AI 웰니스 아이디어, MVP 구현, 출시 준비 기록",
+      "priority": 1,
+      "targetAudience": "AI 제품 제작과 웰니스 서비스 MVP에 관심 있는 독자",
+      "monetizationPotential": "high",
+      "relatedCategories": ["MomentTune", "Startup"],
+      "seedKeywords": ["MomentTune", "AI 웰니스", "웨어러블 데이터", "음악 추천"]
+    },
+    {
+      "id": "ai-employee-ops",
+      "name": "AI 직원 운영",
+      "description": "AI 에이전트를 역할별 직원처럼 운영하며 업무를 분배하고 검수하는 방식",
+      "priority": 2,
+      "targetAudience": "작은 팀이나 1인 조직에서 AI를 운영 체계로 쓰고 싶은 사람",
+      "monetizationPotential": "high",
+      "relatedCategories": ["AI Workflow", "Startup"],
+      "seedKeywords": ["AI 직원", "AI team", "workflow automation", "agent ops"]
+    },
+    {
+      "id": "ai-project-documentation",
+      "name": "AI 프로젝트 문서화",
+      "description": "AI와 함께 만드는 프로젝트에서 기획서, PRD, 회고, 운영 문서를 자동화하는 방법",
+      "priority": 2,
+      "targetAudience": "문서화가 약한 개인 제작자와 초기 팀",
+      "monetizationPotential": "medium",
+      "relatedCategories": ["AI Workflow", "Startup"],
+      "seedKeywords": ["프로젝트 문서화", "PRD", "AI 문서 자동화", "build log"]
+    },
+    {
+      "id": "ux-design",
+      "name": "UX 설계",
+      "description": "AI 제품과 MVP에서 사용자의 문제, 흐름, 화면 구조를 설계하는 과정",
+      "priority": 2,
+      "targetAudience": "기획과 디자인 감각을 제품 제작에 연결하려는 빌더",
+      "monetizationPotential": "medium",
+      "relatedCategories": ["MomentTune", "Startup"],
+      "seedKeywords": ["UX 설계", "서비스 기획", "사용자 흐름", "MVP UX"]
+    },
+    {
+      "id": "mvp-building",
+      "name": "MVP 제작",
+      "description": "빠르게 만들고 검증하는 MVP 제작 과정과 기능 우선순위 결정법",
+      "priority": 1,
+      "targetAudience": "아이디어를 실제 제품으로 검증하려는 1인 창업자",
+      "monetizationPotential": "high",
+      "relatedCategories": ["Startup", "MomentTune"],
+      "seedKeywords": ["MVP 제작", "프로토타입", "검증", "launch"]
+    },
+    {
+      "id": "blog-automation",
+      "name": "블로그 자동화",
+      "description": "아이디어 수집, 초안 생성, SEO 검수, SNS 변환까지 이어지는 블로그 운영 자동화",
+      "priority": 1,
+      "targetAudience": "콘텐츠를 자산화하고 검색 유입을 만들고 싶은 개인 브랜드 운영자",
+      "monetizationPotential": "high",
+      "relatedCategories": ["AI Workflow", "Career"],
+      "seedKeywords": ["블로그 자동화", "SEO 글쓰기", "콘텐츠 파이프라인", "RSS"]
+    }
+  ]
+}
