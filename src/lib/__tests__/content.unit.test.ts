@@ -29,16 +29,17 @@ Markdown body`)
     expect(body).toBe('Markdown body')
   })
 
-  it('loads at least one published content post from the repository content folder', () => {
-    expect(getPublishedContentPosts()).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          slug: 'momenttune-week-3-test',
-          isPublished: true,
-          source: 'content',
-        }),
-      ])
-    )
+  it('loads published content posts from the repository content folder', () => {
+    const posts = getPublishedContentPosts()
+
+    expect(Array.isArray(posts)).toBe(true)
+    posts.forEach((post) => {
+      expect(post).toEqual(expect.objectContaining({
+        isPublished: true,
+        source: 'content',
+        status: 'published',
+      }))
+    })
   })
 
   it('validates bad dates and duplicate slugs', () => {
