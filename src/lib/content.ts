@@ -218,6 +218,10 @@ export function getPublishedContentPostBySlug(slug: string) {
   return getPublishedContentPosts().find((post) => post.slug === slug) || null
 }
 
+export function getContentPostById(id: string) {
+  return getAllContentPosts().find((post) => post.id === id) || null
+}
+
 export function getPublishedContentPostById(id: string) {
   return getPublishedContentPosts().find((post) => post.id === id) || null
 }

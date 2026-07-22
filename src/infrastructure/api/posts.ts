@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
 import { CreatePostInput, UpdatePostInput, PostFilters, PostSort, PaginationOptions } from '../../entities/Post'
 import { PrismaPostRepository } from '../../repositories/PrismaPostRepository'
 import { GetPostsUseCaseImpl, GetPostByIdUseCaseImpl, GetPostBySlugUseCaseImpl, GetBlogStatsUseCaseImpl } from '../../usecases/GetPosts'
@@ -9,7 +11,10 @@ import { prisma } from '../../lib/prisma'
 import { initializeDatabase } from '../../lib/database-init'
 import { verifyAdminPassword, createAuthResponse } from '../../lib/auth-server'
 import {
+  CONTENT_ROOT,
+  getContentPostById,
   getPublishedContentPosts,
+  isContentPostId,
 } from '../../lib/content'
 import {
   getAdjacentPosts as getAdjacentPostsForDetail,
@@ -146,11 +151,34 @@ export async function updatePost(input: UpdatePostInput) {
 
 export async function deletePost(id: string) {
   try {
+    if (isContentPostId(id)) {
+      return deleteContentPost(id)
+    }
+
     return await deletePostUseCase.execute(id)
   } catch (error) {
     console.error('Error deleting post:', error)
     throw error
   }
+}
+
+function deleteContentPost(id: string) {
+  const post = getContentPostById(id)
+
+  if (!post) {
+    throw new Error('Content post not found')
+  }
+
+  const contentRoot = path.resolve(CONTENT_ROOT)
+  const filePath = path.resolve(post.filePath)
+  const isInsideContentRoot = filePath === contentRoot || filePath.startsWith(`${contentRoot}${path.sep}`)
+
+  if (!isInsideContentRoot || path.extname(filePath) !== '.md') {
+    throw new Error('Invalid content post file path')
+  }
+
+  fs.unlinkSync(filePath)
+  return { success: true, id }
 }
 
 export class PostsAPIHandler {

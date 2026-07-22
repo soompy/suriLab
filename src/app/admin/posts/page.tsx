@@ -131,11 +131,6 @@ export default function AdminPostsPage() {
   }, [fetchPosts])
 
   const handleDelete = async (post: PostEntity) => {
-    if (isContentPost(post)) {
-      alert('파일 기반 콘텐츠는 어드민에서 직접 삭제할 수 없습니다. 저장소에서 파일을 삭제한 뒤 배포해야 합니다.')
-      return
-    }
-
     try {
       const response = await fetch(`/api/posts/${post.id}`, {
         method: 'DELETE',
@@ -154,10 +149,10 @@ export default function AdminPostsPage() {
 
       await fetchPosts()
       setDeleteDialog({ open: false, post: null })
-      alert('포스트가 삭제되었습니다.')
+      alert(isContentPost(post) ? '파일 글이 삭제되었습니다.' : '포스트가 삭제되었습니다.')
     } catch (error) {
       console.error('Error deleting post:', error)
-      alert('포스트 삭제에 실패했습니다.')
+      alert(error instanceof Error ? error.message : '포스트 삭제에 실패했습니다.')
     }
   }
 
@@ -274,7 +269,7 @@ export default function AdminPostsPage() {
       <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
         <Header />
         
-        <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Container maxWidth="xl" sx={{ py: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             <Typography variant="h4" component="h1">
               포스트 관리
@@ -347,19 +342,26 @@ export default function AdminPostsPage() {
             </Stack>
           </Paper>
 
-          <TableContainer component={Paper}>
-            <Table>
+          <TableContainer component={Paper} sx={{ overflowX: 'visible' }}>
+            <Table
+              size="small"
+              sx={{
+                tableLayout: 'fixed',
+                width: '100%',
+                '& .MuiTableCell-root': {
+                  px: { xs: 0.75, md: 1.25 },
+                  py: 1,
+                  verticalAlign: 'middle'
+                }
+              }}
+            >
               <TableHead>
                 <TableRow>
-                  <TableCell>썸네일</TableCell>
-                  <TableCell>제목</TableCell>
-                  <TableCell>상태</TableCell>
-                  <TableCell>소스</TableCell>
-                  <TableCell>카테고리</TableCell>
-                  <TableCell>조회수</TableCell>
-                  <TableCell>작성일</TableCell>
-                  <TableCell>수정일</TableCell>
-                  <TableCell>작업</TableCell>
+                  <TableCell sx={{ width: { xs: 56, sm: 76 } }}>썸네일</TableCell>
+                  <TableCell>콘텐츠</TableCell>
+                  <TableCell sx={{ width: { xs: 72, md: 92 }, display: { xs: 'none', sm: 'table-cell' } }}>조회수</TableCell>
+                  <TableCell sx={{ width: { xs: 96, md: 142 }, display: { xs: 'none', md: 'table-cell' } }}>날짜</TableCell>
+                  <TableCell align="right" sx={{ width: { xs: 132, sm: 150 } }}>작업</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -368,8 +370,8 @@ export default function AdminPostsPage() {
                     <TableCell>
                       <Box
                         sx={{
-                          width: 72,
-                          height: 44,
+                          width: { xs: 44, sm: 60 },
+                          height: { xs: 34, sm: 38 },
                           borderRadius: 1,
                           overflow: 'hidden',
                           border: '1px solid',
@@ -399,40 +401,90 @@ export default function AdminPostsPage() {
                         )}
                       </Box>
                     </TableCell>
-                    <TableCell>
-                      <Box>
-                        <Typography variant="subtitle2" noWrap>
+                    <TableCell sx={{ minWidth: 0 }}>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography
+                          variant="subtitle2"
+                          title={post.title}
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '100%',
+                            lineHeight: 1.35
+                          }}
+                        >
                           {post.title}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" noWrap>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          title={post.excerpt}
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '100%'
+                          }}
+                        >
                           {post.excerpt}
                         </Typography>
-                        {post.featured && (
-                          <Chip label="추천" size="small" color="secondary" sx={{ ml: 1 }} />
-                        )}
+                        <Stack
+                          direction="row"
+                          spacing={0.5}
+                          useFlexGap
+                          flexWrap="wrap"
+                          sx={{ mt: 0.5, overflow: 'hidden', maxHeight: 24 }}
+                        >
+                          <Chip
+                            label={post.isPublished ? '공개' : '비공개'}
+                            color={post.isPublished ? 'success' : 'default'}
+                            size="small"
+                            sx={{ height: 20, '& .MuiChip-label': { px: 0.75 } }}
+                          />
+                          <Chip
+                            label={isContentPost(post) ? '파일' : 'DB'}
+                            color={isContentPost(post) ? 'warning' : 'primary'}
+                            size="small"
+                            variant={isContentPost(post) ? 'outlined' : 'filled'}
+                            sx={{ height: 20, '& .MuiChip-label': { px: 0.75 } }}
+                          />
+                          <Chip
+                            label={post.category}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              height: 20,
+                              maxWidth: { xs: 88, sm: 140 },
+                              '& .MuiChip-label': {
+                                px: 0.75,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }
+                            }}
+                          />
+                          {post.featured && (
+                            <Chip label="추천" size="small" color="secondary" sx={{ height: 20, '& .MuiChip-label': { px: 0.75 } }} />
+                          )}
+                        </Stack>
                       </Box>
                     </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={post.isPublished ? '공개' : '비공개'}
-                        color={post.isPublished ? 'success' : 'default'}
-                        size="small"
-                      />
+                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                      <Typography variant="body2" noWrap>
+                        {post.views?.toLocaleString() || 0}
+                      </Typography>
                     </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={isContentPost(post) ? '파일' : 'DB'}
-                        color={isContentPost(post) ? 'warning' : 'primary'}
-                        size="small"
-                        variant={isContentPost(post) ? 'outlined' : 'filled'}
-                      />
+                    <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} noWrap>
+                        작성 {formatDate(post.publishedAt)}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} noWrap>
+                        수정 {formatDate(post.updatedAt)}
+                      </Typography>
                     </TableCell>
-                    <TableCell>{post.category}</TableCell>
-                    <TableCell>{post.views?.toLocaleString() || 0}</TableCell>
-                    <TableCell>{formatDate(post.publishedAt)}</TableCell>
-                    <TableCell>{formatDate(post.updatedAt)}</TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
+                    <TableCell align="right">
+                      <Stack direction="row" spacing={0.25} justifyContent="flex-end" sx={{ flexWrap: 'nowrap' }}>
                         <IconButton
                           size="small"
                           onClick={() => handleView(post)}
@@ -464,18 +516,15 @@ export default function AdminPostsPage() {
                             </IconButton>
                           </span>
                         </Tooltip>
-                        <Tooltip title={isContentPost(post) ? '파일 기반 글은 저장소에서 삭제해야 합니다.' : '삭제'}>
-                          <span>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => setDeleteDialog({ open: true, post })}
-                              disabled={isContentPost(post)}
-                              title="삭제"
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </span>
+                        <Tooltip title={isContentPost(post) ? '파일 글 삭제' : '삭제'}>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => setDeleteDialog({ open: true, post })}
+                            title="삭제"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
                         </Tooltip>
                       </Stack>
                     </TableCell>
@@ -483,7 +532,7 @@ export default function AdminPostsPage() {
                 ))}
                 {visiblePosts.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9}>
+                    <TableCell colSpan={5}>
                       <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
                         조건에 맞는 포스트가 없습니다.
                       </Typography>
@@ -516,6 +565,11 @@ export default function AdminPostsPage() {
                 &quot;{deleteDialog.post?.title}&quot; 포스트를 정말 삭제하시겠습니까?
                 이 작업은 되돌릴 수 없습니다.
               </Typography>
+              {deleteDialog.post && isContentPost(deleteDialog.post) && (
+                <Alert severity="warning" sx={{ mt: 2 }}>
+                  파일 글은 Markdown 파일 자체를 삭제합니다. Git 기반 배포에서는 삭제 후 커밋과 재배포가 필요합니다.
+                </Alert>
+              )}
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setDeleteDialog({ open: false, post: null })}>
