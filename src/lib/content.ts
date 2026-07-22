@@ -7,6 +7,7 @@ export const CONTENT_ROOT = path.join(process.cwd(), 'content')
 export const CONTENT_CATEGORIES = [
   'MomentTune',
   'AI Workflow',
+  'Build Log',
   'Startup',
   'Career',
 ] as const
@@ -44,6 +45,7 @@ export interface ContentPostEntity extends PostEntity {
 const CONTENT_DIRECTORIES = [
   'momenttune',
   'ai-workflow',
+  'build-log',
   'startup',
   'career',
 ]

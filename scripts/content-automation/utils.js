@@ -11,6 +11,7 @@ const REPORTS_ROOT = path.join(AUTOMATION_ROOT, 'reports')
 const CATEGORY_TO_DIR = {
   MomentTune: 'momenttune',
   'AI Workflow': 'ai-workflow',
+  'Build Log': 'build-log',
   Startup: 'startup',
   Career: 'career',
 }
@@ -225,4 +226,3 @@ module.exports = {
   today,
   writeJson,
 }
-
