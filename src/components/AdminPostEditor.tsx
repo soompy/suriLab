@@ -1051,25 +1051,38 @@ function WriteContent() {
     }
   }
 
-  const handleImageUpload = async (file: File) => {
+  const uploadImageFile = async (file: File) => {
     if (!file) return
 
     setIsUploading(true)
     try {
-      const formData = new FormData()
-      formData.append('image', file)
+      const uploadFormData = new FormData()
+      uploadFormData.append('image', file)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData
+        body: uploadFormData
       })
 
       if (!response.ok) {
         throw new Error('Upload failed')
       }
 
-      const result = await response.json()
-      
+      return await response.json()
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      alert('이미지 업로드에 실패했습니다.')
+      return null
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleImageUpload = async (file: File) => {
+    const result = await uploadImageFile(file)
+    if (!result?.url) return
+
+    try {
       // 마크다운 이미지 문법으로 텍스트에 삽입
       const imageMarkdown = `![${file.name}](${result.url})\n\n`
       if (contentRef.current) {
@@ -1089,10 +1102,8 @@ function WriteContent() {
         }, 0)
       }
     } catch (error) {
-      console.error('Error uploading image:', error)
-      alert('이미지 업로드에 실패했습니다.')
-    } finally {
-      setIsUploading(false)
+      console.error('Error inserting uploaded image:', error)
+      alert('이미지 삽입에 실패했습니다.')
     }
   }
 
@@ -1101,6 +1112,30 @@ function WriteContent() {
     if (file) {
       handleImageUpload(file)
     }
+    event.target.value = ''
+  }
+
+  const handleThumbnailFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const result = await uploadImageFile(file)
+    if (result?.url) {
+      setFormData(prev => ({
+        ...prev,
+        thumbnail: result.url
+      }))
+      if (saveStatus === 'saved') setSaveStatus('idle')
+    }
+    event.target.value = ''
+  }
+
+  const handleThumbnailRemove = () => {
+    setFormData(prev => ({
+      ...prev,
+      thumbnail: ''
+    }))
+    if (saveStatus === 'saved') setSaveStatus('idle')
   }
 
   // 로그인 성공 핸들러
@@ -1745,22 +1780,103 @@ function WriteContent() {
                       }}
                     />
 
-                    <TextField
-                      fullWidth
-                      label={isFocused === 'thumbnail' ? '' : '썸네일 URL'}
-                      value={formData.thumbnail}
-                      onChange={handleInputChange('thumbnail')}
-                      onFocus={handleFocus('thumbnail')}
-                      onBlur={handleBlur}
-                      placeholder={isFocused === 'thumbnail' || formData.thumbnail ? 'https://...' : ''}
-                      variant="outlined"
+                    <Box
                       sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 1.5,
-                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper'
-                        }
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1.5,
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'background.paper',
+                        overflow: 'hidden'
                       }}
-                    />
+                    >
+                      {formData.thumbnail ? (
+                        <Box>
+                          <Box
+                            component="img"
+                            src={formData.thumbnail}
+                            alt="업로드된 썸네일 미리보기"
+                            sx={{
+                              display: 'block',
+                              width: '100%',
+                              height: 150,
+                              objectFit: 'cover',
+                              bgcolor: 'action.hover'
+                            }}
+                          />
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                            justifyContent="space-between"
+                            sx={{ p: 1.5 }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                minWidth: 0,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              {formData.thumbnail}
+                            </Typography>
+                            <Stack direction="row" spacing={0.75}>
+                              <Button
+                                component="label"
+                                size="small"
+                                variant="outlined"
+                                startIcon={<PhotoIcon />}
+                                disabled={isUploading}
+                              >
+                                변경
+                                <input
+                                  type="file"
+                                  hidden
+                                  accept="image/*"
+                                  onChange={handleThumbnailFileSelect}
+                                />
+                              </Button>
+                              <IconButton
+                                size="small"
+                                aria-label="썸네일 삭제"
+                                onClick={handleThumbnailRemove}
+                              >
+                                <DeleteIcon sx={{ fontSize: 18 }} />
+                              </IconButton>
+                            </Stack>
+                          </Stack>
+                        </Box>
+                      ) : (
+                        <Button
+                          component="label"
+                          fullWidth
+                          variant="outlined"
+                          startIcon={<PhotoIcon />}
+                          disabled={isUploading}
+                          sx={{
+                            minHeight: 56,
+                            justifyContent: 'center',
+                            border: 0,
+                            borderRadius: 1.5,
+                            color: 'text.secondary',
+                            '&:hover': {
+                              border: 0,
+                              bgcolor: 'action.hover'
+                            }
+                          }}
+                        >
+                          {isUploading ? '썸네일 업로드 중...' : '썸네일 이미지 업로드'}
+                          <input
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            onChange={handleThumbnailFileSelect}
+                          />
+                        </Button>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
 
