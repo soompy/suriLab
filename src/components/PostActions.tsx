@@ -119,7 +119,7 @@ export default function PostActions({
         <>
           <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
           <IconButton
-            onClick={() => router.push(`/write?edit=${postId}`)}
+            onClick={() => router.push(`/admin/posts/new?edit=${postId}`)}
             title="수정하기"
             aria-label="수정하기"
             color="primary"
