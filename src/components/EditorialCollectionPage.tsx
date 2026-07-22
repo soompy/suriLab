@@ -283,32 +283,34 @@ export default function EditorialCollectionPage({
                   </Stack>
                 </Box>
 
-                <Paper
-                  sx={{
-                    p: { xs: 2.5, md: 3 },
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                    boxShadow: 'none',
-                    bgcolor: 'background.paper'
-                  }}
-                >
-                  <Typography variant="overline" color="primary" sx={{ fontWeight: 800 }}>
-                    {eyebrow}
-                  </Typography>
-                  <Stack
-                    direction={{ xs: 'column', md: 'row' }}
-                    spacing={1.5}
-                    divider={<ResponsiveFocusDivider />}
-                    sx={{ mt: 1.5 }}
+                {focusItems.length > 0 && (
+                  <Paper
+                    sx={{
+                      p: { xs: 2.5, md: 3 },
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 2,
+                      boxShadow: 'none',
+                      bgcolor: 'background.paper'
+                    }}
                   >
-                    {focusItems.map((item) => (
-                      <Typography key={item} variant="body2" color="text.secondary" sx={{ flex: 1, lineHeight: 1.65 }}>
-                        {item}
-                      </Typography>
-                    ))}
-                  </Stack>
-                </Paper>
+                    <Typography variant="overline" color="primary" sx={{ fontWeight: 800 }}>
+                      {eyebrow}
+                    </Typography>
+                    <Stack
+                      direction={{ xs: 'column', md: 'row' }}
+                      spacing={1.5}
+                      divider={<ResponsiveFocusDivider />}
+                      sx={{ mt: 1.5 }}
+                    >
+                      {focusItems.map((item) => (
+                        <Typography key={item} variant="body2" color="text.secondary" sx={{ flex: 1, lineHeight: 1.65 }}>
+                          {item}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </Paper>
+                )}
 
                 <Box>
                   <SectionTitle title="Latest Essays" description="최근 발행된 글을 시간순으로 모았습니다." />
