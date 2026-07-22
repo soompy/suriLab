@@ -81,6 +81,7 @@ interface DraftPost {
   thumbnail?: string | null
   content: string
   category: string
+  slug?: string
   tags?: string[]
   isPublished?: boolean
   updatedAt?: string
@@ -109,6 +110,7 @@ function WriteContent() {
     thumbnail: '',
     content: '',
     category: '',
+    slug: '',
     status: 'draft'
   })
   const [tags, setTags] = useState<string[]>([])
@@ -181,6 +183,7 @@ function WriteContent() {
           thumbnail: post.thumbnail || '',
           content: post.content,
           category: post.category,
+          slug: post.slug || '',
           status: status
         })
         setTags(post.tags || [])
@@ -258,6 +261,7 @@ function WriteContent() {
       thumbnail: draft.thumbnail || '',
       content: draft.content,
       category: draft.category,
+      slug: draft.slug || '',
       status: status
     })
     setTags(draft.tags || [])
@@ -858,7 +862,7 @@ function WriteContent() {
         description: excerpt,
         series: formData.series || undefined,
         thumbnail: formData.thumbnail || undefined,
-        slug: generateSlug(formData.title),
+        slug: isEditing ? formData.slug || generateSlug(formData.title) : generateSlug(formData.title),
         tags,
         category: formData.category,
         authorId: BLOG_CONFIG.owner.id,
@@ -961,7 +965,7 @@ function WriteContent() {
         description: excerpt,
         series: formData.series || undefined,
         thumbnail: formData.thumbnail || undefined,
-        slug: generateSlug(formData.title),
+        slug: isEditing ? formData.slug || generateSlug(formData.title) : generateSlug(formData.title),
         tags,
         category: formData.category,
         authorId: BLOG_CONFIG.owner.id,
@@ -1025,6 +1029,7 @@ function WriteContent() {
           thumbnail: '',
           content: '',
           category: '',
+          slug: '',
           status: 'draft'
         })
         setTags([])
