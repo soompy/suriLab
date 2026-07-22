@@ -272,6 +272,7 @@ export default function AdminPostsPage() {
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableCell>썸네일</TableCell>
                   <TableCell>제목</TableCell>
                   <TableCell>상태</TableCell>
                   <TableCell>카테고리</TableCell>
@@ -284,6 +285,40 @@ export default function AdminPostsPage() {
               <TableBody>
                 {posts.map((post) => (
                   <TableRow key={post.id}>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          width: 72,
+                          height: 44,
+                          borderRadius: 1,
+                          overflow: 'hidden',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          bgcolor: 'action.hover',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {post.thumbnail ? (
+                          <Box
+                            component="img"
+                            src={post.thumbnail}
+                            alt={`${post.title} 썸네일`}
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              display: 'block'
+                            }}
+                          />
+                        ) : (
+                          <Typography variant="caption" color="text.secondary">
+                            없음
+                          </Typography>
+                        )}
+                      </Box>
+                    </TableCell>
                     <TableCell>
                       <Box>
                         <Typography variant="subtitle2" noWrap>
