@@ -61,6 +61,7 @@ const OptimizedImage = memo(forwardRef<HTMLDivElement, OptimizedImageProps>(({
   const theme = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const isInlineImage = src.startsWith('data:') || src.startsWith('blob:')
 
   const handleLoad = () => {
     setIsLoading(false)
@@ -105,6 +106,7 @@ const OptimizedImage = memo(forwardRef<HTMLDivElement, OptimizedImageProps>(({
     onError: handleError,
     sizes: sizes || (fill ? '100vw' : undefined),
     className,
+    unoptimized: isInlineImage,
     ...props,
   }
 

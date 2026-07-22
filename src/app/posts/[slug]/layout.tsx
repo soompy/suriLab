@@ -67,7 +67,10 @@ export async function generateMetadata({ params }: PostLayoutProps): Promise<Met
 function getBlogPostingJsonLd(post: PostEntity) {
   const description = getPostDescription(post)
   const postUrl = absoluteUrl(`/posts/${post.slug}`)
-  const image = absoluteUrl(post.thumbnail || BLOG_CONFIG.owner.avatar)
+  const thumbnail = post.thumbnail?.startsWith('data:') || post.thumbnail?.startsWith('blob:')
+    ? null
+    : post.thumbnail
+  const image = absoluteUrl(thumbnail || BLOG_CONFIG.owner.avatar)
   const author = getAuthor()
 
   return {

@@ -1117,16 +1117,39 @@ function WriteContent() {
 
   const handleThumbnailFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (!file) return
+    if (!file) {
+      event.target.value = ''
+      return
+    }
 
-    const result = await uploadImageFile(file)
-    if (result?.url) {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      alert('JPEG, PNG, GIF, WebP 이미지만 업로드할 수 있습니다.')
+      event.target.value = ''
+      return
+    }
+
+    const maxInlineSize = 1.5 * 1024 * 1024
+    if (file.size > maxInlineSize) {
+      alert('썸네일 이미지는 1.5MB 이하로 업로드해주세요.')
+      event.target.value = ''
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') return
+
       setFormData(prev => ({
         ...prev,
-        thumbnail: result.url
+        thumbnail: reader.result as string
       }))
       if (saveStatus === 'saved') setSaveStatus('idle')
     }
+    reader.onerror = () => {
+      alert('썸네일 이미지를 읽지 못했습니다.')
+    }
+    reader.readAsDataURL(file)
     event.target.value = ''
   }
 

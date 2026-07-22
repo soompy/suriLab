@@ -12,14 +12,22 @@ export function getSiteUrl() {
 }
 
 export function absoluteUrl(path = '/') {
+  if (path.startsWith('data:') || path.startsWith('blob:')) {
+    return path
+  }
+
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   return `${getSiteUrl()}${normalizedPath}`
 }
 
 export function getDefaultImages(image?: string | null) {
+  const safeImage = image?.startsWith('data:') || image?.startsWith('blob:')
+    ? DEFAULT_OG_IMAGE
+    : image
+
   return [
     {
-      url: absoluteUrl(image || DEFAULT_OG_IMAGE),
+      url: absoluteUrl(safeImage || DEFAULT_OG_IMAGE),
       width: 1200,
       height: 630,
       alt: SITE_NAME,
