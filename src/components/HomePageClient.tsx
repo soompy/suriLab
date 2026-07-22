@@ -25,7 +25,7 @@ import Loading from '@/components/Loading'
 import { AvatarImage } from '@/components/image'
 import { PostEntity } from '@/entities/Post'
 
-const MOMENT_TUNE_START_DATE = new Date('2026-06-29T00:00:00+09:00')
+const MOMENT_TUNE_START_DATE = new Date(2026, 5, 29)
 const MOMENT_TUNE_TOTAL_WEEKS = 14
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000
 
@@ -96,8 +96,10 @@ export default function HomePageClient({ initialPosts, initialError }: HomePageC
   const publishedPosts = useMemo(() => posts, [posts])
 
   const momentTuneWeek = useMemo(() => {
-    const elapsedWeeks = Math.ceil(
-      Math.max(Date.now() - MOMENT_TUNE_START_DATE.getTime(), 0) / MS_PER_WEEK
+    const today = new Date()
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const elapsedWeeks = Math.floor(
+      Math.max(todayStart.getTime() - MOMENT_TUNE_START_DATE.getTime(), 0) / MS_PER_WEEK
     )
 
     return Math.min(Math.max(elapsedWeeks + 1, 1), MOMENT_TUNE_TOTAL_WEEKS)

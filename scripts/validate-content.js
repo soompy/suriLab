@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 
 const CONTENT_ROOT = path.join(process.cwd(), 'content')
-const CONTENT_DIRECTORIES = ['momenttune', 'ai-workflow', 'startup', 'career']
+const CONTENT_DIRECTORIES = ['momenttune', 'ai-workflow', 'build-log', 'startup', 'career']
 const REQUIRED_FIELDS = [
   'title',
   'description',
@@ -18,7 +18,7 @@ const REQUIRED_FIELDS = [
   'relatedPosts',
 ]
 const VALID_STATUSES = ['idea', 'draft', 'review', 'published']
-const VALID_CATEGORIES = ['MomentTune', 'AI Workflow', 'Startup', 'Career']
+const VALID_CATEGORIES = ['MomentTune', 'AI Workflow', 'Build Log', 'Startup', 'Career']
 const MIN_DESCRIPTION_LENGTH = 50
 const MAX_DESCRIPTION_LENGTH = 160
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
