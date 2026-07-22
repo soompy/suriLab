@@ -19,10 +19,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormControl,
+  InputLabel,
+  MenuItem,
   TextField,
+  Select,
   Stack,
   Alert,
-  Pagination
+  Pagination,
+  Tooltip
 } from '@mui/material'
 import {
   Edit as EditIcon,
@@ -30,7 +35,8 @@ import {
   Visibility as ViewIcon,
   Add as AddIcon,
   Publish as PublishIcon,
-  Unpublished as UnpublishedIcon
+  Unpublished as UnpublishedIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import MuiThemeProvider from '@/components/MuiThemeProvider'
@@ -54,6 +60,8 @@ export default function AdminPostsPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'database' | 'content'>('all')
 
   const fetchPosts = useCallback(async () => {
     if (!AuthService.isAuthenticated()) {
@@ -68,9 +76,15 @@ export default function AdminPostsPage() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '10',
-        isPublished: '', // 모든 포스트 (공개/비공개)
         search: searchQuery
       })
+      if (statusFilter === 'published') {
+        params.set('isPublished', 'true')
+      } else if (statusFilter === 'draft') {
+        params.set('isPublished', 'false')
+      } else {
+        params.set('isPublished', '')
+      }
 
       const response = await fetch(`/api/posts?${params.toString()}`, {
         headers: AuthService.getAuthHeaders()
@@ -87,12 +101,22 @@ export default function AdminPostsPage() {
       const data = await response.json()
       setPosts(data.posts)
       setTotalPages(data.totalPages)
+      setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
-  }, [page, searchQuery])
+  }, [page, searchQuery, statusFilter])
+
+  const visiblePosts = posts.filter((post) => {
+    if (sourceFilter === 'all') return true
+    return sourceFilter === 'content'
+      ? post.source === 'content' || post.id.startsWith('content:')
+      : post.source !== 'content' && !post.id.startsWith('content:')
+  })
+
+  const isContentPost = (post: PostEntity) => post.source === 'content' || post.id.startsWith('content:')
 
   useEffect(() => {
     const authenticated = AuthService.isAuthenticated()
@@ -107,6 +131,11 @@ export default function AdminPostsPage() {
   }, [fetchPosts])
 
   const handleDelete = async (post: PostEntity) => {
+    if (isContentPost(post)) {
+      alert('파일 기반 콘텐츠는 어드민에서 직접 삭제할 수 없습니다. 저장소에서 파일을 삭제한 뒤 배포해야 합니다.')
+      return
+    }
+
     try {
       const response = await fetch(`/api/posts/${post.id}`, {
         method: 'DELETE',
@@ -133,6 +162,11 @@ export default function AdminPostsPage() {
   }
 
   const handleTogglePublish = async (post: PostEntity) => {
+    if (isContentPost(post)) {
+      alert('파일 기반 콘텐츠는 어드민에서 공개 상태를 변경할 수 없습니다.')
+      return
+    }
+
     try {
       const response = await fetch(`/api/posts/${post.id}`, {
         method: 'PUT',
@@ -168,6 +202,11 @@ export default function AdminPostsPage() {
   }
 
   const handleEdit = (post: PostEntity) => {
+    if (isContentPost(post)) {
+      alert('파일 기반 콘텐츠는 어드민 편집기에서 수정할 수 없습니다. DB 글은 수정 가능합니다.')
+      return
+    }
+
     router.push(`/admin/posts/${post.id}/edit`)
   }
 
@@ -256,7 +295,12 @@ export default function AdminPostsPage() {
           )}
 
           <Paper sx={{ mb: 3 }}>
-            <Box sx={{ p: 2 }}>
+            <Stack
+              direction={{ xs: 'column', md: 'row' }}
+              spacing={2}
+              sx={{ p: 2 }}
+              alignItems={{ xs: 'stretch', md: 'center' }}
+            >
               <TextField
                 fullWidth
                 placeholder="제목, 내용으로 검색..."
@@ -265,7 +309,42 @@ export default function AdminPostsPage() {
                 variant="outlined"
                 size="small"
               />
-            </Box>
+              <FormControl size="small" sx={{ minWidth: 140 }}>
+                <InputLabel>상태</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label="상태"
+                  onChange={(event) => {
+                    setStatusFilter(event.target.value as typeof statusFilter)
+                    setPage(1)
+                  }}
+                >
+                  <MenuItem value="all">전체</MenuItem>
+                  <MenuItem value="published">공개</MenuItem>
+                  <MenuItem value="draft">비공개</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl size="small" sx={{ minWidth: 140 }}>
+                <InputLabel>소스</InputLabel>
+                <Select
+                  value={sourceFilter}
+                  label="소스"
+                  onChange={(event) => setSourceFilter(event.target.value as typeof sourceFilter)}
+                >
+                  <MenuItem value="all">전체</MenuItem>
+                  <MenuItem value="database">DB 글</MenuItem>
+                  <MenuItem value="content">파일 글</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                variant="outlined"
+                startIcon={<RefreshIcon />}
+                onClick={fetchPosts}
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                새로고침
+              </Button>
+            </Stack>
           </Paper>
 
           <TableContainer component={Paper}>
@@ -275,6 +354,7 @@ export default function AdminPostsPage() {
                   <TableCell>썸네일</TableCell>
                   <TableCell>제목</TableCell>
                   <TableCell>상태</TableCell>
+                  <TableCell>소스</TableCell>
                   <TableCell>카테고리</TableCell>
                   <TableCell>조회수</TableCell>
                   <TableCell>작성일</TableCell>
@@ -283,7 +363,7 @@ export default function AdminPostsPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {posts.map((post) => (
+                {visiblePosts.map((post) => (
                   <TableRow key={post.id}>
                     <TableCell>
                       <Box
@@ -339,6 +419,14 @@ export default function AdminPostsPage() {
                         size="small"
                       />
                     </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={isContentPost(post) ? '파일' : 'DB'}
+                        color={isContentPost(post) ? 'warning' : 'primary'}
+                        size="small"
+                        variant={isContentPost(post) ? 'outlined' : 'filled'}
+                      />
+                    </TableCell>
                     <TableCell>{post.category}</TableCell>
                     <TableCell>{post.views?.toLocaleString() || 0}</TableCell>
                     <TableCell>{formatDate(post.publishedAt)}</TableCell>
@@ -352,32 +440,56 @@ export default function AdminPostsPage() {
                         >
                           <ViewIcon />
                         </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEdit(post)}
-                          title="편집"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleTogglePublish(post)}
-                          title={post.isPublished ? '비공개로 변경' : '공개로 변경'}
-                        >
-                          {post.isPublished ? <UnpublishedIcon /> : <PublishIcon />}
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => setDeleteDialog({ open: true, post })}
-                          title="삭제"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
+                        <Tooltip title={isContentPost(post) ? '파일 기반 글은 저장소에서 수정해야 합니다.' : '편집'}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEdit(post)}
+                              disabled={isContentPost(post)}
+                              title="편집"
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title={isContentPost(post) ? '파일 기반 글은 저장소에서 공개 상태를 관리합니다.' : post.isPublished ? '비공개로 변경' : '공개로 변경'}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleTogglePublish(post)}
+                              disabled={isContentPost(post)}
+                              title={post.isPublished ? '비공개로 변경' : '공개로 변경'}
+                            >
+                              {post.isPublished ? <UnpublishedIcon /> : <PublishIcon />}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title={isContentPost(post) ? '파일 기반 글은 저장소에서 삭제해야 합니다.' : '삭제'}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => setDeleteDialog({ open: true, post })}
+                              disabled={isContentPost(post)}
+                              title="삭제"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
                       </Stack>
                     </TableCell>
                   </TableRow>
                 ))}
+                {visiblePosts.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={9}>
+                      <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                        조건에 맞는 포스트가 없습니다.
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </TableContainer>

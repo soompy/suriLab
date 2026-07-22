@@ -32,7 +32,7 @@ export async function getPosts(
   pagination?: PaginationOptions
 ) {
   try {
-    const shouldIncludeContentPosts = filters?.isPublished === true
+    const shouldIncludeContentPosts = filters?.isPublished !== false
 
     if (!shouldIncludeContentPosts) {
       return await getPostsUseCase.execute(filters, sort, pagination)
