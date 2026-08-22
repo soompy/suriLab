@@ -16,6 +16,9 @@ import {
 import './globals.css'
 import 'highlight.js/styles/github.css'
 
+const GOOGLE_SITE_VERIFICATION =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'rFD74xHDz5FnTVJ7KeuW4Jl_VWh8dsaohpJScOfaBoM'
+
 // Inter 폰트 설정 (본문용)
 const inter = Inter({
   subsets: ['latin'],
@@ -68,7 +71,7 @@ export const metadata: Metadata = {
     path: '/',
   }),
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    google: GOOGLE_SITE_VERIFICATION,
   },
   icons: {
     icon: absoluteUrl('/images/profile.jpg'),
