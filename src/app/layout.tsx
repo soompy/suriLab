@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono, Nanum_Gothic, Noto_Sans_KR } from 'next/font/google'
+import GoogleAdSense from '@/components/GoogleAdSense'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import { CustomThemeProvider } from '@/components/ThemeContext'
 import {
@@ -86,6 +87,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        <GoogleAdSense />
         <GoogleAnalytics />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansKR.variable} ${nanumGothic.variable}`}>

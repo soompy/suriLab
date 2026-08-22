@@ -19,6 +19,7 @@ export default function robots(): MetadataRoute.Robots {
         '/archives/',
         '/rss.xml',
         '/llms.txt',
+        '/ads.txt',
       ],
       disallow: ['/admin/', '/api/', '/write/'],
     },
