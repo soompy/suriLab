@@ -5,6 +5,7 @@ import { getPosts } from '@/infrastructure/api/posts'
 import { prisma } from '@/lib/prisma'
 import { findNameBySlug } from '@/lib/taxonomy'
 import { getPublishedContentPosts } from '@/lib/content'
+import { toPostPreviews } from '@/lib/post-preview'
 
 export const revalidate = 300
 
@@ -42,7 +43,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       { field: 'publishedAt', order: 'desc' },
       { page: 1, limit: 200 }
     )
-    initialPosts = result.posts.map((post) => ({ ...post, content: '' }))
+    initialPosts = toPostPreviews(result.posts)
   } catch (error) {
     console.error('Failed to load category posts:', error)
     initialError = '카테고리 글 목록을 불러오지 못했습니다.'

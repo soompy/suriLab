@@ -21,6 +21,7 @@ import {
   getPublishedPostById,
   getRelatedPosts as getRelatedPostsForDetail,
 } from '../../lib/post-detail'
+import { toPostListPreviewResponse } from '../../lib/post-preview'
 
 const postRepository = new PrismaPostRepository(prisma)
 const getPostsUseCase = new GetPostsUseCaseImpl(postRepository)
@@ -233,7 +234,7 @@ export class PostsAPIHandler {
       }
 
       const result = await getPosts(filters, sort, pagination)
-      const response = NextResponse.json(result)
+      const response = NextResponse.json(isAuthorized ? result : toPostListPreviewResponse(result))
 
       if (!isAuthorized) {
         response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')

@@ -1,15 +1,13 @@
 import EditorialCollectionPage from '@/components/EditorialCollectionPage'
 import { getPublishedContentPosts } from '@/lib/content'
+import { toPostPreviews } from '@/lib/post-preview'
 
 export const revalidate = 300
 
 export default function BuildLogPage() {
   const initialPosts = getPublishedContentPosts()
     .filter((post) => post.category === 'Build Log')
-    .map((post) => ({
-      ...post,
-      content: ''
-    }))
+  const previewPosts = toPostPreviews(initialPosts)
 
   return (
     <EditorialCollectionPage
@@ -25,7 +23,7 @@ export default function BuildLogPage() {
         '작은 MVP를 만들며 생긴 판단, 오류, 수정 과정을 재사용 가능한 기록으로 바꿉니다.',
         '실험과 회고를 함께 남겨 다음 제품 제작 속도를 높이는 데 초점을 둡니다.'
       ]}
-      initialPosts={initialPosts}
+      initialPosts={previewPosts}
     />
   )
 }

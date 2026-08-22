@@ -1,6 +1,7 @@
 import EditorialCollectionPage from '@/components/EditorialCollectionPage'
 import type { PostEntity } from '@/entities/Post'
 import { getPosts } from '@/infrastructure/api/posts'
+import { toPostPreviews } from '@/lib/post-preview'
 
 export const revalidate = 300
 
@@ -14,10 +15,7 @@ export default async function ArticlesPage() {
       { field: 'publishedAt', order: 'desc' },
       { page: 1, limit: 200 }
     )
-    initialPosts = result.posts.map((post) => ({
-      ...post,
-      content: ''
-    }))
+    initialPosts = toPostPreviews(result.posts)
   } catch (error) {
     console.error('Failed to load initial articles:', error)
     initialError = '데이터베이스에 연결하지 못해 글 목록을 불러올 수 없습니다.'

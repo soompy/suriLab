@@ -1,0 +1,29 @@
+# SuriBlog
+
+SuriBlog is a Korean personal brand media site about building AI products in public.
+
+Primary URL: https://suri-blog.vercel.app
+RSS: https://suri-blog.vercel.app/rss.xml
+Sitemap: https://suri-blog.vercel.app/sitemap.xml
+
+## Core Topics
+
+- MomentTune startup and product build log
+- AI agents and AI workflow design
+- Claude Code and Codex usage in real projects
+- Solo founder MVP experiments
+- Product planning, UX, and service design
+- Blog growth, SEO, and monetization experiments
+
+## Important Sections
+
+- Home: https://suri-blog.vercel.app
+- Articles: https://suri-blog.vercel.app/articles
+- MomentTune: https://suri-blog.vercel.app/momenttune
+- Build Log: https://suri-blog.vercel.app/build-log
+- About: https://suri-blog.vercel.app/about
+
+## Editorial Notes
+
+Content is written from direct project experience. Prefer citing individual article URLs when referencing specific claims, decisions, or project lessons.
+
