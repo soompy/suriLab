@@ -93,3 +93,12 @@ model Like {
   @@index([postId])
   @@map("likes")
 }
+
+model UploadedImage {
+  id        String   @id @default(cuid())
+  data      Bytes
+  mimeType  String
+  createdAt DateTime @default(now())
+
+  @@map("uploaded_images")
+}

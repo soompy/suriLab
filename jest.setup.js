@@ -5,7 +5,7 @@ import { TextDecoder, TextEncoder } from 'util'
 Object.assign(global, { TextDecoder, TextEncoder })
 
 // MUI and responsive components read matchMedia during render.
-Object.defineProperty(window, 'matchMedia', {
+if (typeof window !== 'undefined') Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,
@@ -41,8 +41,8 @@ global.URL.createObjectURL = jest.fn(() => 'blob:mock-url')
 global.URL.revokeObjectURL = jest.fn()
 
 // Table of contents and keyboard flows can call scroll APIs.
-window.scrollTo = jest.fn()
-Element.prototype.scrollIntoView = jest.fn()
+if (typeof window !== 'undefined') window.scrollTo = jest.fn()
+if (typeof Element !== 'undefined') Element.prototype.scrollIntoView = jest.fn()
 
 const navigationMocks = {
   push: jest.fn(),

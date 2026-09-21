@@ -8,6 +8,7 @@ import remarkBreaks from 'remark-breaks'
 import rehypeHighlight from 'rehype-highlight'
 import { BLOG_CATEGORIES } from '@/shared/constants/categories'
 import { AuthService } from '@/lib/auth'
+import { IMAGE_ACCEPT, validateImageFile } from '@/lib/image-upload'
 import { BLOG_CONFIG } from '@/config/blog'
 import LoginDialog from '@/components/LoginDialog'
 import {
@@ -94,6 +95,7 @@ function WriteContent() {
   const theme = useTheme()
   const router = useRouter()
   const contentRef = useRef<HTMLTextAreaElement>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
   const searchParams = useSearchParams()
   const editId = searchParams.get('edit')
   
@@ -1052,26 +1054,34 @@ function WriteContent() {
   }
 
   const uploadImageFile = async (file: File) => {
-    if (!file) return
+    if (isUploading) return null
+    const validationError = validateImageFile(file)
+    if (validationError) {
+      alert(validationError)
+      return null
+    }
 
     setIsUploading(true)
     try {
       const uploadFormData = new FormData()
       uploadFormData.append('image', file)
 
+      const headers = new Headers(AuthService.getAuthHeaders())
+      headers.delete('Content-Type')
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers,
         body: uploadFormData
       })
 
+      const result = await response.json().catch(() => null)
       if (!response.ok) {
-        throw new Error('Upload failed')
+        throw new Error(result?.error || '이미지 업로드에 실패했습니다.')
       }
-
-      return await response.json()
+      return result
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('이미지 업로드에 실패했습니다.')
+      alert(error instanceof Error ? error.message : '이미지 업로드에 실패했습니다.')
       return null
     } finally {
       setIsUploading(false)
@@ -1079,16 +1089,18 @@ function WriteContent() {
   }
 
   const handleImageUpload = async (file: File) => {
+    const start = contentRef.current?.selectionStart ?? formData.content.length
     const result = await uploadImageFile(file)
     if (!result?.url) return
 
     try {
       // 마크다운 이미지 문법으로 텍스트에 삽입
-      const imageMarkdown = `![${file.name}](${result.url})\n\n`
+      const alt = file.name.replace(/[\[\]\\\r\n]/g, ' ').replace(/\.[^.]+$/, '')
+      const imageMarkdown = `![${alt}](${result.url})\n\n`
       if (contentRef.current) {
         const textarea = contentRef.current
-        const start = textarea.selectionStart
         const newValue = textarea.value.substring(0, start) + imageMarkdown + textarea.value.substring(start)
+        addToHistory(textarea.value)
         
         setFormData(prev => ({
           ...prev,
@@ -1122,35 +1134,11 @@ function WriteContent() {
       return
     }
 
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      alert('JPEG, PNG, GIF, WebP 이미지만 업로드할 수 있습니다.')
-      event.target.value = ''
-      return
-    }
-
-    const maxInlineSize = 1.5 * 1024 * 1024
-    if (file.size > maxInlineSize) {
-      alert('썸네일 이미지는 1.5MB 이하로 업로드해주세요.')
-      event.target.value = ''
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') return
-
-      setFormData(prev => ({
-        ...prev,
-        thumbnail: reader.result as string
-      }))
-      if (saveStatus === 'saved') setSaveStatus('idle')
-    }
-    reader.onerror = () => {
-      alert('썸네일 이미지를 읽지 못했습니다.')
-    }
-    reader.readAsDataURL(file)
     event.target.value = ''
+    const result = await uploadImageFile(file)
+    if (!result?.url) return
+    setFormData(prev => ({ ...prev, thumbnail: result.url }))
+    if (saveStatus === 'saved') setSaveStatus('idle')
   }
 
   const handleThumbnailRemove = () => {
@@ -1473,8 +1461,8 @@ function WriteContent() {
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
-                        <Tab label="편집" icon={<EditIcon />} iconPosition="start" />
-                        <Tab label="미리보기" icon={<EyeIcon />} iconPosition="start" />
+                        <Tab disabled={isUploading} label="편집" icon={<EditIcon />} iconPosition="start" />
+                        <Tab disabled={isUploading} label="미리보기" icon={<EyeIcon />} iconPosition="start" />
                       </Tabs>
                     </Box>
                   </Box>
@@ -1573,22 +1561,22 @@ function WriteContent() {
                           <PhotoIcon sx={{ fontSize: 16 }} />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="이미지 업로드">
-                        <IconButton
-                          size="small"
-                          component="label"
-                          disabled={isUploading}
-                          sx={{ p: 0.75 }}
-                        >
-                          <Typography sx={{ fontWeight: 'bold', fontSize: '10px' }}>📷</Typography>
-                          <input
-                            type="file"
-                            hidden
-                            accept="image/*"
-                            onChange={handleFileSelect}
-                          />
-                        </IconButton>
-                      </Tooltip>
+                      <Button
+                        size="small"
+                        startIcon={<PhotoIcon />}
+                        disabled={isUploading || activeTab !== 0}
+                        onClick={() => imageInputRef.current?.click()}
+                      >
+                        {isUploading ? '업로드 중...' : '이미지 업로드'}
+                      </Button>
+                      <input
+                        ref={imageInputRef}
+                        type="file"
+                        hidden
+                        accept={IMAGE_ACCEPT}
+                        onChange={handleFileSelect}
+                        aria-label="본문 이미지 파일 선택"
+                      />
                       <Divider orientation="vertical" flexItem />
                       
                       {/* 목록 */}
@@ -1857,7 +1845,7 @@ function WriteContent() {
                                 <input
                                   type="file"
                                   hidden
-                                  accept="image/*"
+                                  accept={IMAGE_ACCEPT}
                                   onChange={handleThumbnailFileSelect}
                                 />
                               </Button>
@@ -1894,7 +1882,7 @@ function WriteContent() {
                           <input
                             type="file"
                             hidden
-                            accept="image/*"
+                            accept={IMAGE_ACCEPT}
                             onChange={handleThumbnailFileSelect}
                           />
                         </Button>
@@ -2403,7 +2391,7 @@ function WriteContent() {
                       size="medium"
                       startIcon={<SaveIcon />}
                       onClick={handleSave}
-                      disabled={saveStatus === 'saving'}
+                      disabled={saveStatus === 'saving' || isUploading}
                       sx={{ 
                         borderRadius: 2,
                         textTransform: 'none',
@@ -2425,6 +2413,7 @@ function WriteContent() {
                       size="medium"
                       startIcon={<PublishIcon />}
                       onClick={handlePublish}
+                      disabled={isUploading}
                       sx={{ 
                         borderRadius: 2,
                         textTransform: 'none',

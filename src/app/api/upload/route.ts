@@ -1,71 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
-import { existsSync, mkdirSync } from 'fs'
+import { verifyAdminToken } from '@/lib/auth-server'
+import { prisma } from '@/lib/prisma'
+import { MAX_IMAGE_SIZE, matchesImageSignature, validateImageFile } from '@/lib/image-upload'
+
+export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
+  if (!verifyAdminToken(request)) {
+    return NextResponse.json({ error: '관리자 로그인이 필요합니다.' }, { status: 401 })
+  }
+  if (Number(request.headers.get('content-length')) > MAX_IMAGE_SIZE + 64 * 1024) {
+    return NextResponse.json({ error: '이미지는 4MB 이하여야 합니다.' }, { status: 413 })
+  }
+  let formData: FormData
   try {
-    const formData = await request.formData()
-    const file = formData.get('image') as File
-
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file uploaded' },
-        { status: 400 }
-      )
+    formData = await request.formData()
+  } catch {
+    return NextResponse.json({ error: '올바른 이미지 파일을 선택해주세요.' }, { status: 400 })
+  }
+  const file = formData.get('image')
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: '이미지 파일을 선택해주세요.' }, { status: 400 })
+  }
+  const error = validateImageFile(file)
+  if (error) return NextResponse.json({ error }, { status: 400 })
+  try {
+    const data = new Uint8Array(await file.arrayBuffer())
+    if (!matchesImageSignature(data, file.type)) {
+      return NextResponse.json({ error: '이미지 내용과 파일 형식이 일치하지 않습니다.' }, { status: 400 })
     }
-
-    // 파일 확장자 검증
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.' },
-        { status: 400 }
-      )
-    }
-
-    // 파일 크기 제한 (5MB)
-    const maxSize = 5 * 1024 * 1024 // 5MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'File size too large. Maximum size is 5MB.' },
-        { status: 400 }
-      )
-    }
-
-    // 업로드 폴더 확인 및 생성
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'images')
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true })
-    }
-
-    // 고유한 파일명 생성
-    const timestamp = Date.now()
-    const fileExtension = file.name.split('.').pop()
-    const fileName = `${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`
-    const filePath = join(uploadDir, fileName)
-
-    // 파일을 ArrayBuffer로 변환 후 저장
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filePath, buffer)
-
-    // 상대 경로 URL 반환
-    const imageUrl = `/uploads/images/${fileName}`
-
-    return NextResponse.json({
-      success: true,
-      url: imageUrl,
-      fileName,
-      size: file.size,
-      type: file.type
+    const image = await prisma.uploadedImage.create({
+      data: { data, mimeType: file.type }, select: { id: true }
     })
-
+    return NextResponse.json({ success: true, url: `/api/images/${image.id}` }, { status: 201 })
   } catch (error) {
-    console.error('Error uploading file:', error)
-    return NextResponse.json(
-      { error: 'Failed to upload file' },
-      { status: 500 }
-    )
+    console.error('Error uploading image:', error)
+    return NextResponse.json({ error: '이미지 저장에 실패했습니다. 잠시 후 다시 시도해주세요.' }, { status: 500 })
   }
 }
