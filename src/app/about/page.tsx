@@ -69,8 +69,8 @@ const experiences = [
   {
     company: '엔라이튼',
     period: '2018 - 2019',
-    role: 'Web Publisher',
-    description: '태양광 금융 도메인의 웹 UI 구현과 운영을 경험했습니다.'
+    role: 'UI Developer (Web Publishing)',
+    description: '태양광 금융 서비스의 반응형 웹 UI를 구현하고, 기존 화면의 유지보수와 사용성 개선을 담당했습니다.'
   }
 ]
 
